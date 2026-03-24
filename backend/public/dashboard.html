@@ -261,9 +261,9 @@ textarea{resize:vertical;min-height:100px}
     <div class="page-title">Good to see you, <em id="greetName">...</em></div>
     <div class="page-sub">Here's your subscription overview.</div>
     <div id="phoneAlertBox" class="phone-alert" style="display:none">
-      <div class="phone-alert-text">Add your phone number to enable payment and delivery.</div>
+      <div class="phone-alert-text">⚠️ Please add your mobile number to enable payments and delivery coordination.</div>
       <div class="phone-input-row">
-        <input type="tel" id="phoneInput" placeholder="10-digit number" maxlength="10"/>
+        <input type="tel" id="phoneInput" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" pattern="[6-9][0-9]{9}"/>
         <button onclick="savePhone()">Save</button>
       </div>
     </div>
@@ -639,11 +639,47 @@ async function resumeSub(id) {
 
 // ── PHONE ─────────────────────────────────────────────────────────────────
 async function savePhone() {
-  const phone = document.getElementById('phoneInput').value.trim();
+  const phoneEl = document.getElementById('phoneInput');
+  const phone = phoneEl ? phoneEl.value.trim() : '';
+  if (!phone || phone.length !== 10 || !/^[6-9]/.test(phone)) {
+    showToast('Enter a valid 10-digit mobile number'); return;
+  }
   const r = await fetch(API+'/api/auth/phone',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({phone})});
   const d = await r.json();
-  if (r.ok) { document.getElementById('phoneAlertBox').style.display='none'; showToast('Phone saved'); userData.phone=phone; }
-  else showToast(d.message);
+  if (r.ok) {
+    document.getElementById('phoneAlertBox').style.display='none';
+    showToast('✓ Phone number saved!');
+    userData.phone = phone;
+    const profilePhone = document.getElementById('profilePhone');
+    if (profilePhone) profilePhone.textContent = phone;
+  } else { showToast(d.message || 'Failed to save phone'); }
+}
+
+function showPhoneEdit() {
+  const editBox = document.getElementById('profilePhoneEdit');
+  const input = document.getElementById('profilePhoneInput');
+  if (editBox) editBox.style.display = 'block';
+  if (input) { input.value = userData.phone || ''; input.focus(); }
+}
+
+async function savePhoneFromProfile() {
+  const input = document.getElementById('profilePhoneInput');
+  const phone = input ? input.value.trim() : '';
+  if (!phone || phone.length !== 10 || !/^[6-9]/.test(phone)) {
+    showToast('Enter a valid 10-digit mobile number'); return;
+  }
+  const r = await fetch(API+'/api/auth/phone',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({phone})});
+  const d = await r.json();
+  if (r.ok) {
+    showToast('✓ Phone number updated!');
+    userData.phone = phone;
+    const profilePhone = document.getElementById('profilePhone');
+    if (profilePhone) profilePhone.textContent = phone;
+    document.getElementById('profilePhoneEdit').style.display = 'none';
+    if (!document.getElementById('phoneAlertBox').style.display || document.getElementById('phoneAlertBox').style.display !== 'none') {
+      document.getElementById('phoneAlertBox').style.display = 'none';
+    }
+  } else { showToast(d.message || 'Failed to update phone'); }
 }
 
 // ── MENU ──────────────────────────────────────────────────────────────────
@@ -724,7 +760,7 @@ function renderProfile() {
       </div>
     </div>
     <div class="profile-grid">
-      <div class="profile-field"><div class="pf-label">Phone</div><div class="pf-value">${userData.phone||'Not added'}</div></div>
+      <div class="profile-field"><div class="pf-label">Phone</div><div class="pf-value" id="profilePhone">${userData.phone||'<span style=\"color:#e67e22\">Not added</span>'}</div><button class="btn-edit-phone" onclick="showPhoneEdit()" style="margin-left:auto;font-size:0.75rem;padding:4px 10px;background:var(--g0);color:var(--g7);border:1px solid var(--g1);border-radius:5px;cursor:pointer;font-family:var(--fb)">Edit</button></div><div id="profilePhoneEdit" style="display:none;margin-top:8px"><div class="phone-input-row"><input type="tel" id="profilePhoneInput" placeholder="10-digit number" maxlength="10" inputmode="numeric" pattern="[6-9][0-9]{9}"/><button onclick="savePhoneFromProfile()">Save</button><button onclick="document.getElementById('profilePhoneEdit').style.display='none'" style="height:38px;padding:0 12px;background:transparent;color:var(--tl);border:1px solid var(--bd);border-radius:6px;font-family:var(--fb);font-size:0.8rem;cursor:pointer">Cancel</button></div></div>
       <div class="profile-field"><div class="pf-label">Credits</div><div class="pf-value">&#8377;${userData.credits||0}</div></div>
       <div class="profile-field"><div class="pf-label">Active Plan</div><div class="pf-value">${activeSub?activeSub.planName:'No active plan'}</div></div>
       <div class="profile-field"><div class="pf-label">Days Remaining</div><div class="pf-value">${activeSub?Math.max(0,Math.ceil((new Date(activeSub.endDate)-Date.now())/86400000))+' days':'—'}</div></div>
