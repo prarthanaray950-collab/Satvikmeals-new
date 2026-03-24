@@ -1,424 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DW6N59QQND"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-DW6N59QQND');
-  </script>
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DW6N59QQND');</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SatvikMeals — Pure Vegetarian Tiffin Service, Patna</title>
-  <meta name="description" content="SatvikMeals is a subscription-based vegetarian meal service in Patna built on consistency, purity, and responsible preparation." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
-
+  <meta name="description" content="SatvikMeals is a subscription-based vegetarian meal service in Patna built on consistency, purity, and responsible preparation."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --g9: #0F2D1F;
-      --g8: #1B4332;
-      --g7: #2D6A4F;
-      --g6: #40916C;
-      --g1: #D8F3DC;
-      --g0: #F0FAF2;
-      --gold: #B5965A;
-      --gold-l: #E8D9B5;
-      --cream: #FAF8F3;
-      --ww: #FDFCF8;
-      --td: #1A1A16;
-      --tm: #3D3D35;
-      --tl: #7A7A6E;
-      --bd: #E5E2D8;
-      --fd: 'Cormorant Garamond', Georgia, serif;
-      --fb: 'DM Sans', -apple-system, sans-serif;
+    :root{
+      --g9:#0F2D1F;--g8:#1B4332;--g7:#2D6A4F;--g6:#40916C;--g5:#52B788;
+      --g1:#D8F3DC;--g0:#F0FAF2;
+      --gold:#B5965A;--gold-l:#F0E4C4;--gold-d:#8B6E3A;
+      --cream:#FAF8F3;--ww:#FDFCF8;
+      --td:#1A1A16;--tm:#3D3D35;--tl:#7A7A6E;--bd:#E5E2D8;
+      --fd:'Cormorant Garamond',Georgia,serif;
+      --fb:'DM Sans',-apple-system,sans-serif;
+      --shadow-sm:0 1px 3px rgba(15,45,31,0.08);
+      --shadow-md:0 8px 32px rgba(15,45,31,0.12);
+      --shadow-lg:0 24px 64px rgba(15,45,31,0.18);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--fb); background: var(--ww); color: var(--td); line-height: 1.6; overflow-x: hidden; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--fb);background:var(--ww);color:var(--td);line-height:1.6;overflow-x:hidden;}
+
+    /* ── ANNOUNCEMENT BAR ── */
+    .ann-bar{background:var(--g8);color:rgba(255,255,255,0.9);text-align:center;padding:10px 20px;font-size:0.75rem;letter-spacing:0.08em;font-weight:400;}
+    .ann-bar a{color:var(--g1);text-decoration:none;margin-left:8px;font-weight:500;}
 
     /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(253,252,248,0.95); backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--bd); height: 68px;
-      display: flex; align-items: center; padding: 0 32px;
-      justify-content: space-between;
-    }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--g8); }
-    .logo img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-    .logo-text { font-family: var(--fd); font-size: 1.35rem; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
-    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
-    .nav-links a { font-size: 0.82rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tm); text-decoration: none; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--g8); }
-    .btn-nav { height: 36px !important; padding: 0 20px !important; background: var(--g8) !important; color: var(--cream) !important; border-radius: 6px !important; font-size: 0.775rem !important; letter-spacing: 0.08em !important; }
-    .btn-nav:hover { background: var(--g7) !important; color: var(--cream) !important; }
-    .nav-hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
-    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--g8); border-radius: 2px; transition: all 0.3s; }
-    .mobile-menu { display: none; position: fixed; top: 68px; left: 0; right: 0; background: var(--ww); border-bottom: 1px solid var(--bd); padding: 20px 24px; z-index: 99; flex-direction: column; gap: 16px; }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a { font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tm); text-decoration: none; padding: 8px 0; border-bottom: 1px solid var(--bd); }
-    .mobile-menu a:last-child { border: none; }
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(253,252,248,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);height:68px;display:flex;align-items:center;padding:0 40px;justify-content:space-between;transition:box-shadow 0.3s;}
+    nav.scrolled{box-shadow:var(--shadow-md);}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--g8);}
+    .logo img{width:36px;height:36px;border-radius:8px;object-fit:cover;}
+    .logo-text{font-family:var(--fd);font-size:1.35rem;font-weight:600;letter-spacing:0.02em;}
+    .nav-links{display:flex;align-items:center;gap:36px;list-style:none;}
+    .nav-links a{font-size:0.78rem;font-weight:400;letter-spacing:0.07em;text-transform:uppercase;color:var(--tm);text-decoration:none;transition:color 0.2s;position:relative;padding-bottom:2px;}
+    .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--g6);transition:width 0.2s;}
+    .nav-links a:hover{color:var(--g8);}
+    .nav-links a:hover::after{width:100%;}
+    .nav-right{display:flex;align-items:center;gap:12px;}
+    .btn-nav-ghost{height:36px;padding:0 18px;background:transparent;color:var(--g8);border:1.5px solid var(--bd);border-radius:6px;font-size:0.775rem;font-family:var(--fb);letter-spacing:0.06em;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer;transition:all 0.2s;}
+    .btn-nav-ghost:hover{border-color:var(--g6);color:var(--g6);}
+    .btn-nav{height:36px;padding:0 20px;background:var(--g8);color:var(--cream);border:none;border-radius:6px;font-size:0.775rem;font-family:var(--fb);font-weight:500;letter-spacing:0.08em;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer;transition:background 0.2s;}
+    .btn-nav:hover{background:var(--g7);}
+    .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+    .nav-hamburger span{display:block;width:22px;height:2px;background:var(--g8);border-radius:2px;transition:all 0.3s;}
+    .mobile-menu{display:none;position:fixed;top:68px;left:0;right:0;background:var(--ww);border-bottom:1px solid var(--bd);padding:24px;z-index:199;flex-direction:column;gap:0;box-shadow:var(--shadow-lg);}
+    .mobile-menu.open{display:flex;}
+    .mobile-menu a{font-size:0.88rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--tm);text-decoration:none;padding:14px 0;border-bottom:1px solid var(--bd);font-weight:400;}
+    .mobile-menu a:last-child{border:none;}
 
     /* ── HERO ── */
-    .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; padding-top: 68px; position: relative; overflow: hidden; }
-    .hero-left { display: flex; align-items: center; padding: 80px 60px 80px 48px; background: linear-gradient(150deg, var(--ww) 60%, var(--g0) 100%); position: relative; }
-    .hero-left::after { content: ''; position: absolute; right: 0; top: 10%; bottom: 10%; width: 1px; background: linear-gradient(to bottom, transparent, var(--bd) 30%, var(--bd) 70%, transparent); }
-    .hero-content { max-width: 540px; }
-    .hero-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g7); margin-bottom: 28px; animation: fadeUp 0.6s ease both; }
-    .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--g7); }
-    .hero h1 { font-family: var(--fd); font-size: clamp(2.6rem, 4.5vw, 4.4rem); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; color: var(--g9); margin-bottom: 24px; animation: fadeUp 0.7s 0.1s ease both; }
-    .hero h1 em { font-style: italic; color: var(--g7); }
-    .hero-sub { font-size: 1rem; font-weight: 300; color: var(--tm); line-height: 1.8; margin-bottom: 40px; max-width: 440px; animation: fadeUp 0.7s 0.2s ease both; }
-    .hero-cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; animation: fadeUp 0.7s 0.3s ease both; }
-    .btn-primary { height: 50px; padding: 0 32px; background: var(--g8); color: var(--cream); border: none; border-radius: 7px; font-family: var(--fb); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: background 0.2s, transform 0.15s; }
-    .btn-primary:hover { background: var(--g7); transform: translateY(-1px); }
-    .btn-outline { height: 50px; padding: 0 28px; background: transparent; color: var(--g8); border: 1.5px solid var(--g8); border-radius: 7px; font-family: var(--fb); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.2s; }
-    .btn-outline:hover { background: var(--g8); color: var(--cream); }
-    .hero-trust { margin-top: 52px; display: flex; gap: 24px; flex-wrap: wrap; animation: fadeUp 0.7s 0.4s ease both; }
-    .trust-pill { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--tl); font-weight: 300; }
-    .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g6); flex-shrink: 0; }
+    .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:68px;position:relative;overflow:hidden;}
+    .hero-left{display:flex;align-items:center;padding:80px 64px 80px 60px;background:linear-gradient(145deg,var(--ww) 55%,var(--g0) 100%);position:relative;}
+    .hero-left::after{content:'';position:absolute;right:0;top:8%;bottom:8%;width:1px;background:linear-gradient(to bottom,transparent,var(--bd) 25%,var(--bd) 75%,transparent);}
+    .hero-content{max-width:560px;}
+    .hero-kicker{display:inline-flex;align-items:center;gap:10px;font-size:0.7rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6);margin-bottom:32px;animation:fadeUp 0.6s ease both;}
+    .hero-kicker-line{width:32px;height:1px;background:var(--g6);}
+    .hero h1{font-family:var(--fd);font-size:clamp(2.8rem,4.5vw,4.8rem);font-weight:300;line-height:1.08;letter-spacing:-0.02em;color:var(--g9);margin-bottom:26px;animation:fadeUp 0.7s 0.1s ease both;}
+    .hero h1 em{font-style:italic;color:var(--g6);}
+    .hero h1 strong{font-weight:500;}
+    .hero-desc{font-size:1.05rem;font-weight:300;color:var(--tm);line-height:1.85;margin-bottom:44px;max-width:460px;animation:fadeUp 0.7s 0.2s ease both;}
+    .hero-cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;animation:fadeUp 0.7s 0.3s ease both;}
+    .btn-primary{height:52px;padding:0 36px;background:var(--g8);color:var(--cream);border:none;border-radius:8px;font-family:var(--fb);font-size:0.875rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.2s;box-shadow:0 4px 20px rgba(27,67,50,0.3);}
+    .btn-primary:hover{background:var(--g7);transform:translateY(-2px);box-shadow:0 8px 30px rgba(27,67,50,0.4);}
+    .btn-outline{height:52px;padding:0 32px;background:transparent;color:var(--g8);border:1.5px solid var(--g8);border-radius:8px;font-family:var(--fb);font-size:0.875rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 0.2s;}
+    .btn-outline:hover{background:var(--g8);color:var(--cream);}
+    .hero-proof{margin-top:56px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;animation:fadeUp 0.7s 0.4s ease both;padding-top:32px;border-top:1px solid var(--bd);}
+    .proof-item{display:flex;align-items:center;gap:10px;}
+    .proof-icon{width:38px;height:38px;background:var(--g0);border:1px solid var(--g1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .proof-icon svg{width:18px;height:18px;stroke:var(--g7);fill:none;stroke-width:1.8;}
+    .proof-label{font-size:0.8rem;color:var(--tm);font-weight:400;line-height:1.4;}
+    .proof-label strong{display:block;color:var(--g8);font-weight:500;font-size:0.85rem;}
+    .hero-right{position:relative;overflow:hidden;background:var(--g9);}
+    .hero-photo-stack{position:relative;width:100%;height:100%;min-height:600px;}
+    .hero-img-main{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.8;}
+    .hero-gradient{position:absolute;inset:0;background:linear-gradient(160deg,rgba(15,45,31,0.5) 0%,rgba(15,45,31,0.15) 60%,rgba(15,45,31,0.6) 100%);}
+    .hero-badge{position:absolute;top:36px;left:36px;background:rgba(255,255,255,0.1);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:18px 24px;color:white;}
+    .hero-badge-num{font-family:var(--fd);font-size:2.2rem;font-weight:300;line-height:1;}
+    .hero-badge-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:4px;}
+    .hero-badge-2{position:absolute;bottom:100px;right:36px;background:rgba(255,255,255,0.1);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:16px 20px;color:white;display:flex;align-items:center;gap:12px;}
+    .hero-badge-2 .bd2-icon{width:36px;height:36px;background:var(--g6);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .hero-badge-2 .bd2-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;}
+    .hero-badge-2-text .bd2-t{font-size:0.78rem;font-weight:500;color:white;}
+    .hero-badge-2-text .bd2-s{font-size:0.68rem;color:rgba(255,255,255,0.5);}
+    .hero-bottom-strip{position:absolute;bottom:0;left:0;right:0;background:rgba(15,45,31,0.7);backdrop-filter:blur(8px);padding:20px 32px;display:flex;align-items:center;gap:32px;}
+    .strip-item{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.8);font-size:0.78rem;}
+    .strip-dot{width:6px;height:6px;border-radius:50%;background:var(--g5);flex-shrink:0;}
 
-    /* Hero Right — Photo Gallery */
-    .hero-right { position: relative; overflow: hidden; background: var(--g9); }
-    .hero-photo-stack { position: relative; width: 100%; height: 100%; min-height: 580px; }
-    .hero-img-main { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
-    .hero-img-overlay { position: absolute; bottom: 32px; right: 32px; width: 46%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; border: 3px solid rgba(255,255,255,0.15); box-shadow: 0 20px 60px rgba(0,0,0,0.4); transition: transform 0.4s; }
-    .hero-img-overlay:hover { transform: scale(1.03); }
-    .hero-overlay-badge { position: absolute; top: 28px; left: 28px; background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 14px 20px; color: white; }
-    .hero-overlay-badge .badge-num { font-family: var(--fd); font-size: 2rem; font-weight: 300; line-height: 1; }
-    .hero-overlay-badge .badge-text { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 4px; }
-    .hero-gradient-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 180px; background: linear-gradient(to top, rgba(15,45,31,0.7), transparent); }
+    /* ── TICKER / SCROLLING BAND ── */
+    .ticker-band{background:var(--gold);overflow:hidden;padding:14px 0;}
+    .ticker-track{display:flex;gap:0;animation:ticker 22s linear infinite;white-space:nowrap;}
+    .ticker-track:hover{animation-play-state:paused;}
+    .ticker-item{display:inline-flex;align-items:center;gap:12px;padding:0 36px;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:white;}
+    .ticker-sep{width:4px;height:4px;background:rgba(255,255,255,0.5);border-radius:50%;flex-shrink:0;}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-    /* ── PHOTO STRIP ── */
-    .photo-strip { display: grid; grid-template-columns: 1fr 1fr; height: 420px; overflow: hidden; }
-    .photo-strip-item { position: relative; overflow: hidden; }
-    .photo-strip-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-    .photo-strip-item:hover img { transform: scale(1.04); }
-    .photo-strip-item .photo-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 28px; background: linear-gradient(to top, rgba(15,45,31,0.82) 0%, transparent 100%); color: white; }
-    .photo-caption .cap-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g1); margin-bottom: 4px; }
-    .photo-caption .cap-title { font-family: var(--fd); font-size: 1.3rem; font-weight: 400; }
-    .photo-strip-item:first-child { border-right: 2px solid rgba(255,255,255,0.1); }
-
-    /* ── STATS BAR ── */
-    .stats-bar { background: var(--g9); padding: 0 32px; }
-    .stats-bar-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); border-left: 1px solid rgba(255,255,255,0.08); }
-    .stats-bar-item { padding: 36px 32px; border-right: 1px solid rgba(255,255,255,0.08); }
-    .stats-bar-item .sn { font-family: var(--fd); font-size: 2.4rem; font-weight: 300; color: white; line-height: 1; }
-    .stats-bar-item .sl { font-size: 0.76rem; color: rgba(255,255,255,0.45); margin-top: 6px; letter-spacing: 0.04em; font-weight: 300; }
+    /* ── STATS BAND ── */
+    .stats-band{background:var(--g9);padding:0 40px;}
+    .stats-band-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);border-left:1px solid rgba(255,255,255,0.07);}
+    .stat-item{padding:44px 36px;border-right:1px solid rgba(255,255,255,0.07);position:relative;}
+    .stat-item::before{content:'';position:absolute;top:0;left:0;width:3px;height:0;background:var(--g5);transition:height 0.4s;}
+    .stat-item:hover::before{height:100%;}
+    .stat-num{font-family:var(--fd);font-size:2.8rem;font-weight:300;color:white;line-height:1;}
+    .stat-unit{font-family:var(--fd);font-size:1.8rem;color:var(--g5);}
+    .stat-label{font-size:0.73rem;color:rgba(255,255,255,0.4);margin-top:8px;letter-spacing:0.04em;font-weight:300;}
 
     /* ── SECTION COMMONS ── */
-    section { padding: 96px 32px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .section-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--g6); display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-    .section-label::before { content: ''; width: 24px; height: 1px; background: var(--g6); }
-    h2 { font-family: var(--fd); font-size: clamp(1.9rem, 3vw, 2.8rem); font-weight: 300; line-height: 1.2; color: var(--g9); }
-    h2 em { font-style: italic; color: var(--g7); }
+    section{padding:100px 40px;}
+    .container{max-width:1280px;margin:0 auto;}
+    .section-eyebrow{font-size:0.68rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6);display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .section-eyebrow::before{content:'';width:28px;height:1px;background:var(--g6);}
+    h2{font-family:var(--fd);font-size:clamp(2rem,3vw,3rem);font-weight:300;line-height:1.18;color:var(--g9);}
+    h2 em{font-style:italic;color:var(--g6);}
+
+    /* ── FEATURES GRID ── */
+    .features{background:var(--cream);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);}
+    .features-grid{margin-top:60px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border:1px solid var(--bd);border-radius:16px;overflow:hidden;}
+    .feat-card{padding:44px 36px;background:white;position:relative;transition:background 0.3s;}
+    .feat-card:hover{background:var(--g0);}
+    .feat-card:first-child{background:var(--g9);}
+    .feat-card:first-child:hover{background:var(--g8);}
+    .feat-card:first-child .feat-num{color:rgba(255,255,255,0.07);}
+    .feat-card:first-child .feat-icon{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);}
+    .feat-card:first-child .feat-icon svg{stroke:var(--g1);}
+    .feat-card:first-child .feat-title{color:white;}
+    .feat-card:first-child .feat-desc{color:rgba(255,255,255,0.5);}
+    .feat-card:first-child .feat-tag{background:rgba(255,255,255,0.08);color:var(--g1);border-color:rgba(255,255,255,0.1);}
+    .feat-num{font-family:var(--fd);font-size:4rem;font-weight:300;color:var(--g0);line-height:1;margin-bottom:20px;}
+    .feat-icon{width:48px;height:48px;border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+    .feat-icon svg{width:22px;height:22px;stroke:var(--g7);fill:none;stroke-width:1.5;}
+    .feat-title{font-family:var(--fd);font-size:1.25rem;font-weight:500;color:var(--g9);margin-bottom:10px;}
+    .feat-desc{font-size:0.875rem;color:var(--tl);line-height:1.8;font-weight:300;}
+    .feat-tags{margin-top:18px;display:flex;flex-wrap:wrap;gap:6px;}
+    .feat-tag{font-size:0.65rem;font-weight:600;letter-spacing:0.07em;padding:4px 10px;border-radius:4px;background:var(--g0);color:var(--g7);border:1px solid var(--g1);text-transform:uppercase;}
 
     /* ── PLANS SECTION ── */
-    .plans-section { background: var(--g9); padding: 96px 32px; }
-    .plans-section .section-label { color: var(--g1); }
-    .plans-section .section-label::before { background: var(--g1); }
-    .plans-section h2 { color: white; margin-bottom: 12px; }
-    .plans-section h2 em { color: var(--g1); }
-    .plans-section .plans-subtitle { color: rgba(255,255,255,0.5); font-size: 0.95rem; font-weight: 300; margin-bottom: 52px; }
-    .plans-filter { display: flex; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
-    .plans-filter button { padding: 8px 20px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); border-radius: 6px; font-family: var(--fb); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-    .plans-filter button.active, .plans-filter button:hover { background: var(--g6); border-color: var(--g6); color: white; }
-    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .plan-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 32px 28px; position: relative; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; }
-    .plan-card:hover { border-color: var(--g6); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-    .plan-card.featured { border-color: var(--g6); background: rgba(64,145,108,0.12); }
-    .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: white; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; white-space: nowrap; }
-    .plan-type-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g6); margin-bottom: 6px; }
-    .plan-name { font-family: var(--fd); font-size: 1.5rem; font-weight: 500; color: white; margin-bottom: 8px; }
-    .plan-desc { font-size: 0.845rem; color: rgba(255,255,255,0.45); font-weight: 300; line-height: 1.65; margin-bottom: 20px; }
-    .plan-price { margin-bottom: 16px; }
-    .plan-price .amount { font-family: var(--fd); font-size: 2.8rem; font-weight: 300; color: white; line-height: 1; }
-    .plan-price .period { font-size: 0.78rem; color: rgba(255,255,255,0.4); font-weight: 300; margin-left: 4px; }
-    .plan-meals { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-    .meal-tag { font-size: 0.63rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.08); color: var(--g1); border: 1px solid rgba(255,255,255,0.12); }
-    .plan-validity { font-size: 0.78rem; color: rgba(255,255,255,0.35); font-weight: 300; margin-bottom: 18px; }
-    .plan-feats { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
-    .plan-feats li { font-size: 0.84rem; color: rgba(255,255,255,0.55); font-weight: 300; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
-    .plan-feats li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--g6); flex-shrink: 0; margin-top: 6px; }
-    .btn-plan { width: 100%; height: 46px; background: var(--g6); color: white; border: none; border-radius: 8px; font-family: var(--fb); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-plan:hover { background: var(--g7); }
-    .plans-loading { text-align: center; padding: 60px; color: rgba(255,255,255,0.35); }
-    .plans-cta-row { margin-top: 40px; text-align: center; }
-    .btn-plans-all { display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 36px; background: white; color: var(--g9); border: none; border-radius: 7px; font-family: var(--fb); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: background 0.2s; }
-    .btn-plans-all:hover { background: var(--gold-l); }
+    .plans-section{background:var(--g9);padding:100px 40px;}
+    .plans-section .section-eyebrow{color:var(--g1);}
+    .plans-section .section-eyebrow::before{background:var(--g1);}
+    .plans-section h2{color:white;}
+    .plans-section h2 em{color:var(--g1);}
+    .plans-subtitle{color:rgba(255,255,255,0.45);font-size:1rem;font-weight:300;margin-bottom:52px;max-width:520px;line-height:1.8;}
+    .plans-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:16px;}
+    .plans-filter{display:flex;gap:8px;flex-wrap:wrap;}
+    .plans-filter button{padding:9px 22px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.55);border-radius:6px;font-family:var(--fb);font-size:0.775rem;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+    .plans-filter button.active,.plans-filter button:hover{background:var(--g6);border-color:var(--g6);color:white;}
+    .plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;}
+    .plan-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:36px 28px;position:relative;transition:all 0.3s;}
+    .plan-card:hover{border-color:var(--g5);transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,0.35);}
+    .plan-card.featured{border-color:var(--g6);background:rgba(64,145,108,0.1);}
+    .plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:white;font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:5px 18px;border-radius:20px;white-space:nowrap;}
+    .plan-type-label{font-size:0.65rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--g5);margin-bottom:6px;}
+    .plan-name{font-family:var(--fd);font-size:1.55rem;font-weight:500;color:white;margin-bottom:10px;}
+    .plan-desc{font-size:0.845rem;color:rgba(255,255,255,0.4);font-weight:300;line-height:1.7;margin-bottom:22px;}
+    .plan-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:18px;}
+    .plan-price-amount{font-family:var(--fd);font-size:3rem;font-weight:300;color:white;line-height:1;}
+    .plan-price-period{font-size:0.8rem;color:rgba(255,255,255,0.35);font-weight:300;}
+    .plan-meals{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .meal-tag{font-size:0.63rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:4px 10px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--g1);border:1px solid rgba(255,255,255,0.1);}
+    .plan-validity{font-size:0.78rem;color:rgba(255,255,255,0.3);font-weight:300;margin-bottom:20px;}
+    .plan-feats{list-style:none;margin-bottom:28px;display:flex;flex-direction:column;gap:9px;}
+    .plan-feats li{font-size:0.845rem;color:rgba(255,255,255,0.5);font-weight:300;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+    .plan-feats li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--g5);flex-shrink:0;margin-top:7px;}
+    .btn-plan{width:100%;height:48px;background:var(--g6);color:white;border:none;border-radius:9px;font-family:var(--fb);font-size:0.82rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-plan:hover{background:var(--g5);}
+    .plans-loading{text-align:center;padding:80px;color:rgba(255,255,255,0.3);}
+    .plans-cta-row{margin-top:48px;text-align:center;}
+    .btn-plans-all{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 40px;background:white;color:var(--g9);border:none;border-radius:8px;font-family:var(--fb);font-size:0.85rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+    .btn-plans-all:hover{background:var(--gold-l);transform:translateY(-2px);}
 
     /* ── ABOUT ── */
-    .about { background: white; border-top: 1px solid var(--bd); border-bottom: 1px solid var(--bd); }
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
-    .about-text p { font-size: 1rem; font-weight: 300; color: var(--tm); line-height: 1.85; margin-top: 22px; }
-    .about-img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .about-img-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; }
-    .about-img-grid img:first-child { grid-column: 1/-1; aspect-ratio: 16/7; }
-
-    /* ── PHILOSOPHY ── */
-    .philosophy { background: var(--cream); }
-    .phil-grid { margin-top: 52px; display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; border: 1px solid var(--bd); border-radius: 14px; overflow: hidden; }
-    .phil-card { padding: 40px 32px; background: white; }
-    .phil-card:first-child { background: var(--g9); }
-    .phil-card:first-child .phil-num { color: rgba(255,255,255,0.1); }
-    .phil-card:first-child .phil-title { color: white; }
-    .phil-card:first-child .phil-desc { color: rgba(255,255,255,0.5); }
-    .phil-card:first-child .tag { background: rgba(255,255,255,0.08); color: var(--g1); border-color: rgba(255,255,255,0.1); }
-    .phil-num { font-family: var(--fd); font-size: 3.5rem; font-weight: 300; color: var(--g0); line-height: 1; margin-bottom: 18px; }
-    .phil-title { font-family: var(--fd); font-size: 1.2rem; font-weight: 500; color: var(--g9); margin-bottom: 10px; }
-    .phil-desc { font-size: 0.875rem; color: var(--tl); line-height: 1.75; font-weight: 300; }
-    .phil-tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag { font-size: 0.66rem; font-weight: 500; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 3px; background: var(--g0); color: var(--g7); border: 1px solid var(--g1); text-transform: uppercase; }
+    .about{background:white;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+    .about-text p{font-size:1rem;font-weight:300;color:var(--tm);line-height:1.9;margin-top:22px;}
+    .about-imgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .about-imgs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;}
+    .about-imgs img:first-child{grid-column:1/-1;aspect-ratio:16/7;}
+    .about-highlight{margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .hl-item{display:flex;align-items:flex-start;gap:12px;padding:16px;background:var(--g0);border-radius:10px;border:1px solid var(--g1);}
+    .hl-icon{width:36px;height:36px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .hl-icon svg{width:18px;height:18px;stroke:var(--g7);fill:none;stroke-width:2;}
+    .hl-text{font-size:0.82rem;color:var(--g8);font-weight:400;line-height:1.5;}
+    .hl-text strong{display:block;font-weight:600;font-size:0.85rem;margin-bottom:2px;}
 
     /* ── HOW IT WORKS ── */
-    .hiw { background: white; }
-    .hiw-steps { margin-top: 60px; display: grid; grid-template-columns: repeat(3,1fr); gap: 0; position: relative; }
-    .hiw-steps::before { content: ''; position: absolute; top: 28px; left: calc(16.66% + 24px); right: calc(16.66% + 24px); height: 1px; background: var(--bd); }
-    .hiw-step { padding: 0 32px; text-align: center; }
-    .step-num { width: 56px; height: 56px; border-radius: 50%; background: var(--g8); color: var(--cream); font-family: var(--fd); font-size: 1.3rem; font-weight: 300; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; }
-    .step-title { font-family: var(--fd); font-size: 1.2rem; font-weight: 500; color: var(--g9); margin-bottom: 10px; }
-    .step-desc { font-size: 0.875rem; color: var(--tl); line-height: 1.75; font-weight: 300; }
+    .hiw{background:var(--cream);}
+    .hiw-inner{display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:start;}
+    .hiw-intro p{font-size:1rem;font-weight:300;color:var(--tm);line-height:1.85;margin-top:18px;}
+    .hiw-steps{display:flex;flex-direction:column;gap:0;}
+    .hiw-step{display:grid;grid-template-columns:64px 1fr;gap:28px;padding:36px 0;border-bottom:1px solid var(--bd);position:relative;}
+    .hiw-step:last-child{border-bottom:none;padding-bottom:0;}
+    .step-num-wrap{display:flex;flex-direction:column;align-items:center;gap:0;}
+    .step-circle{width:56px;height:56px;border-radius:50%;background:var(--g8);color:white;font-family:var(--fd);font-size:1.3rem;font-weight:300;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .step-line{flex:1;width:1px;background:var(--bd);margin-top:8px;}
+    .step-body{padding-top:12px;}
+    .step-title{font-family:var(--fd);font-size:1.2rem;font-weight:500;color:var(--g9);margin-bottom:8px;}
+    .step-desc{font-size:0.875rem;color:var(--tl);line-height:1.8;font-weight:300;}
+
+    /* ── MENU PREVIEW ── */
+    .menu-preview{background:white;border-top:1px solid var(--bd);}
+    .menu-preview-grid{margin-top:60px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+    .menu-card{border:1px solid var(--bd);border-radius:12px;overflow:hidden;transition:all 0.3s;}
+    .menu-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);}
+    .menu-card-img{height:160px;background:var(--g0);display:flex;align-items:center;justify-content:center;font-size:3rem;}
+    .menu-card-body{padding:18px;}
+    .menu-card-day{font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--g6);margin-bottom:5px;}
+    .menu-card-name{font-family:var(--fd);font-size:1.1rem;font-weight:500;color:var(--g9);margin-bottom:4px;}
+    .menu-card-desc{font-size:0.8rem;color:var(--tl);font-weight:300;line-height:1.6;}
+    .menu-cta{margin-top:40px;text-align:center;}
+
+    /* ── TESTIMONIALS ── */
+    .testimonials{background:var(--g9);padding:100px 40px;}
+    .testimonials .section-eyebrow{color:var(--g1);}
+    .testimonials .section-eyebrow::before{background:var(--g1);}
+    .testimonials h2{color:white;margin-bottom:56px;}
+    .testimonials h2 em{color:var(--g1);}
+    .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    .testi-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:32px 28px;transition:border-color 0.3s;}
+    .testi-card:hover{border-color:var(--g5);}
+    .testi-stars{display:flex;gap:3px;margin-bottom:20px;}
+    .testi-stars svg{width:14px;height:14px;fill:var(--gold);stroke:none;}
+    .testi-text{font-size:0.925rem;color:rgba(255,255,255,0.65);font-weight:300;line-height:1.85;font-style:italic;margin-bottom:24px;}
+    .testi-author{display:flex;align-items:center;gap:12px;}
+    .testi-avatar{width:40px;height:40px;border-radius:50%;background:var(--g6);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.1rem;font-weight:500;color:white;flex-shrink:0;}
+    .testi-name{font-size:0.875rem;font-weight:500;color:white;}
+    .testi-role{font-size:0.75rem;color:rgba(255,255,255,0.35);font-weight:300;}
 
     /* ── HYGIENE ── */
-    .hygiene { background: var(--g9); }
-    .hygiene .section-label { color: var(--g1); }
-    .hygiene .section-label::before { background: var(--g1); }
-    .hygiene h2 { color: white; }
-    .hygiene h2 em { color: var(--g1); }
-    .hygiene-grid { margin-top: 52px; display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
-    .hygiene-item { padding: 36px 24px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 2px; }
-    .hygiene-icon { width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
-    .hygiene-icon svg { width: 20px; height: 20px; stroke: var(--g1); fill: none; stroke-width: 1.5; }
-    .hygiene-label { font-family: var(--fd); font-size: 1.05rem; font-weight: 400; color: white; margin-bottom: 7px; }
-    .hygiene-sub { font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 300; line-height: 1.6; }
+    .hygiene{background:var(--g8);padding:100px 40px;}
+    .hygiene .section-eyebrow{color:var(--g1);}
+    .hygiene .section-eyebrow::before{background:var(--g1);}
+    .hygiene h2{color:white;margin-bottom:16px;}
+    .hygiene h2 em{color:var(--g1);}
+    .hygiene-sub{color:rgba(255,255,255,0.45);font-size:0.95rem;font-weight:300;margin-bottom:56px;max-width:480px;line-height:1.8;}
+    .hygiene-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;}
+    .hygiene-item{padding:36px 24px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:2px;transition:background 0.3s;}
+    .hygiene-item:hover{background:rgba(255,255,255,0.08);}
+    .hygiene-icon{width:48px;height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+    .hygiene-icon svg{width:22px;height:22px;stroke:var(--g1);fill:none;stroke-width:1.5;}
+    .hygiene-label{font-family:var(--fd);font-size:1.05rem;font-weight:400;color:white;margin-bottom:8px;}
+    .hygiene-desc{font-size:0.8rem;color:rgba(255,255,255,0.38);font-weight:300;line-height:1.65;}
 
     /* ── WHO WE SERVE ── */
-    .wws { background: var(--cream); }
-    .wws-grid { margin-top: 52px; display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
-    .wws-card { padding: 36px 26px; background: white; border: 1px solid var(--bd); border-radius: 12px; transition: border-color 0.2s, box-shadow 0.2s; }
-    .wws-card:hover { border-color: var(--g6); box-shadow: 0 8px 32px rgba(27,67,50,0.08); }
-    .wws-icon { width: 48px; height: 48px; background: var(--g0); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
-    .wws-icon svg { width: 22px; height: 22px; stroke: var(--g7); fill: none; stroke-width: 1.5; }
-    .wws-title { font-family: var(--fd); font-size: 1.1rem; font-weight: 500; color: var(--g9); margin-bottom: 8px; }
-    .wws-desc { font-size: 0.845rem; color: var(--tl); font-weight: 300; line-height: 1.7; }
+    .wws{background:var(--cream);}
+    .wws-grid{margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+    .wws-card{padding:32px 24px;background:white;border:1px solid var(--bd);border-radius:12px;transition:all 0.3s;}
+    .wws-card:hover{border-color:var(--g5);transform:translateY(-4px);box-shadow:var(--shadow-md);}
+    .wws-icon{width:52px;height:52px;background:var(--g0);border:1px solid var(--g1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+    .wws-icon svg{width:24px;height:24px;stroke:var(--g7);fill:none;stroke-width:1.5;}
+    .wws-title{font-family:var(--fd);font-size:1.15rem;font-weight:500;color:var(--g9);margin-bottom:10px;}
+    .wws-desc{font-size:0.855rem;color:var(--tl);line-height:1.75;font-weight:300;}
 
     /* ── DELIVERY ── */
-    .delivery { background: white; border-top: 1px solid var(--bd); }
-    .delivery-inner { display: grid; grid-template-columns: 1fr 1.2fr; gap: 72px; align-items: start; }
-    .delivery-text p { font-size: 1rem; font-weight: 300; color: var(--tm); line-height: 1.85; margin-top: 22px; }
-    .delivery-areas { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border: 1px solid var(--bd); border-radius: 10px; overflow: hidden; }
-    .area-item { padding: 14px 18px; background: var(--cream); display: flex; align-items: center; gap: 10px; font-size: 0.875rem; color: var(--tm); font-weight: 300; border-bottom: 1px solid var(--bd); }
-    .area-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g6); flex-shrink: 0; }
+    .delivery{background:white;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);}
+    .delivery-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+    .delivery-text p{font-size:1rem;font-weight:300;color:var(--tm);line-height:1.85;margin-top:18px;}
+    .delivery-areas{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+    .area-item{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--bd);border-right:1px solid var(--bd);font-size:0.875rem;color:var(--tm);font-weight:400;transition:background 0.2s;}
+    .area-item:hover{background:var(--g0);}
+    .area-item:nth-child(even){border-right:none;}
+    .area-item:last-child,.area-item:nth-last-child(2){border-bottom:none;}
+    .area-dot{width:7px;height:7px;background:var(--g5);border-radius:50%;flex-shrink:0;}
 
     /* ── CTA BAND ── */
-    .cta-band { background: var(--g8); padding: 80px 32px; }
-    .cta-band-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
-    .cta-band h2 { color: white; font-size: clamp(1.6rem, 2.5vw, 2.2rem); }
-    .cta-band h2 em { color: var(--g1); }
-    .cta-band p { color: rgba(255,255,255,0.55); font-size: 0.95rem; font-weight: 300; margin-top: 8px; }
-    .btn-light { height: 50px; padding: 0 32px; background: var(--cream); color: var(--g9); border: none; border-radius: 7px; font-family: var(--fb); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; transition: background 0.2s; }
-    .btn-light:hover { background: var(--gold-l); }
+    .cta-band{background:linear-gradient(135deg,var(--g8) 0%,var(--g7) 100%);padding:80px 40px;}
+    .cta-band-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;}
+    .cta-band h2{color:white;font-size:clamp(1.8rem,2.5vw,2.6rem);}
+    .cta-band h2 em{color:var(--g1);}
+    .cta-band p{color:rgba(255,255,255,0.55);font-size:0.95rem;font-weight:300;margin-top:8px;}
+    .btn-light{height:54px;padding:0 40px;background:white;color:var(--g8);border:none;border-radius:8px;font-family:var(--fb);font-size:0.875rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+    .btn-light:hover{background:var(--gold-l);transform:translateY(-2px);}
 
     /* ── FOOTER ── */
-    footer { background: var(--g9); padding: 64px 32px 32px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 48px; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 16px; }
-    .footer-logo img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
-    .footer-logo span { font-family: var(--fd); font-size: 1.2rem; font-weight: 600; color: white; }
-    .footer-brand p { font-size: 0.845rem; color: rgba(255,255,255,0.4); font-weight: 300; line-height: 1.75; max-width: 260px; }
-    .footer-contact { margin-top: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.45); display: flex; flex-direction: column; gap: 6px; font-weight: 300; }
-    .footer-contact a { color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; }
-    .footer-contact a:hover { color: var(--g1); }
-    .footer-col h4 { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 20px; }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .footer-col ul a { font-size: 0.845rem; color: rgba(255,255,255,0.5); text-decoration: none; font-weight: 300; transition: color 0.2s; }
-    .footer-col ul a:hover { color: var(--g1); }
-    .footer-bottom { max-width: 1200px; margin: 24px auto 0; display: flex; align-items: center; justify-content: space-between; font-size: 0.775rem; color: rgba(255,255,255,0.25); flex-wrap: wrap; gap: 8px; }
+    footer{background:var(--g9);color:white;padding:72px 40px 36px;}
+    .footer-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:56px;}
+    .footer-brand{}
+    .footer-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:white;font-family:var(--fd);font-size:1.3rem;font-weight:600;margin-bottom:16px;}
+    .footer-logo img{width:34px;height:34px;border-radius:7px;object-fit:cover;}
+    .footer-brand p{font-size:0.855rem;color:rgba(255,255,255,0.38);font-weight:300;line-height:1.75;max-width:300px;}
+    .footer-contact{display:flex;flex-direction:column;gap:6px;margin-top:18px;}
+    .footer-contact a{font-size:0.82rem;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;}
+    .footer-contact a:hover{color:var(--g5);}
+    .footer-col h4{font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:18px;}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .footer-col ul a{font-size:0.855rem;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:300;transition:color 0.2s;}
+    .footer-col ul a:hover{color:white;}
+    .footer-bottom{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding-top:28px;border-top:1px solid rgba(255,255,255,0.07);font-size:0.75rem;color:rgba(255,255,255,0.25);flex-wrap:wrap;gap:10px;}
 
     /* ── WHATSAPP ── */
-    .wa-float { position: fixed; bottom: 28px; right: 28px; z-index: 200; width: 54px; height: 54px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
-    .wa-float:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(37,211,102,0.5); }
-    .wa-float svg { width: 28px; height: 28px; fill: white; }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .wa-float{position:fixed;bottom:28px;right:28px;z-index:300;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(37,211,102,0.4);transition:all 0.3s;text-decoration:none;}
+    .wa-float:hover{transform:scale(1.1);box-shadow:0 8px 32px rgba(37,211,102,0.5);}
+    .wa-float svg{width:28px;height:28px;fill:white;}
+    .wa-tooltip{position:absolute;right:68px;background:rgba(0,0,0,0.75);color:white;font-size:0.75rem;padding:6px 12px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+    .wa-float:hover .wa-tooltip{opacity:1;}
 
     /* ── TOAST ── */
-    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--g8); color: white; padding: 12px 24px; border-radius: 8px; font-size: 0.845rem; display: none; z-index: 9999; }
+    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--g9);color:white;padding:12px 24px;border-radius:8px;font-size:0.85rem;display:none;z-index:999;box-shadow:var(--shadow-lg);}
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-left { padding: 72px 32px; }
-      .hero-left::after { display: none; }
-      .hero-right { min-height: 360px; }
-      .about-grid, .delivery-inner { grid-template-columns: 1fr; gap: 40px; }
-      .phil-grid { grid-template-columns: 1fr 1fr; }
-      .hygiene-grid { grid-template-columns: repeat(3,1fr); }
-      .wws-grid { grid-template-columns: 1fr 1fr; }
-      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-      .stats-bar-inner { grid-template-columns: 1fr 1fr; }
+    @media(max-width:1100px){
+      .hero{grid-template-columns:1fr;}
+      .hero-right{height:480px;}
+      .hero-left{padding:60px 40px;}
+      .about-grid,.delivery-inner,.hiw-inner{grid-template-columns:1fr;gap:48px;}
+      .stats-band-inner{grid-template-columns:repeat(2,1fr);}
+      .testi-grid{grid-template-columns:1fr 1fr;}
+      .hygiene-grid{grid-template-columns:repeat(3,1fr);}
+      .footer-grid{grid-template-columns:1fr 1fr;gap:40px;}
     }
-    @media (max-width: 768px) {
-      nav { padding: 0 20px; }
-      .nav-links { display: none; }
-      .nav-hamburger { display: flex; }
-      section { padding: 64px 20px; }
-      .hero { grid-template-columns: 1fr; }
-      .hero-left { padding: 52px 20px 48px; }
-      .hero h1 { font-size: 2.4rem; }
-      .hero-right { min-height: 280px; }
-      .hero-img-overlay { width: 52%; bottom: 16px; right: 16px; }
-      .photo-strip { grid-template-columns: 1fr; height: auto; }
-      .photo-strip-item { height: 260px; }
-      .photo-strip-item:first-child { border-right: none; border-bottom: 2px solid rgba(255,255,255,0.1); }
-      .stats-bar-inner { grid-template-columns: 1fr 1fr; }
-      .stats-bar-item { padding: 24px 20px; }
-      .plans-grid { grid-template-columns: 1fr; }
-      .phil-grid { grid-template-columns: 1fr; }
-      .hygiene-grid { grid-template-columns: 1fr 1fr; }
-      .wws-grid { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-      .hiw-steps { grid-template-columns: 1fr; }
-      .hiw-steps::before { display: none; }
-      .hiw-step { padding: 0; margin-bottom: 36px; text-align: left; }
-      .step-num { margin: 0 0 20px; }
-      .cta-band-inner { flex-direction: column; align-items: flex-start; }
-      .delivery-areas { grid-template-columns: 1fr; }
-      .about-img-grid { grid-template-columns: 1fr; }
-      .about-img-grid img:first-child { grid-column: auto; aspect-ratio: 16/7; }
+    @media(max-width:768px){
+      section{padding:72px 24px;}
+      nav{padding:0 20px;height:62px;}
+      .mobile-menu{top:62px;}
+      .nav-links,.nav-right .btn-nav-ghost{display:none;}
+      .nav-hamburger{display:flex;}
+      .hero-left{padding:52px 24px 48px;}
+      .stats-band{padding:0 24px;}
+      .stats-band-inner{grid-template-columns:1fr 1fr;}
+      .features-grid{grid-template-columns:1fr;}
+      .plans-section{padding:72px 24px;}
+      .plans-grid{grid-template-columns:1fr;}
+      .testi-grid{grid-template-columns:1fr;}
+      .wws-grid{grid-template-columns:1fr 1fr;}
+      .hygiene-grid{grid-template-columns:1fr 1fr;}
+      .menu-preview-grid{grid-template-columns:1fr 1fr;}
+      .cta-band{padding:56px 24px;}
+      footer{padding:56px 24px 28px;}
+      .footer-grid{grid-template-columns:1fr;gap:32px;}
+      .hero-proof{gap:16px;}
+      .ann-bar{display:none;}
     }
-    @media (max-width: 480px) {
-      .hero-cta { flex-direction: column; align-items: flex-start; }
-      .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+    @media(max-width:480px){
+      .wws-grid{grid-template-columns:1fr;}
+      .menu-preview-grid{grid-template-columns:1fr;}
+      .hygiene-grid{grid-template-columns:1fr;}
+      .stats-band-inner{grid-template-columns:1fr 1fr;}
     }
   </style>
 </head>
 <body>
 
+<!-- ANNOUNCEMENT BAR -->
+<div class="ann-bar">
+  🎉 New subscribers get first week free — limited slots available
+  <a href="login.html?redirect=plans.html">Claim Now →</a>
+</div>
+
 <!-- NAV -->
-<nav>
-  <a href="/" class="logo">
-    <img src="/logo.jpg" alt="SatvikMeals" />
+<nav id="mainNav">
+  <a href="index.html" class="logo">
+    <img src="/logo.jpg" alt="SatvikMeals"/>
     <span class="logo-text">SatvikMeals</span>
   </a>
   <ul class="nav-links">
-    <li><a href="menu.html">Menu</a></li>
     <li><a href="#plans">Plans</a></li>
-    <li><a href="#how-it-works">How It Works</a></li>
-    <li><a href="support.html">Support</a></li>
-    <li id="navAuthBtn"><a href="login.html" class="btn-nav" id="navLogin">Login</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#how-it-works">How it Works</a></li>
+    <li><a href="support.html">Contact</a></li>
   </ul>
+  <div class="nav-right">
+    <a href="login.html" class="btn-nav-ghost" id="navLogin">Login</a>
+    <a href="javascript:void(0)" onclick="orderNow(event)" class="btn-nav">Start Today</a>
+  </div>
   <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
+  <a href="#plans" onclick="toggleMenu()">Plans</a>
   <a href="menu.html">Menu</a>
-  <a href="#plans" onclick="document.getElementById('mobileMenu').classList.remove('open')">Plans</a>
-  <a href="#how-it-works" onclick="document.getElementById('mobileMenu').classList.remove('open')">How It Works</a>
-  <a href="support.html">Support</a>
-  <a href="login.html" id="mobileAuthLink">Login</a>
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#how-it-works" onclick="toggleMenu()">How it Works</a>
+  <a href="support.html">Contact</a>
+  <a href="login.html" id="mobileAuthLink">Login / Dashboard</a>
 </div>
 
 <!-- HERO -->
-<section class="hero" id="home">
+<div class="hero">
   <div class="hero-left">
     <div class="hero-content">
-      <p class="hero-eyebrow">Patna, Bihar — Pure Vegetarian</p>
-      <h1>Ghar jaisa swad.<br><em>Delivered with discipline.</em></h1>
-      <p class="hero-sub">SatvikMeals is a subscription-based vegetarian meal service built on consistency, purity, and responsible preparation — cooked fresh every single day.</p>
+      <div class="hero-kicker">
+        <span class="hero-kicker-line"></span>
+        Patna's Premium Tiffin Service
+      </div>
+      <h1>Fresh meals,<br><em>every single</em><br><strong>day.</strong></h1>
+      <p class="hero-desc">Pure vegetarian tiffin service crafted with home-style discipline. Delivered to your door, on schedule — so you never miss a proper meal.</p>
       <div class="hero-cta">
         <a href="javascript:void(0)" onclick="orderNow(event)" class="btn-primary">
           Subscribe Now
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <a href="#about" class="btn-outline">Our Story</a>
+        <a href="menu.html" class="btn-outline">View This Week's Menu</a>
       </div>
-      <div class="hero-trust">
-        <div class="trust-pill"><span class="trust-dot"></span>100% Pure Vegetarian</div>
-        <div class="trust-pill"><span class="trust-dot"></span>Daily Fresh Cooking</div>
-        <div class="trust-pill"><span class="trust-dot"></span>Zero Preservatives</div>
+      <div class="hero-proof">
+        <div class="proof-item">
+          <div class="proof-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="proof-label">
+            <strong>100% Vegetarian</strong>
+            No meat, eggs or impure ingredients
+          </div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="proof-label">
+            <strong>Fixed Daily Schedule</strong>
+            Same time, every single day
+          </div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <div class="proof-label">
+            <strong>Home-Style Cooking</strong>
+            Freshly cooked each morning
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div class="hero-right">
     <div class="hero-photo-stack">
-      <img class="hero-img-main" src="kitchen1.png" alt="SatvikMeals Kitchen — fresh tiffin preparation" />
-      <img class="hero-img-overlay" src="kitchen2.png" alt="SatvikMeals team packing tiffins" />
-      <div class="hero-overlay-badge">
-        <div class="badge-num">365</div>
-        <div class="badge-text">Days of Fresh Cooking</div>
+      <img class="hero-img-main" src="kitchen1.png" alt="SatvikMeals fresh tiffin kitchen"/>
+      <div class="hero-gradient"></div>
+      <div class="hero-badge">
+        <div class="hero-badge-num">200+</div>
+        <div class="hero-badge-label">Happy Subscribers</div>
       </div>
-      <div class="hero-gradient-bottom"></div>
+      <div class="hero-badge-2">
+        <div class="bd2-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="hero-badge-2-text">
+          <div class="bd2-t">Fresh Daily</div>
+          <div class="bd2-s">Cooked every morning</div>
+        </div>
+      </div>
+      <div class="hero-bottom-strip">
+        <div class="strip-item"><span class="strip-dot"></span>No Preservatives</div>
+        <div class="strip-item"><span class="strip-dot"></span>Hygiene Certified</div>
+        <div class="strip-item"><span class="strip-dot"></span>Pause Anytime</div>
+        <div class="strip-item"><span class="strip-dot"></span>Central Patna</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-band" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="ticker-sep"></span>Pure Vegetarian</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>No Onion · No Garlic (Satvik Plans)</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Freshly Cooked Daily</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Delivered On Schedule</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Pause or Cancel Anytime</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Patna, Bihar</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Students · Professionals · Families</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Hygienic Kitchen</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="ticker-sep"></span>Pure Vegetarian</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>No Onion · No Garlic (Satvik Plans)</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Freshly Cooked Daily</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Delivered On Schedule</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Pause or Cancel Anytime</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Patna, Bihar</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Students · Professionals · Families</span>
+    <span class="ticker-item"><span class="ticker-sep"></span>Hygienic Kitchen</span>
+  </div>
+</div>
+
+<!-- STATS BAND -->
+<div class="stats-band">
+  <div class="stats-band-inner">
+    <div class="stat-item">
+      <div class="stat-num">200<span class="stat-unit">+</span></div>
+      <div class="stat-label">Active Subscribers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3<span class="stat-unit">yr</span></div>
+      <div class="stat-label">Serving Patna</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Missed Deliveries</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100<span class="stat-unit">%</span></div>
+      <div class="stat-label">Pure Vegetarian</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="philosophy">
+  <div class="container">
+    <div class="section-eyebrow">Our Promise</div>
+    <h2>What <em>Satvik</em> means to us</h2>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-num">01</div>
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="feat-title">The Satvik Standard</div>
+        <div class="feat-desc">Prepared without onion or garlic, following principles of calm, balanced nourishment. Every ingredient is selected for absolute purity and peace of mind.</div>
+        <div class="feat-tags">
+          <span class="feat-tag">No Onion</span>
+          <span class="feat-tag">No Garlic</span>
+          <span class="feat-tag">Balanced Spices</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">02</div>
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="feat-title">Fresh, Daily Preparation</div>
+        <div class="feat-desc">No reheating. No advance batch cooking. Every tiffin is cooked fresh on the day of delivery, preserving full flavour and nutritional integrity.</div>
+        <div class="feat-tags">
+          <span class="feat-tag">Zero Preservatives</span>
+          <span class="feat-tag">Daily Cooking</span>
+          <span class="feat-tag">Fresh Ingredients</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">03</div>
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="feat-title">Regular Plans Also Available</div>
+        <div class="feat-desc">For those who prefer standard vegetarian cooking with onion and garlic, we offer regular meal plans with the same care, hygiene, and consistency.</div>
+        <div class="feat-tags">
+          <span class="feat-tag">With Onion &amp; Garlic</span>
+          <span class="feat-tag">Home Style</span>
+          <span class="feat-tag">Consistent Taste</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- PHOTO STRIP -->
-<div class="photo-strip">
-  <div class="photo-strip-item">
-    <img src="kitchen2.png" alt="Preparing tiffin meals" loading="lazy" />
-    <div class="photo-caption">
-      <div class="cap-label">Our Kitchen</div>
-      <div class="cap-title">Made with care, every morning</div>
-    </div>
-  </div>
-  <div class="photo-strip-item">
-    <img src="kitchen1.png" alt="Packing fresh tiffins" loading="lazy" />
-    <div class="photo-caption">
-      <div class="cap-label">Fresh Daily</div>
-      <div class="cap-title">Packed and delivered on schedule</div>
-    </div>
-  </div>
-</div>
-
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stats-bar-inner">
-    <div class="stats-bar-item">
-      <div class="sn">100%</div>
-      <div class="sl">Pure Vegetarian Kitchen</div>
-    </div>
-    <div class="stats-bar-item">
-      <div class="sn">0</div>
-      <div class="sl">Preservatives Used</div>
-    </div>
-    <div class="stats-bar-item">
-      <div class="sn">8+</div>
-      <div class="sl">Delivery Areas in Patna</div>
-    </div>
-    <div class="stats-bar-item">
-      <div class="sn">365</div>
-      <div class="sl">Days of Fresh Cooking</div>
-    </div>
-  </div>
-</div>
-
-<!-- SUBSCRIPTION PLANS -->
+<!-- PLANS SECTION -->
 <section class="plans-section" id="plans">
   <div class="container">
-    <div class="section-label">Subscription Plans</div>
-    <h2>Honest, <em>simple pricing.</em></h2>
-    <p class="plans-subtitle">Choose a plan that suits you. Pause or cancel anytime from your dashboard.</p>
-    <div class="plans-filter">
-      <button class="active" onclick="filterPlans('all',this)">All Plans</button>
-      <button onclick="filterPlans('satvik',this)">Satvik (No Onion/Garlic)</button>
-      <button onclick="filterPlans('regular',this)">Regular</button>
+    <div class="plans-header">
+      <div>
+        <div class="section-eyebrow">Subscription Plans</div>
+        <h2>Honest, <em>simple pricing.</em></h2>
+        <p class="plans-subtitle">Choose a weekly or monthly plan. Pause or cancel anytime from your dashboard.</p>
+      </div>
+      <div class="plans-filter">
+        <button class="active" onclick="filterPlans('all',this)">All Plans</button>
+        <button onclick="filterPlans('satvik',this)">Satvik (No Onion/Garlic)</button>
+        <button onclick="filterPlans('regular',this)">Regular</button>
+      </div>
     </div>
     <div class="plans-grid" id="homePlansGrid">
       <div class="plans-loading">Loading plans…</div>
     </div>
     <div class="plans-cta-row">
       <a href="plans.html" class="btn-plans-all">
-        View All Plans & Details
+        View All Plans &amp; Details
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- MENU PREVIEW -->
+<section class="menu-preview">
+  <div class="container">
+    <div class="section-eyebrow">Weekly Menu</div>
+    <h2>What's cooking <em>this week</em></h2>
+    <div class="menu-preview-grid">
+      <div class="menu-card">
+        <div class="menu-card-img">🍛</div>
+        <div class="menu-card-body">
+          <div class="menu-card-day">Monday</div>
+          <div class="menu-card-name">Dal Tadka + Roti</div>
+          <div class="menu-card-desc">Yellow lentil, ghee tadka, fresh chapati, seasonal sabzi</div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-img">🥘</div>
+        <div class="menu-card-body">
+          <div class="menu-card-day">Tuesday</div>
+          <div class="menu-card-name">Rajma + Jeera Rice</div>
+          <div class="menu-card-desc">Kidney beans curry, cumin-tempered basmati rice</div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-img">🫕</div>
+        <div class="menu-card-body">
+          <div class="menu-card-day">Wednesday</div>
+          <div class="menu-card-name">Palak Paneer + Roti</div>
+          <div class="menu-card-desc">Spinach and cottage cheese, fresh wholewheat roti</div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-img">🍱</div>
+        <div class="menu-card-body">
+          <div class="menu-card-day">Thursday–Sunday</div>
+          <div class="menu-card-name">Rotating Specials</div>
+          <div class="menu-card-desc">Chole, Aloo Matar, Baingan Bharta &amp; more seasonal preparations</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-cta">
+      <a href="menu.html" class="btn-outline" style="display:inline-flex;">
+        See Full Weekly Menu
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-left:8px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
     </div>
   </div>
@@ -429,55 +627,33 @@
   <div class="container">
     <div class="about-grid">
       <div class="about-text">
-        <div class="section-label">About Us</div>
-        <h2>A meal service built on <em>discipline and trust</em></h2>
+        <div class="section-eyebrow">About SatvikMeals</div>
+        <h2>A meal service built on<br><em>discipline and trust</em></h2>
         <p>SatvikMeals is a Patna-based 100% pure vegetarian tiffin service committed to providing fresh, hygienic, and home-style meals to students, professionals, and families across the city.</p>
-        <p>Every meal is prepared with the same care and attention you would expect in your own home. We do not compromise on hygiene, ingredient quality, or the consistency of taste.</p>
-      </div>
-      <div class="about-img-grid">
-        <img src="kitchen1.png" alt="SatvikMeals kitchen team" loading="lazy" />
-        <img src="kitchen2.png" alt="Tiffin preparation" loading="lazy" />
-        <img src="kitchen1.png" alt="Fresh meal packing" loading="lazy" style="display:none;" />
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PHILOSOPHY -->
-<section class="philosophy" id="philosophy">
-  <div class="container">
-    <div class="section-label">Our Philosophy</div>
-    <h2>What <em>Satvik</em> means to us</h2>
-    <div class="phil-grid">
-      <div class="phil-card">
-        <div class="phil-num">01</div>
-        <div class="phil-title">The Satvik Standard</div>
-        <div class="phil-desc">Prepared without onion or garlic, following principles of calm, balanced nourishment. Every ingredient is selected for purity.</div>
-        <div class="phil-tags">
-          <span class="tag">No Onion</span>
-          <span class="tag">No Garlic</span>
-          <span class="tag">Balanced Spices</span>
+        <p>Every meal is prepared with the same care you would expect in your own home. We do not compromise on hygiene, ingredient quality, or the consistency of taste — ever.</p>
+        <div class="about-highlight">
+          <div class="hl-item">
+            <div class="hl-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="hl-text"><strong>Zero Compromise</strong>Quality standards never drop</div>
+          </div>
+          <div class="hl-item">
+            <div class="hl-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="hl-text"><strong>On-Time Delivery</strong>Same time every single day</div>
+          </div>
+          <div class="hl-item">
+            <div class="hl-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+            <div class="hl-text"><strong>Home Kitchen Feel</strong>Real, recognisable recipes</div>
+          </div>
+          <div class="hl-item">
+            <div class="hl-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="hl-text"><strong>Pause Anytime</strong>Full control via dashboard</div>
+          </div>
         </div>
       </div>
-      <div class="phil-card">
-        <div class="phil-num">02</div>
-        <div class="phil-title">Fresh, Daily Preparation</div>
-        <div class="phil-desc">No reheating. No advance batch cooking. Every meal is cooked fresh on the day of delivery, preserving flavour and nutritional value.</div>
-        <div class="phil-tags">
-          <span class="tag">Zero Preservatives</span>
-          <span class="tag">Daily Cooking</span>
-          <span class="tag">Fresh Ingredients</span>
-        </div>
-      </div>
-      <div class="phil-card">
-        <div class="phil-num">03</div>
-        <div class="phil-title">Regular Meals Also Available</div>
-        <div class="phil-desc">For those who prefer standard vegetarian cooking with onion and garlic, we offer regular meal plans with equal care and hygiene standards.</div>
-        <div class="phil-tags">
-          <span class="tag">With Onion &amp; Garlic</span>
-          <span class="tag">Home Style</span>
-          <span class="tag">Consistent Taste</span>
-        </div>
+      <div class="about-imgs">
+        <img src="kitchen1.png" alt="SatvikMeals kitchen team" loading="lazy"/>
+        <img src="kitchen2.png" alt="Tiffin preparation" loading="lazy"/>
+        <img src="kitchen1.png" alt="Fresh meal packing" loading="lazy"/>
       </div>
     </div>
   </div>
@@ -486,23 +662,107 @@
 <!-- HOW IT WORKS -->
 <section class="hiw" id="how-it-works">
   <div class="container">
-    <div class="section-label">Process</div>
-    <h2>How it <em>works</em></h2>
-    <div class="hiw-steps">
-      <div class="hiw-step">
-        <div class="step-num">1</div>
-        <div class="step-title">Choose a Subscription Plan</div>
-        <div class="step-desc">Select a weekly or monthly plan that suits your schedule. Manage, pause, or resume your subscription anytime from your dashboard.</div>
+    <div class="hiw-inner">
+      <div class="hiw-intro">
+        <div class="section-eyebrow">Process</div>
+        <h2>How it<br><em>works</em></h2>
+        <p>From subscribing to your door — it's a simple three-step process designed to make home-style eating effortless for busy people.</p>
+        <a href="javascript:void(0)" onclick="orderNow(event)" class="btn-primary" style="margin-top:36px;display:inline-flex;">
+          Get Started
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
       </div>
-      <div class="hiw-step">
-        <div class="step-num">2</div>
-        <div class="step-title">Meals Prepared in Our Kitchen</div>
-        <div class="step-desc">Your tiffin is cooked fresh each morning in our hygiene-certified kitchen under strict quality controls and clean preparation standards.</div>
+      <div class="hiw-steps">
+        <div class="hiw-step">
+          <div class="step-num-wrap">
+            <div class="step-circle">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Choose Your Plan</div>
+            <div class="step-desc">Pick a weekly or monthly subscription — Satvik or Regular. Log in with Google and manage everything from your personal dashboard.</div>
+          </div>
+        </div>
+        <div class="hiw-step">
+          <div class="step-num-wrap">
+            <div class="step-circle">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Meals Prepared Fresh</div>
+            <div class="step-desc">Your tiffin is cooked fresh each morning in our hygiene-certified kitchen, with strict quality controls and clean preparation standards.</div>
+          </div>
+        </div>
+        <div class="hiw-step">
+          <div class="step-num-wrap">
+            <div class="step-circle">3</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Delivered to Your Door</div>
+            <div class="step-desc">Your tiffin arrives at a consistent scheduled time, every day. Pause or resume your subscription anytime from your dashboard.</div>
+          </div>
+        </div>
       </div>
-      <div class="hiw-step">
-        <div class="step-num">3</div>
-        <div class="step-title">Delivered at a Fixed Time</div>
-        <div class="step-desc">Your tiffin arrives at your door at a consistent scheduled time, every day, so you can plan your meals with complete reliability.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-eyebrow">Customer Reviews</div>
+    <h2>Trusted by Patna's <em>everyday people</em></h2>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="testi-text">"Finally a tiffin service that actually delivers on time. I've been a subscriber for 6 months and not once has the quality dropped. The dal tastes like home."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">R</div>
+          <div>
+            <div class="testi-name">Rahul Verma</div>
+            <div class="testi-role">Software Engineer, Boring Road</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="testi-text">"The Satvik plan is perfect for me. I follow a strict diet and I can trust that every meal is genuinely free of onion and garlic. Highly recommend."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">P</div>
+          <div>
+            <div class="testi-name">Priya Singh</div>
+            <div class="testi-role">Student, Anandpuri PG</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="testi-text">"I paused my subscription for two weeks when I travelled and resumed it in seconds from the app. The pause feature alone makes this worth it."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div>
+            <div class="testi-name">Amit Kumar</div>
+            <div class="testi-role">Working Professional, Bailey Road</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -511,78 +771,82 @@
 <!-- HYGIENE -->
 <section class="hygiene" id="hygiene">
   <div class="container">
-    <div class="section-label">Kitchen Standards</div>
+    <div class="section-eyebrow">Kitchen Standards</div>
     <h2>Hygiene is not optional.<br><em>It is the baseline.</em></h2>
+    <p class="hygiene-sub">Every kitchen process follows strict sanitation standards. No shortcuts, no compromises — from preparation to packaging.</p>
     <div class="hygiene-grid">
       <div class="hygiene-item">
         <div class="hygiene-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
         <div class="hygiene-label">Hair Caps</div>
-        <div class="hygiene-sub">All kitchen staff wear hair caps during food preparation.</div>
+        <div class="hygiene-desc">All kitchen staff wear hair caps during food preparation without exception.</div>
       </div>
       <div class="hygiene-item">
         <div class="hygiene-icon"><svg viewBox="0 0 24 24"><path d="M18 11a6 6 0 0 1-6 6 6 6 0 0 1-6-6V5l6-3 6 3z"/></svg></div>
-        <div class="hygiene-label">Gloves</div>
-        <div class="hygiene-sub">Food-grade gloves used for handling and packing all meals.</div>
+        <div class="hygiene-label">Food-Grade Gloves</div>
+        <div class="hygiene-desc">Clean gloves used for all food handling and packaging operations.</div>
       </div>
       <div class="hygiene-item">
         <div class="hygiene-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-        <div class="hygiene-label">Clean Kitchen</div>
-        <div class="hygiene-sub">Surfaces and utensils sanitised before every cooking session.</div>
+        <div class="hygiene-label">Sanitised Kitchen</div>
+        <div class="hygiene-desc">Surfaces and utensils fully sanitised before every cooking session.</div>
       </div>
       <div class="hygiene-item">
         <div class="hygiene-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <div class="hygiene-label">Safe Ingredients</div>
-        <div class="hygiene-sub">Vegetables and grains sourced from verified suppliers.</div>
+        <div class="hygiene-label">Verified Ingredients</div>
+        <div class="hygiene-desc">Vegetables and grains sourced from trusted, verified local suppliers.</div>
       </div>
       <div class="hygiene-item">
         <div class="hygiene-icon"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-        <div class="hygiene-label">Quality Control</div>
-        <div class="hygiene-sub">Each batch is tasted and inspected before packaging.</div>
+        <div class="hygiene-label">Quality Checks</div>
+        <div class="hygiene-desc">Every batch is tasted and inspected before packaging and dispatch.</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- WHO WE SERVE -->
-<section class="wws" id="who-we-serve">
+<section class="wws">
   <div class="container">
-    <div class="section-label">Who We Serve</div>
+    <div class="section-eyebrow">Who We Serve</div>
     <h2>Meals for <em>every kind</em> of household</h2>
     <div class="wws-grid">
       <div class="wws-card">
         <div class="wws-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
         <div class="wws-title">Students</div>
-        <div class="wws-desc">Hostel and PG residents who need a consistent, affordable, home-style meal without the hassle of cooking.</div>
+        <div class="wws-desc">Hostel and PG residents who need a consistent, affordable, home-style meal without the hassle of cooking or canteen compromise.</div>
       </div>
       <div class="wws-card">
         <div class="wws-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
         <div class="wws-title">Working Professionals</div>
-        <div class="wws-desc">Busy individuals who require punctual, nutritious meals delivered at a fixed time, every day.</div>
+        <div class="wws-desc">Busy individuals who require punctual, nutritious meals delivered at a fixed time every day — no planning, no stress.</div>
       </div>
       <div class="wws-card">
         <div class="wws-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
         <div class="wws-title">Families</div>
-        <div class="wws-desc">Households looking for reliable daily meals with the taste and quality of home cooking.</div>
+        <div class="wws-desc">Households looking for reliable daily meals with the taste and quality of home cooking, delivered on schedule.</div>
       </div>
       <div class="wws-card">
         <div class="wws-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         <div class="wws-title">Satvik Diet Followers</div>
-        <div class="wws-desc">Those who follow a strict Satvik lifestyle and require meals without onion, garlic, or impure ingredients.</div>
+        <div class="wws-desc">Those who follow a strict Satvik lifestyle requiring meals without onion, garlic, or any impure ingredients — we serve you with care.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- DELIVERY -->
+<!-- DELIVERY AREAS -->
 <section class="delivery" id="delivery">
   <div class="container">
     <div class="delivery-inner">
       <div class="delivery-text">
-        <div class="section-label">Delivery Coverage</div>
-        <h2>We deliver across <em>central Patna</em></h2>
-        <p>Our delivery network covers key residential and professional areas within Patna. We maintain a fixed daily delivery schedule to ensure punctuality.</p>
-        <p style="margin-top:16px;font-size:0.85rem;color:var(--tl);">Delivery area expansion is ongoing. Contact us if your locality is not listed.</p>
-        <a href="support.html" class="btn-outline" style="margin-top:28px;display:inline-flex;">Enquire About Your Area</a>
+        <div class="section-eyebrow">Delivery Coverage</div>
+        <h2>We deliver across<br><em>central Patna</em></h2>
+        <p>Our delivery network covers key residential and professional areas within Patna. We maintain a fixed daily delivery schedule to ensure punctuality and freshness.</p>
+        <p style="margin-top:16px;font-size:0.875rem;color:var(--tl);font-weight:300;">Delivery area expansion is ongoing. Contact us if your locality is not listed yet.</p>
+        <a href="support.html" class="btn-outline" style="margin-top:32px;display:inline-flex;">
+          Enquire About Your Area
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-left:8px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
       </div>
       <div>
         <div class="delivery-areas">
@@ -594,7 +858,7 @@
           <div class="area-item"><span class="area-dot"></span>Shekhpura</div>
           <div class="area-item"><span class="area-dot"></span>Mainpura</div>
           <div class="area-item"><span class="area-dot"></span>Lodipur</div>
-          <div class="area-item" style="grid-column:1/-1;border-bottom:none;"><span class="area-dot"></span>Other Nearby Patna Areas</div>
+          <div class="area-item" style="grid-column:1/-1"><span class="area-dot"></span>Other Nearby Patna Areas</div>
         </div>
       </div>
     </div>
@@ -606,7 +870,7 @@
   <div class="cta-band-inner">
     <div>
       <h2>Ready to start eating <em>well, every day?</em></h2>
-      <p>Subscribe today and receive fresh meals at your door, on schedule.</p>
+      <p>Subscribe today and receive fresh tiffin at your door — on schedule, every day.</p>
     </div>
     <a href="javascript:void(0)" onclick="orderNow(event)" class="btn-light">
       Get Started Today
@@ -620,29 +884,31 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <a href="/" class="footer-logo">
-        <img src="/logo.jpg" alt="SatvikMeals" />
+        <img src="/logo.jpg" alt="SatvikMeals"/>
         <span>SatvikMeals</span>
       </a>
       <p>Pure vegetarian tiffin service based in Patna, Bihar. Subscription-based meal delivery built on consistency, purity, and responsible preparation.</p>
       <div class="footer-contact">
-        <a href="tel:+916201276506">+91 62012 76506</a>
-        <a href="tel:+919031447621">+91 90314 47621</a>
+        <a href="tel:+916201276506">📞 +91 62012 76506</a>
+        <a href="tel:+919031447621">📞 +91 90314 47621</a>
+        <a href="https://wa.me/919031447621" target="_blank">💬 WhatsApp Us</a>
       </div>
     </div>
     <div class="footer-col">
       <h4>Platform</h4>
       <ul>
-        <li><a href="menu.html">Menu</a></li>
-        <li><a href="plans.html">Plans</a></li>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="login.html">Login</a></li>
+        <li><a href="menu.html">This Week's Menu</a></li>
+        <li><a href="plans.html">All Plans</a></li>
+        <li><a href="dashboard.html">My Dashboard</a></li>
+        <li><a href="login.html">Login / Register</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
       <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="support.html">Contact</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#hygiene">Kitchen Standards</a></li>
+        <li><a href="support.html">Contact Us</a></li>
         <li><a href="support.html">Support</a></li>
       </ul>
     </div>
@@ -656,22 +922,25 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span>&copy; 2025 SatvikMeals. All rights reserved. Patna, Bihar, India.</span>
+    <span>© 2025 SatvikMeals. All rights reserved. Patna, Bihar, India.</span>
     <span>Secure Payments via Instamojo</span>
   </div>
 </footer>
 
-<!-- WHATSAPP FLOAT -->
-<a href="https://wa.me/919031447621" class="wa-float" target="_blank" rel="noopener" aria-label="Contact on WhatsApp">
-  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.115 1.524 5.845L.057 23.95l6.265-1.643A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.007-1.367l-.36-.214-3.72.976.992-3.626-.234-.373A9.817 9.817 0 0 1 2.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
-  </svg>
+<!-- WHATSAPP -->
+<a href="https://wa.me/919031447621" class="wa-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <span class="wa-tooltip">Chat with us</span>
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.115 1.524 5.845L.057 23.95l6.265-1.643A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.007-1.367l-.36-.214-3.72.976.992-3.626-.234-.373A9.817 9.817 0 0 1 2.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
 </a>
 
 <div id="toast"></div>
 
 <script>
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+});
+
 // ── NAV AUTH ──
 const token = localStorage.getItem('satvikToken');
 if (token) {
@@ -683,13 +952,9 @@ if (token) {
 
 // ── ORDER FLOW ──
 function orderNow(e) {
-  e.preventDefault();
+  if(e) e.preventDefault();
   gtag('event', 'click_order_now', { event_category: 'engagement' });
-  if (localStorage.getItem('satvikToken')) {
-    window.location.href = 'plans.html';
-  } else {
-    window.location.href = 'login.html?redirect=plans.html';
-  }
+  window.location.href = localStorage.getItem('satvikToken') ? 'plans.html' : 'login.html?redirect=plans.html';
 }
 
 // ── MOBILE MENU ──
@@ -699,7 +964,7 @@ function toggleMenu() {
 document.addEventListener('click', function(e) {
   const menu = document.getElementById('mobileMenu');
   const btn = document.querySelector('.nav-hamburger');
-  if (!menu.contains(e.target) && !btn.contains(e.target)) {
+  if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
     menu.classList.remove('open');
   }
 });
@@ -714,7 +979,8 @@ async function loadPlans() {
     allPlans = await r.json();
     renderHomePlans();
   } catch(e) {
-    document.getElementById('homePlansGrid').innerHTML = '<div class="plans-loading">Could not load plans. <a href="plans.html" style="color:var(--g1);">View all plans →</a></div>';
+    document.getElementById('homePlansGrid').innerHTML =
+      '<div class="plans-loading">Could not load plans. <a href="plans.html" style="color:var(--g1);">View all plans →</a></div>';
   }
 }
 
@@ -728,7 +994,6 @@ function filterPlans(type, btn) {
 function renderHomePlans() {
   const grid = document.getElementById('homePlansGrid');
   let filtered = currentFilter === 'all' ? allPlans : allPlans.filter(p => p.mealType === currentFilter || p.mealType === 'both');
-  // Show max 3 on homepage
   const display = filtered.slice(0, 3);
   if (!display.length) {
     grid.innerHTML = '<div class="plans-loading">No plans found. <a href="plans.html" style="color:var(--g1);">View all →</a></div>';
@@ -737,14 +1002,14 @@ function renderHomePlans() {
   grid.innerHTML = display.map((p, i) => {
     const meals = (p.meals || ['lunch','dinner']).map(m => `<span class="meal-tag">${m}</span>`).join('');
     const feats = (p.features || []).slice(0,4).map(f => `<li>${f}</li>`).join('');
-    return `<div class="plan-card ${p.type==='monthly'?'featured':''}" style="animation: fadeUp 0.5s ${i*0.1}s ease both;">
+    return `<div class="plan-card ${p.type==='monthly'?'featured':''}" style="animation:fadeUp 0.5s ${i*0.1}s ease both">
       ${p.type==='monthly' ? '<div class="plan-badge">Best Value</div>' : ''}
-      <div class="plan-type-label">${p.type} &bull; ${p.mealType}</div>
+      <div class="plan-type-label">${p.type} · ${p.mealType||'vegetarian'}</div>
       <div class="plan-name">${p.name}</div>
-      <div class="plan-desc">${p.description || ''}</div>
-      <div class="plan-price"><span class="amount">&#8377;${p.price}</span><span class="period">/ ${p.type==='weekly'?'week':'month'}</span></div>
+      <div class="plan-desc">${p.description||''}</div>
+      <div class="plan-price-row"><span class="plan-price-amount">₹${p.price}</span><span class="plan-price-period">/ ${p.type==='weekly'?'week':'month'}</span></div>
       <div class="plan-meals">${meals}</div>
-      <div class="plan-validity">Valid for ${p.validityDays || 30} days</div>
+      <div class="plan-validity">Valid for ${p.validityDays||30} days</div>
       <ul class="plan-feats">${feats}</ul>
       <button class="btn-plan" onclick="subscribePlan('${p._id}','${p.name}',${p.price})">
         Subscribe Now
@@ -755,7 +1020,7 @@ function renderHomePlans() {
 }
 
 function subscribePlan(planId, planName, price) {
-  gtag('event', 'begin_checkout', { value: price, currency: 'INR', items: [{ item_name: planName }] });
+  gtag('event','begin_checkout',{value:price,currency:'INR',items:[{item_name:planName}]});
   if (!localStorage.getItem('satvikToken')) {
     showToast('Please login first');
     setTimeout(() => window.location.href = 'login.html?redirect=plans.html', 1200);
