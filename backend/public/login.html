@@ -153,9 +153,42 @@ function saveAndRedirect(d) {
   localStorage.setItem('satvikUser', JSON.stringify(d.user));
   showStatus('Login successful! Redirecting...', 'success');
   const redirect = new URLSearchParams(window.location.search).get('redirect') || 'dashboard.html';
-  setTimeout(() => {
-    window.location.href = d.user.role === 'admin' ? 'admin.html' : redirect;
-  }, 600);
+  const dest = d.user.role === 'admin' ? 'admin.html' : redirect;
+  // For new users, try to capture location before redirecting
+  if (d.isNewUser) {
+    captureAndSendLocation(d.token, dest);
+  } else {
+    setTimeout(() => { window.location.href = dest; }, 600);
+  }
+}
+
+async function captureAndSendLocation(token, dest) {
+  if (!navigator.geolocation) {
+    setTimeout(() => { window.location.href = dest; }, 600);
+    return;
+  }
+  showStatus('Almost there... setting up your account ✓', 'loading');
+  try {
+    const pos = await new Promise((resolve, reject) =>
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 6000 })
+    );
+    const { latitude, longitude } = pos.coords;
+    // Reverse geocode using free API
+    let address = '';
+    try {
+      const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+      const gd  = await geo.json();
+      address   = gd.display_name || '';
+    } catch(_) {}
+    await fetch(API + '/api/auth/location', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body:    JSON.stringify({ latitude, longitude, address })
+    });
+  } catch(_) {
+    // Location denied or failed — continue silently
+  }
+  setTimeout(() => { window.location.href = dest; }, 400);
 }
 
 function showStatus(msg, type) {
