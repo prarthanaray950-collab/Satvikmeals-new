@@ -266,7 +266,7 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Coins</th><th>Joined</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Location</th><th>Role</th><th>Coins</th><th>Joined</th><th>Actions</th></tr></thead>
         <tbody id="usersBody"></tbody>
       </table>
     </div>
@@ -576,18 +576,25 @@ async function loadUsers() {
 
 function renderUsersTable(users) {
   const tbody = document.getElementById('usersBody');
-  if (!users.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--tl);">No users yet.</td></tr>'; return; }
-  tbody.innerHTML = users.map(u=>`<tr>
+  if (!users.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--tl);">No users yet.</td></tr>'; return; }
+  tbody.innerHTML = users.map(u=>{
+    const loc = u.location && u.location.latitude ? u.location : null;
+    const locCell = loc
+      ? `<a href="https://maps.google.com/?q=${loc.latitude},${loc.longitude}" target="_blank" style="color:var(--g6);font-size:0.78rem;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2C7.58 2 4 5.58 4 10c0 6 8 12 8 12s8-6 8-12c0-4.42-3.58-8-8-8z"/></svg>${(loc.address||'').split(',')[0]||'View Map'}</a>`
+      : '<span style="color:var(--tl);font-size:0.75rem">—</span>';
+    return `<tr>
     <td><strong>${u.name||'—'}</strong></td>
     <td style="font-size:0.8rem;">${u.email}</td>
     <td>${u.phone||'—'}</td>
+    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${locCell}</td>
     <td><span class="badge ${u.role||'user'}">${u.role||'user'}</span></td>
     <td>${u.coins||0}</td>
     <td>${new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
     <td><div class="td-actions">
       <button class="btn-sm" onclick="viewUser('${u._id}')">View</button>
     </div></td>
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
 }
 
 function filterUsers() {
