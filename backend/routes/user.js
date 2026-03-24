@@ -1,44 +1,81 @@
-const mongoose = require('mongoose');
+const express     = require('express');
+const User        = require('../models/User');
+const { protect } = require('../middleware/auth');
 
-const genCode = () => Math.random().toString(36).substring(2,8).toUpperCase();
+const router = express.Router();
 
-const subscriptionSchema = new mongoose.Schema({
-  planId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Plan' },
-  planName:  String,
-  planType:  String,
-  startDate: Date,
-  endDate:   Date,
-  status:    { type: String, enum: ['active','paused','expired','cancelled'], default: 'active' },
-  pausedAt:  Date,
-  paymentId: String
-}, { timestamps: true });
-
-const referredUserSchema = new mongoose.Schema({
-  email:        String,
-  name:         String,
-  joinedAt:     Date,
-  hasPurchased: { type: Boolean, default: false },
-  planName:     String,
-  rewardPaid:   { type: Boolean, default: false }
+// GET /api/user/dashboard
+router.get('/dashboard', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-__v');
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    res.json(user);
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    res.status(500).json({ message: 'Server error.' });
+  }
 });
 
-const userSchema = new mongoose.Schema({
-  name:          { type: String, required: true },
-  email:         { type: String, required: true, unique: true, lowercase: true },
-  googleId:      { type: String, sparse: true },
-  phone:         { type: String, validate: { validator: v => !v || /^[6-9]\d{9}$/.test(v), message: 'Invalid phone' } },
-  role:          { type: String, enum: ['user','admin'], default: 'user' },
-  referralCode:  { type: String, unique: true, default: genCode },
-  referredBy:    { type: String, default: null },
-  coins:         { type: Number, default: 0 },
-  referredUsers: [referredUserSchema],
-  subscriptions: [subscriptionSchema],
-  location: {
-    latitude:   { type: Number, default: null },
-    longitude:  { type: Number, default: null },
-    address:    { type: String, default: null },
-    capturedAt: { type: Date,   default: null }
+// PATCH /api/user/location
+router.patch('/location', protect, async (req, res) => {
+  try {
+    const { latitude, longitude, address } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { location: { latitude, longitude, address, capturedAt: new Date() } },
+      { new: true }
+    );
+    res.json({ message: 'Location updated.', location: user.location });
+  } catch (err) {
+    console.error('Location update error:', err);
+    res.status(500).json({ message: 'Server error.' });
   }
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model('User', userSchema);
+// POST /api/user/subscription/:id/pause
+router.post('/subscription/:id/pause', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    const sub = user.subscriptions.id(req.params.id);
+    if (!sub) return res.status(404).json({ message: 'Subscription not found.' });
+    if (sub.status !== 'active') return res.status(400).json({ message: 'Only active subscriptions can be paused.' });
+
+    sub.status   = 'paused';
+    sub.pausedAt = new Date();
+    await user.save();
+
+    res.json({ message: 'Subscription paused.', subscription: sub });
+  } catch (err) {
+    console.error('Pause error:', err);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
+// POST /api/user/subscription/:id/resume
+router.post('/subscription/:id/resume', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    const sub = user.subscriptions.id(req.params.id);
+    if (!sub) return res.status(404).json({ message: 'Subscription not found.' });
+    if (sub.status !== 'paused') return res.status(400).json({ message: 'Only paused subscriptions can be resumed.' });
+
+    if (sub.pausedAt) {
+      const pausedMs = Date.now() - new Date(sub.pausedAt).getTime();
+      sub.endDate = new Date(new Date(sub.endDate).getTime() + pausedMs);
+    }
+    sub.status   = 'active';
+    sub.pausedAt = undefined;
+    await user.save();
+
+    res.json({ message: 'Subscription resumed.', subscription: sub });
+  } catch (err) {
+    console.error('Resume error:', err);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
+module.exports = router;
