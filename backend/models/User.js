@@ -14,12 +14,12 @@ const subscriptionSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const referredUserSchema = new mongoose.Schema({
-  email:       String,
-  name:        String,
-  joinedAt:    Date,
-  hasPurchased:{ type: Boolean, default: false },
-  planName:    String,
-  rewardPaid:  { type: Boolean, default: false }
+  email:        String,
+  name:         String,
+  joinedAt:     Date,
+  hasPurchased: { type: Boolean, default: false },
+  planName:     String,
+  rewardPaid:   { type: Boolean, default: false }
 });
 
 const userSchema = new mongoose.Schema({
@@ -32,7 +32,13 @@ const userSchema = new mongoose.Schema({
   referredBy:    { type: String, default: null },
   coins:         { type: Number, default: 0 },
   referredUsers: [referredUserSchema],
-  subscriptions: [subscriptionSchema]
+  subscriptions: [subscriptionSchema],
+  location: {
+    latitude:   { type: Number, default: null },
+    longitude:  { type: Number, default: null },
+    address:    { type: String, default: null },
+    capturedAt: { type: Date,   default: null }
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
