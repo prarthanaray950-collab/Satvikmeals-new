@@ -1,37 +1,44 @@
-const express = require('express');
-const { protect } = require('../middleware/auth');
-const User = require('../models/User');
-const router = express.Router();
-router.use(protect);
+const mongoose = require('mongoose');
 
-router.get('/dashboard', async (req, res) => {
-  const user = await User.findById(req.user._id).select('-__v');
-  res.json({
-    name: user.name, email: user.email, phone: user.phone,
-    referralCode: user.referralCode, coins: user.coins,
-    subscriptions: user.subscriptions, referredUsers: user.referredUsers,
-    createdAt: user.createdAt
-  });
+const genCode = () => Math.random().toString(36).substring(2,8).toUpperCase();
+
+const subscriptionSchema = new mongoose.Schema({
+  planId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Plan' },
+  planName:  String,
+  planType:  String,
+  startDate: Date,
+  endDate:   Date,
+  status:    { type: String, enum: ['active','paused','expired','cancelled'], default: 'active' },
+  pausedAt:  Date,
+  paymentId: String
+}, { timestamps: true });
+
+const referredUserSchema = new mongoose.Schema({
+  email:        String,
+  name:         String,
+  joinedAt:     Date,
+  hasPurchased: { type: Boolean, default: false },
+  planName:     String,
+  rewardPaid:   { type: Boolean, default: false }
 });
 
-router.post('/subscription/:subId/pause', async (req, res) => {
-  const user = await User.findById(req.user._id);
-  const sub  = user.subscriptions.id(req.params.subId);
-  if (!sub) return res.status(404).json({ message: 'Not found.' });
-  if (sub.status !== 'active') return res.status(400).json({ message: 'Not active.' });
-  sub.status = 'paused'; sub.pausedAt = new Date();
-  await user.save(); res.json({ message: 'Subscription paused.', subscription: sub });
-});
+const userSchema = new mongoose.Schema({
+  name:          { type: String, required: true },
+  email:         { type: String, required: true, unique: true, lowercase: true },
+  googleId:      { type: String, sparse: true },
+  phone:         { type: String, validate: { validator: v => !v || /^[6-9]\d{9}$/.test(v), message: 'Invalid phone' } },
+  role:          { type: String, enum: ['user','admin'], default: 'user' },
+  referralCode:  { type: String, unique: true, default: genCode },
+  referredBy:    { type: String, default: null },
+  coins:         { type: Number, default: 0 },
+  referredUsers: [referredUserSchema],
+  subscriptions: [subscriptionSchema],
+  location: {
+    latitude:   { type: Number, default: null },
+    longitude:  { type: Number, default: null },
+    address:    { type: String, default: null },
+    capturedAt: { type: Date,   default: null }
+  }
+}, { timestamps: true });
 
-router.post('/subscription/:subId/resume', async (req, res) => {
-  const user = await User.findById(req.user._id);
-  const sub  = user.subscriptions.id(req.params.subId);
-  if (!sub) return res.status(404).json({ message: 'Not found.' });
-  if (sub.status !== 'paused') return res.status(400).json({ message: 'Not paused.' });
-  const days = Math.floor((Date.now() - sub.pausedAt) / 86400000);
-  sub.endDate = new Date(sub.endDate.getTime() + days * 86400000);
-  sub.status = 'active'; sub.pausedAt = undefined;
-  await user.save(); res.json({ message: 'Subscription resumed.', subscription: sub });
-});
-
-module.exports = router;
+module.exports = mongoose.model('User', userSchema);
