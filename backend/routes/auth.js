@@ -1,80 +1,133 @@
-const express     = require('express');
-const User        = require('../models/User');
+const express = require('express');
+const { OAuth2Client } = require('google-auth-library');
+const jwt  = require('jsonwebtoken');
+const User = require('../models/User');
 const { protect } = require('../middleware/auth');
-
+const { sendTelegramMessage } = require('../utils/telegram');
 const router = express.Router();
 
-// GET /api/user/dashboard
-router.get('/dashboard', protect, async (req, res) => {
+const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+// ── GOOGLE AUTH ───────────────────────────────────────────────────────────────
+router.post('/google', async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-__v');
-    if (!user) return res.status(404).json({ message: 'User not found.' });
-    res.json(user);
+    const { idToken, referralCode } = req.body;
+    if (!idToken) return res.status(400).json({ message: 'ID token required.' });
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const client = new OAuth2Client(clientId);
+    let payload;
+
+    try {
+      const ticket = await client.verifyIdToken({ idToken, audience: clientId });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      try {
+        const ticket2 = await client.verifyIdToken({ idToken });
+        payload = ticket2.getPayload();
+      } catch (err2) {
+        return res.status(401).json({ message: 'Google login failed. Please try again.' });
+      }
+    }
+
+    const { sub: googleId, email, name } = payload;
+    if (!email) return res.status(400).json({ message: 'Could not get email from Google.' });
+
+    let user = await User.findOne({ email: email.toLowerCase() });
+    const isNewUser = !user;
+
+    if (!user) {
+      user = await User.create({ googleId, email: email.toLowerCase(), name, referredBy: referralCode || null });
+      if (referralCode) {
+        await User.findOneAndUpdate(
+          { referralCode },
+          { $push: { referredUsers: { email: email.toLowerCase(), name, joinedAt: new Date() } } }
+        );
+      }
+    } else {
+      if (!user.googleId) { user.googleId = googleId; await user.save(); }
+    }
+
+    const token = signToken(user._id);
+    res.json({
+      token, isNewUser,
+      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, referralCode: user.referralCode, coins: user.coins }
+    });
   } catch (err) {
-    console.error('Dashboard error:', err);
-    res.status(500).json({ message: 'Server error.' });
+    console.error('[Google Auth] Error:', err.message);
+    res.status(500).json({ message: 'Login failed. Please try again.' });
   }
 });
 
-// PATCH /api/user/location
-router.patch('/location', protect, async (req, res) => {
+// ── GET ME ────────────────────────────────────────────────────────────────────
+router.get('/me', protect, (req, res) => {
+  const u = req.user;
+  res.json({ id: u._id, name: u.name, email: u.email, phone: u.phone, role: u.role, referralCode: u.referralCode, coins: u.coins, subscriptions: u.subscriptions });
+});
+
+// ── SAVE PHONE ────────────────────────────────────────────────────────────────
+async function savePhone(req, res) {
+  try {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ message: 'Phone required.' });
+    const cleaned = phone.toString().replace(/\D/g, '');
+    if (cleaned.length !== 10 || !/^[6-9]/.test(cleaned))
+      return res.status(400).json({ message: 'Enter a valid 10-digit Indian mobile number.' });
+    const result = await User.findByIdAndUpdate(req.user._id, { $set: { phone: cleaned } }, { new: true });
+    res.json({ success: true, message: 'Phone saved.', phone: result.phone });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+}
+
+router.patch('/phone', protect, savePhone);
+router.post('/save-phone', protect, savePhone);
+
+// ── SAVE LOCATION ─────────────────────────────────────────────────────────────
+router.post('/location', protect, async (req, res) => {
   try {
     const { latitude, longitude, address } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { location: { latitude, longitude, address, capturedAt: new Date() } },
-      { new: true }
+    if (!latitude || !longitude) return res.status(400).json({ message: 'lat/lng required.' });
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $set: { location: { latitude, longitude, address: address || '', capturedAt: new Date() } }
+    });
+
+    const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+    await sendTelegramMessage(
+      `📍 NEW USER SIGNUP\n\n` +
+      `👤 Name: ${req.user.name}\n` +
+      `📧 Email: ${req.user.email}\n` +
+      `📱 Phone: ${req.user.phone || 'Not added yet'}\n` +
+      `🗓 Joined: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n\n` +
+      `📌 Location: ${address || 'Unknown'}\n` +
+      `🗺 Maps: ${mapsLink}`
     );
-    res.json({ message: 'Location updated.', location: user.location });
+
+    res.json({ success: true });
   } catch (err) {
-    console.error('Location update error:', err);
-    res.status(500).json({ message: 'Server error.' });
+    console.error('[Location Save]', err.message);
+    res.status(500).json({ message: 'Failed to save location.' });
   }
 });
 
-// POST /api/user/subscription/:id/pause
-router.post('/subscription/:id/pause', protect, async (req, res) => {
+// ── DEV LOGIN ─────────────────────────────────────────────────────────────────
+router.post('/dev-login', async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: 'User not found.' });
-
-    const sub = user.subscriptions.id(req.params.id);
-    if (!sub) return res.status(404).json({ message: 'Subscription not found.' });
-    if (sub.status !== 'active') return res.status(400).json({ message: 'Only active subscriptions can be paused.' });
-
-    sub.status   = 'paused';
-    sub.pausedAt = new Date();
-    await user.save();
-
-    res.json({ message: 'Subscription paused.', subscription: sub });
-  } catch (err) {
-    console.error('Pause error:', err);
-    res.status(500).json({ message: 'Server error.' });
-  }
-});
-
-// POST /api/user/subscription/:id/resume
-router.post('/subscription/:id/resume', protect, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: 'User not found.' });
-
-    const sub = user.subscriptions.id(req.params.id);
-    if (!sub) return res.status(404).json({ message: 'Subscription not found.' });
-    if (sub.status !== 'paused') return res.status(400).json({ message: 'Only paused subscriptions can be resumed.' });
-
-    if (sub.pausedAt) {
-      const pausedMs = Date.now() - new Date(sub.pausedAt).getTime();
-      sub.endDate = new Date(new Date(sub.endDate).getTime() + pausedMs);
+    const { name, email, referralCode } = req.body;
+    if (!name || !email) return res.status(400).json({ message: 'Name and email required.' });
+    const emailLower = email.toLowerCase().trim();
+    let user = await User.findOne({ email: emailLower });
+    if (!user) {
+      user = await User.create({ name: name.trim(), email: emailLower, referredBy: referralCode || null });
+      if (referralCode) {
+        await User.findOneAndUpdate({ referralCode }, { $push: { referredUsers: { email: emailLower, name, joinedAt: new Date() } } });
+      }
     }
-    sub.status   = 'active';
-    sub.pausedAt = undefined;
-    await user.save();
-
-    res.json({ message: 'Subscription resumed.', subscription: sub });
+    const token = signToken(user._id);
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, referralCode: user.referralCode, coins: user.coins } });
   } catch (err) {
-    console.error('Resume error:', err);
-    res.status(500).json({ message: 'Server error.' });
+    res.status(500).json({ message: 'Login failed: ' + err.message });
   }
 });
 
