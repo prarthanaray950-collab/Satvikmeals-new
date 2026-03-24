@@ -83,10 +83,9 @@ h1 em{font-style:italic;color:#2D6A4F}
   <div class="info" id="infoBox"></div>
   <div class="phone-ok" id="phoneOk"></div>
 
-  <div class="field" id="phoneField" style="display:none">
-    <label>Mobile Number *</label>
-    <input type="tel" id="phoneInput" placeholder="10-digit mobile number"
-           maxlength="10" inputmode="numeric"/>
+  <div class="field" id="phoneField" style="display:none;background:#fffbf0;border:1.5px solid #f0c040;border-radius:10px;padding:16px">
+    <label>📱 Mobile Number * <small style="color:var(--tl);font-weight:300">(Required for delivery)</small></label>
+    <input type="tel" id="phoneInput" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" pattern="[6-9][0-9]{9}"/>
     <div class="hint">Required for delivery coordination only.</div>
   </div>
 
