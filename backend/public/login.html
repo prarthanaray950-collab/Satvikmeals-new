@@ -1,97 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Login — SatvikMeals</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--g9:#0A2415;--g8:#163B26;--g7:#1E5C39;--g6:#2E8B57;--g5:#3DAA6C;--g0:#EDFAF3;--g00:#F6FDF9;--cream:#FDFAF4;--warm:#FEFCF8;--text:#0F1F14;--text2:#2D4A38;--text3:#6B8C78;--border:#D6EBE0;--shadow:rgba(14,55,33,0.12)}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito',sans-serif;background:linear-gradient(150deg,var(--warm) 0%,var(--g00) 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.back-link{position:fixed;top:20px;left:20px;display:flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:600;color:var(--text3);text-decoration:none;padding:8px 14px;background:white;border:1px solid var(--border);border-radius:8px;transition:border-color 0.2s}
-.back-link:hover{border-color:var(--g5);color:var(--g7)}
-.card{background:white;border:1px solid var(--border);border-radius:20px;padding:48px 40px;max-width:420px;width:100%;box-shadow:0 16px 56px var(--shadow);animation:fadeUp 0.5s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.logo{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:32px}
-.logo-icon{width:44px;height:44px;background:var(--g8);border-radius:10px;display:flex;align-items:center;justify-content:center}
-.logo-icon svg{width:22px;height:22px;fill:var(--cream)}
-.logo-text{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--g8)}
-.logo-sub{font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--g6);display:block;margin-top:-3px}
-h1{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:700;color:var(--g9);margin-bottom:8px;text-align:center}
-h1 em{font-style:italic;color:var(--g6)}
-.sub{font-size:0.875rem;color:var(--text3);font-weight:400;line-height:1.7;margin-bottom:28px;text-align:center}
-.form-label{display:block;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.form-input{width:100%;height:46px;border:1.5px solid var(--border);border-radius:9px;padding:0 14px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;background:var(--warm);color:var(--text);transition:border-color 0.2s;margin-bottom:16px}
-.form-input:focus{border-color:var(--g6)}
-.divider{text-align:center;font-size:0.75rem;color:var(--text3);margin:4px 0 16px;position:relative}
-.divider::before,.divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border)}
-.divider::before{left:0}.divider::after{right:0}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:48px;border:1.5px solid var(--border);border-radius:9px;background:white;font-family:'Nunito',sans-serif;font-size:0.875rem;font-weight:600;color:var(--text);cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:10px}
-.btn-google:hover{border-color:var(--g5);box-shadow:0 2px 14px var(--shadow)}
-.btn-google svg{width:20px;height:20px;flex-shrink:0}
-.btn-primary{width:100%;height:48px;border-radius:9px;border:none;cursor:pointer;background:var(--g7);color:white;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.03em;transition:background 0.2s,transform 0.15s;margin-bottom:10px}
-.btn-primary:hover{background:var(--g6);transform:translateY(-1px)}
-.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-#status{padding:12px 14px;border-radius:8px;font-size:0.845rem;margin-top:4px;display:none;font-weight:500}
-#status.success{background:var(--g0);color:var(--g7)}
-#status.error{background:#FFF5F5;color:#c53030}
-#status.loading{background:#F5F5F5;color:var(--text3)}
-.note{font-size:0.72rem;color:var(--text3);line-height:1.65;margin-top:16px;text-align:center}
-.note a{color:var(--g6);text-decoration:none}
-.ref-wrap{background:var(--g0);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px}
-.ref-wrap label{font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--g6);display:block;margin-bottom:6px}
-.ref-wrap input{width:100%;height:38px;border:1px solid var(--border);border-radius:7px;padding:0 12px;font-family:'Nunito',sans-serif;font-size:0.875rem;background:white;outline:none;text-transform:uppercase;letter-spacing:0.08em}
-.ref-wrap input:focus{border-color:var(--g5)}
-.ref-note{font-size:0.7rem;color:var(--g6);margin-top:5px;font-weight:400}
-.wa-link{display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:white;border-radius:9px;height:44px;text-decoration:none;font-size:0.86rem;font-weight:700;transition:background 0.2s;margin-top:8px}
-.wa-link:hover{background:#1ebb59}
-.wa-link svg{width:18px;height:18px;fill:white}
+:root{
+  --g9:#0A2318;--g8:#143D2A;--g7:#1E5C3F;--g6:#2E7D55;--g5:#3DAA70;--g4:#52C985;
+  --g1:#C8F2D8;--g0:#E8FAF0;
+  --saffron:#E8871A;--saffron-l:#FFF0D6;
+  --cream:#FEFCF7;--ww:#FFFFFF;
+  --td:#0F1A12;--tl:#6B8070;--bd:#D8EBE0;
+  --shadow-sm:0 2px 8px rgba(10,35,24,0.08);
+  --shadow-md:0 8px 32px rgba(10,35,24,0.14);
+  --shadow-xl:0 40px 120px rgba(10,35,24,0.28);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;}
+body::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(30,92,63,0.08) 0%,transparent 70%),radial-gradient(ellipse at 80% 20%,rgba(52,201,112,0.06) 0%,transparent 60%);pointer-events:none;}
+
+/* NAV MINI */
+.login-nav{position:fixed;top:0;left:0;right:0;height:64px;background:rgba(254,252,247,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 32px;justify-content:space-between;z-index:100;}
+.login-nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--g8);font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;}
+.login-nav-logo img{width:34px;height:34px;border-radius:8px;object-fit:cover;}
+.login-nav-back{font-size:0.78rem;color:var(--tl);text-decoration:none;display:flex;align-items:center;gap:6px;font-weight:500;transition:color 0.2s;}
+.login-nav-back:hover{color:var(--g7);}
+
+/* CARD */
+.card{background:white;border:1px solid var(--bd);border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow-xl);position:relative;margin-top:64px;animation:popIn 0.4s ease both;}
+@keyframes popIn{from{opacity:0;transform:scale(0.96) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+.card-logo{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;color:var(--g8);font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:28px;}
+.card-logo img{width:40px;height:40px;border-radius:10px;object-fit:cover;box-shadow:var(--shadow-sm);}
+
+h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--g9);margin-bottom:8px;line-height:1.2;}
+h1 em{font-style:italic;color:var(--g6);}
+.sub{font-size:0.845rem;color:var(--tl);font-weight:400;line-height:1.7;margin-bottom:28px;}
+
+/* BENEFITS */
+.login-benefits{display:flex;flex-direction:column;gap:8px;background:var(--g0);border:1px solid var(--g1);border-radius:12px;padding:16px;margin-bottom:24px;text-align:left;}
+.lb-item{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--g8);font-weight:500;}
+.lb-item::before{content:'✓';color:var(--g5);font-weight:800;font-size:0.82rem;flex-shrink:0;}
+
+/* REFERRAL */
+.ref-box{background:var(--saffron-l);border:1px solid rgba(232,135,26,0.25);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left;}
+.ref-box label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--saffron);display:block;margin-bottom:5px;}
+.ref-box input{width:100%;height:38px;border:1px solid rgba(232,135,26,0.3);border-radius:8px;padding:0 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;background:white;outline:none;text-transform:uppercase;letter-spacing:0.08em;}
+.ref-box input:focus{border-color:var(--saffron);}
+.ref-note{font-size:0.68rem;color:var(--saffron);margin-top:5px;font-weight:400;}
+
+/* GOOGLE BTN */
+#googleSignInDiv{display:flex;justify-content:center;margin-bottom:16px;}
+#googleSignInDiv iframe{border-radius:10px!important;}
+
+/* DEV LOGIN */
+.dev-box{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:12px;padding:18px;margin-bottom:14px;text-align:left;}
+.dev-box h3{font-size:0.84rem;font-weight:700;color:#0C4A6E;margin-bottom:4px;}
+.dev-box p{font-size:0.75rem;color:#075985;font-weight:300;line-height:1.55;margin-bottom:10px;}
+.dev-input{width:100%;height:40px;border:1px solid #BAE6FD;border-radius:8px;padding:0 12px;font-size:0.845rem;font-family:'Plus Jakarta Sans',sans-serif;outline:none;margin-bottom:8px;background:white;}
+.dev-input:focus{border-color:#0369A1;}
+.btn-dev{height:42px;background:#0369A1;color:white;border:none;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;width:100%;font-weight:700;letter-spacing:0.04em;transition:background 0.2s;}
+.btn-dev:hover{background:#0284C7;}
+
+/* STATUS */
+#status{padding:12px 16px;border-radius:10px;font-size:0.845rem;margin-top:12px;display:none;text-align:left;font-weight:500;}
+#status.success{background:var(--g0);color:var(--g8);border:1px solid var(--g1);}
+#status.error{background:#FFF5F5;color:#c53030;border:1px solid #FED7D7;}
+#status.loading{background:#F5F5F5;color:var(--tl);}
+
+.note{font-size:0.68rem;color:var(--tl);font-weight:300;line-height:1.6;margin-top:14px;}
+.note a{color:var(--g6);text-decoration:none;font-weight:500;}
+
+/* SOCIAL PROOF */
+.login-social{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;padding-top:18px;border-top:1px solid var(--bd);}
+.ls-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g7),var(--g6));color:white;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;margin-left:-8px;}
+.ls-avatar:first-child{margin-left:0;}
+.ls-text{font-size:0.72rem;color:var(--tl);margin-left:4px;font-weight:400;}
+.ls-text strong{color:var(--g8);font-weight:600;}
+
+/* LOCATION MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal-overlay.open{display:flex;}
+.modal-box{background:white;border-radius:24px;padding:44px 36px;max-width:500px;width:90%;text-align:center;animation:popIn 0.35s ease both;box-shadow:var(--shadow-xl);}
+.modal-icon{width:68px;height:68px;background:var(--g0);border:2px solid var(--g1);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.modal-icon svg{width:32px;height:32px;stroke:var(--g7);fill:none;stroke-width:2;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--g9);margin-bottom:10px;}
+.modal-desc{font-size:0.875rem;color:var(--tl);line-height:1.8;margin-bottom:28px;}
+.modal-btns{display:flex;flex-direction:column;gap:10px;}
+.btn-modal-yes{height:54px;background:linear-gradient(135deg,var(--g8),var(--g7));color:white;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-modal-yes:hover{filter:brightness(1.1);}
+.btn-modal-yes:disabled{opacity:0.65;cursor:default;}
+.btn-modal-map{height:54px;background:transparent;color:var(--g8);border:2px solid var(--g8);border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-modal-map:hover{background:var(--g0);}
+.btn-modal-skip{height:40px;background:transparent;color:var(--tl);border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;cursor:pointer;text-decoration:underline;}
+
+/* MAP PICKER */
+#mapPickerContainer{display:none;margin-top:16px;}
+.map-instruction{font-size:0.78rem;color:var(--tl);margin-bottom:8px;text-align:left;background:var(--g0);border:1px solid var(--g1);padding:10px 14px;border-radius:8px;}
+#osmMap{width:100%;height:320px;border-radius:12px;border:2px solid var(--bd);overflow:hidden;}
+.map-search-row{display:flex;gap:8px;margin-top:10px;}
+.map-search-input{flex:1;height:40px;border:1px solid var(--bd);border-radius:8px;padding:0 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.845rem;outline:none;}
+.map-search-input:focus{border-color:var(--g6);}
+.btn-map-search{height:40px;padding:0 16px;background:var(--g7);color:white;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;}
+.map-confirm-row{display:flex;gap:10px;margin-top:10px;}
+.btn-map-confirm{flex:1;height:46px;background:var(--g8);color:white;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background 0.2s;}
+.btn-map-confirm:hover{background:var(--g7);}
+.btn-map-cancel{height:46px;padding:0 20px;background:transparent;color:var(--tl);border:1.5px solid var(--bd);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;cursor:pointer;}
+.selected-addr{font-size:0.75rem;color:var(--g7);margin-top:6px;text-align:left;padding:8px 12px;background:var(--g0);border-radius:6px;min-height:32px;}
 </style>
 </head>
 <body>
-<a href="index.html" class="back-link">← Back to Home</a>
-<div class="card">
-  <a href="index.html" class="logo">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 5 4.5 5 8.5c0 2.5 1.3 4.7 3.2 6V19h7.6v-4.5C17.7 13.2 19 11 19 8.5 19 4.5 15.5 2 12 2z"/></svg></div>
-    <div><span class="logo-text">SatvikMeals</span><span class="logo-sub">Patna, Bihar</span></div>
+
+<!-- MINI NAV -->
+<div class="login-nav">
+  <a href="index.html" class="login-nav-logo">
+    <img src="/logo.jpg" alt="SatvikMeals"/>
+    SatvikMeals
   </a>
-  <h1>Welcome <em>back.</em></h1>
-  <p class="sub">Sign in to manage your subscription, meals, and delivery.</p>
-  <div class="ref-wrap">
-    <label>Referral Code (Optional)</label>
-    <input type="text" id="refInput" placeholder="e.g. ABC123" maxlength="8"/>
-    <div class="ref-note">Have a friend's referral code? Enter it before signing in.</div>
-  </div>
-  <div id="googleSignInDiv"></div>
-  <button class="btn-google" id="googleBtn" onclick="startGoogleLogin()" style="display:none">
-    <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-    Continue with Google
-  </button>
-  <div id="devBox">
-    <div class="divider">sign in with your details</div>
-    <label class="form-label">Full Name</label>
-    <input class="form-input" id="devName" placeholder="Your Name" type="text"/>
-    <label class="form-label">Email Address</label>
-    <input class="form-input" id="devEmail" placeholder="your@email.com" type="email"/>
-    <button class="btn-primary" id="loginBtn" onclick="devLogin()">Sign In to Dashboard</button>
-  </div>
-  <div id="status"></div>
-  <a href="https://wa.me/919031447621?text=Hi!%20I%20need%20help%20with%20my%20SatvikMeals%20account." target="_blank" class="wa-link">
-    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.115 1.524 5.845L.057 23.95l6.265-1.643A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.367l-.36-.214-3.72.976.992-3.626-.234-.373A9.817 9.817 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
-    Need help? Message us on WhatsApp
+  <a href="index.html" class="login-nav-back">
+    ← Back to Home
   </a>
-  <p class="note">By continuing you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
 </div>
+
+<!-- LOGIN CARD -->
+<div class="card">
+  <a href="index.html" class="card-logo">
+    <img src="/logo.jpg" alt="SatvikMeals"/>
+    SatvikMeals
+  </a>
+
+  <h1>Welcome <em>back.</em></h1>
+  <div class="sub">Sign in to manage your subscription, meals, and delivery schedule.</div>
+
+  <div class="login-benefits">
+    <div class="lb-item">First week completely free for new users</div>
+    <div class="lb-item">Manage deliveries from your dashboard</div>
+    <div class="lb-item">Pause or cancel anytime — no hassle</div>
+    <div class="lb-item">Secure Google Sign-In in one click</div>
+  </div>
+
+  <div class="ref-box">
+    <label>🎁 Referral Code (Optional)</label>
+    <input type="text" id="refInput" placeholder="E.G. ABC123" maxlength="8"/>
+    <div class="ref-note">Have a friend's code? Enter it to unlock bonus rewards.</div>
+  </div>
+
+  <div id="googleSignInDiv"></div>
+
+  <div class="dev-box" id="devBox" style="display:none">
+    <h3>Quick Access Login</h3>
+    <p>Enter your name and email to access your dashboard.</p>
+    <input class="dev-input" id="devName" placeholder="Your Full Name"/>
+    <input class="dev-input" id="devEmail" placeholder="your@email.com" type="email"/>
+    <button class="btn-dev" onclick="devLogin()">Continue →</button>
+  </div>
+
+  <div id="status"></div>
+  <div class="note">By continuing you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</div>
+
+  <div class="login-social">
+    <div class="ls-avatar">R</div>
+    <div class="ls-avatar">P</div>
+    <div class="ls-avatar">A</div>
+    <div class="ls-avatar">S</div>
+    <div class="ls-avatar">M</div>
+    <div class="ls-text"><strong>200+</strong> happy subscribers in Patna</div>
+  </div>
+</div>
+
+<!-- LOCATION MODAL -->
+<div class="modal-overlay" id="locationModal">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    </div>
+    <div class="modal-title" id="modalTitle">Where should we deliver?</div>
+    <div class="modal-desc" id="modalDesc">To get fresh tiffin at your door, let us know your delivery location. You can share your current location or pick it on a map.</div>
+
+    <div class="modal-btns" id="modalBtns">
+      <button class="btn-modal-yes" id="btnCurrentLoc" onclick="useCurrentLocation()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        Deliver to My Current Location
+      </button>
+      <button class="btn-modal-map" onclick="showMapPicker()">
+        📍 Pick Location on Map
+      </button>
+
+      <!-- MAP PICKER INLINE -->
+      <div id="mapPickerContainer">
+        <div class="map-instruction">📌 Search for your area or landmark below, then confirm your pin location.</div>
+        <div class="map-search-row">
+          <input type="text" class="map-search-input" id="mapSearchInput" placeholder="Search: e.g. Boring Road Patna"/>
+          <button class="btn-map-search" onclick="searchMap()">Search</button>
+        </div>
+        <div id="osmMap">
+          <iframe id="mapFrame" width="100%" height="320" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=85.05%2C25.50%2C85.25%2C25.68&layer=mapnik&marker=25.5941%2C85.1376"
+            style="border:none;border-radius:12px;display:block;width:100%;height:320px;">
+          </iframe>
+        </div>
+        <div class="selected-addr" id="selectedAddr">📍 Default: Patna, Bihar — or search your area above</div>
+        <div class="map-confirm-row">
+          <button class="btn-map-confirm" onclick="confirmMapLocation()">✅ Confirm This Location</button>
+          <button class="btn-map-cancel" onclick="hideMapPicker()">← Back</button>
+        </div>
+      </div>
+
+      <button class="btn-modal-skip" onclick="skipAndRedirect()">Skip for now, continue to app</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const API='';const GOOGLE_CLIENT_ID='';
-if(localStorage.getItem('satvikToken')){const redirect=new URLSearchParams(window.location.search).get('redirect')||'dashboard.html';window.location.href=redirect;}
-const refCode=new URLSearchParams(window.location.search).get('ref')||'';
-if(refCode)document.getElementById('refInput').value=refCode.toUpperCase();
-if(GOOGLE_CLIENT_ID){document.getElementById('devBox').style.display='none';document.getElementById('googleBtn').style.display='flex';const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=()=>{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleGoogleCredential,auto_select:false});google.accounts.id.renderButton(document.getElementById('googleSignInDiv'),{theme:'outline',size:'large',width:332,text:'continue_with'});};document.head.appendChild(s);}
-async function handleGoogleCredential(response){showStatus('Signing in...','loading');const referralCode=document.getElementById('refInput').value.trim().toUpperCase();try{const r=await fetch(API+'/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:response.credential,referralCode})});const d=await r.json();if(!r.ok)throw new Error(d.message);saveAndRedirect(d);}catch(err){showStatus(err.message||'Login failed','error');}}
-async function devLogin(){const name=document.getElementById('devName').value.trim();const email=document.getElementById('devEmail').value.trim().toLowerCase();const referralCode=document.getElementById('refInput').value.trim().toUpperCase();if(!name||!email){showStatus('Please enter your name and email.','error');return;}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showStatus('Please enter a valid email.','error');return;}const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Signing in...';showStatus('Signing in...','loading');try{const r=await fetch(API+'/api/auth/dev-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,referralCode})});const d=await r.json();if(!r.ok)throw new Error(d.message);saveAndRedirect(d);}catch(err){showStatus(err.message||'Login failed. Is server running?','error');btn.disabled=false;btn.textContent='Sign In to Dashboard';}}
-function saveAndRedirect(d){localStorage.setItem('satvikToken',d.token);localStorage.setItem('satvikUser',JSON.stringify(d.user));showStatus('Login successful! Redirecting...','success');const redirect=new URLSearchParams(window.location.search).get('redirect')||'dashboard.html';setTimeout(()=>{window.location.href=d.user.role==='admin'?'admin.html':redirect;},700);}
-function showStatus(msg,type){const s=document.getElementById('status');s.textContent=msg;s.className=type;s.style.display='block';}
+const API = '';
+const GOOGLE_CLIENT_ID = '213132143602-an29ji4fuv3393o62bq1ke8roak4q7u8.apps.googleusercontent.com';
+
+// If already logged in, skip
+if (localStorage.getItem('satvikToken')) {
+  const redirect = new URLSearchParams(window.location.search).get('redirect') || 'dashboard.html';
+  window.location.href = redirect;
+}
+
+// Pre-fill referral
+const refCode = new URLSearchParams(window.location.search).get('ref') || '';
+if (refCode) document.getElementById('refInput').value = refCode.toUpperCase();
+
+// Load Google GSI
+if (GOOGLE_CLIENT_ID) {
+  const script = document.createElement('script');
+  script.src = 'https://accounts.google.com/gsi/client';
+  script.onload = () => {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('googleSignInDiv'),
+      { theme: 'outline', size: 'large', width: 340, text: 'continue_with', shape: 'rectangular', logo_alignment: 'center' }
+    );
+    google.accounts.id.prompt();
+  };
+  document.head.appendChild(script);
+} else {
+  document.getElementById('devBox').style.display = 'block';
+}
+
+async function handleGoogleCredential(response) {
+  showStatus('Signing in with Google…', 'loading');
+  const referralCode = document.getElementById('refInput').value.trim().toUpperCase();
+  try {
+    const r = await fetch(API + '/api/auth/google', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({idToken: response.credential, referralCode})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message);
+    handleLoginSuccess(d);
+  } catch(err) {
+    showStatus('❌ ' + (err.message || 'Login failed. Please try again.'), 'error');
+  }
+}
+
+async function devLogin() {
+  const name  = document.getElementById('devName').value.trim();
+  const email = document.getElementById('devEmail').value.trim().toLowerCase();
+  const referralCode = document.getElementById('refInput').value.trim().toUpperCase();
+  if (!name || !email) { showStatus('Please enter your name and email', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStatus('Please enter a valid email address', 'error'); return; }
+  showStatus('Logging in…', 'loading');
+  try {
+    const r = await fetch(API + '/api/auth/dev-login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, referralCode})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message);
+    handleLoginSuccess(d);
+  } catch(err) {
+    showStatus('❌ ' + (err.message || 'Login failed.'), 'error');
+  }
+}
+
+let pendingToken = null, pendingDest = null;
+
+function handleLoginSuccess(d) {
+  localStorage.setItem('satvikToken', d.token);
+  localStorage.setItem('satvikUser', JSON.stringify(d.user));
+  showStatus('✅ Login successful! Welcome to SatvikMeals.', 'success');
+  const redirect = new URLSearchParams(window.location.search).get('redirect') || 'dashboard.html';
+  const dest = d.user.role === 'admin' ? 'admin.html' : redirect;
+
+  if (d.isNewUser) {
+    pendingToken = d.token;
+    pendingDest = dest;
+    setTimeout(() => openLocationModal(), 700);
+  } else {
+    setTimeout(() => window.location.href = dest, 800);
+  }
+}
+
+// ── LOCATION MODAL ──
+function openLocationModal() {
+  document.getElementById('locationModal').classList.add('open');
+}
+
+async function useCurrentLocation() {
+  if (!navigator.geolocation) {
+    skipAndRedirect();
+    return;
+  }
+  const btn = document.getElementById('btnCurrentLoc');
+  btn.textContent = '📡 Getting your location...';
+  btn.disabled = true;
+  try {
+    const pos = await new Promise((res,rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, {timeout: 8000, enableHighAccuracy: true})
+    );
+    const {latitude, longitude} = pos.coords;
+    let address = 'Patna, Bihar';
+    try {
+      const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+      const gd = await geo.json();
+      address = gd.display_name || address;
+    } catch(_) {}
+    await saveLoc(latitude, longitude, address);
+    document.getElementById('locationModal').classList.remove('open');
+    window.location.href = pendingDest || 'dashboard.html';
+  } catch(err) {
+    btn.textContent = 'Deliver to My Current Location';
+    btn.disabled = false;
+    showMapPicker(); // Auto-fall to map if denied
+  }
+}
+
+let mapLat = 25.5941, mapLng = 85.1376;
+
+function showMapPicker() {
+  document.getElementById('mapPickerContainer').style.display = 'block';
+  document.querySelector('.btn-modal-yes').style.display = 'none';
+  document.querySelector('.btn-modal-map').style.display = 'none';
+}
+
+function hideMapPicker() {
+  document.getElementById('mapPickerContainer').style.display = 'none';
+  document.querySelector('.btn-modal-yes').style.display = 'flex';
+  document.querySelector('.btn-modal-map').style.display = 'block';
+}
+
+async function searchMap() {
+  const q = document.getElementById('mapSearchInput').value.trim();
+  if (!q) return;
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ' Patna Bihar')}&format=json&limit=1`);
+    const results = await r.json();
+    if (results.length) {
+      mapLat = parseFloat(results[0].lat);
+      mapLng = parseFloat(results[0].lon);
+      const display = results[0].display_name;
+      document.getElementById('selectedAddr').textContent = '📍 ' + display;
+      const bbox = `${mapLng-0.03}%2C${mapLat-0.02}%2C${mapLng+0.03}%2C${mapLat+0.02}`;
+      document.getElementById('mapFrame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${mapLat}%2C${mapLng}`;
+    } else {
+      document.getElementById('selectedAddr').textContent = '❌ Location not found. Try a more specific name.';
+    }
+  } catch(e) {
+    document.getElementById('selectedAddr').textContent = '❌ Search failed. Check your connection.';
+  }
+}
+
+async function confirmMapLocation() {
+  const addrText = document.getElementById('selectedAddr').textContent.replace('📍 ','');
+  await saveLoc(mapLat, mapLng, addrText);
+  document.getElementById('locationModal').classList.remove('open');
+  window.location.href = pendingDest || 'dashboard.html';
+}
+
+function skipAndRedirect() {
+  document.getElementById('locationModal').classList.remove('open');
+  window.location.href = pendingDest || 'dashboard.html';
+}
+
+async function saveLoc(lat, lng, address) {
+  const tok = pendingToken || localStorage.getItem('satvikToken');
+  if (!tok) return;
+  try {
+    await fetch(API + '/api/auth/location', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+tok},
+      body: JSON.stringify({latitude:lat, longitude:lng, address})
+    });
+  } catch(_) {}
+}
+
+function showStatus(msg, type) {
+  const s = document.getElementById('status');
+  s.textContent = msg;
+  s.className = type;
+  s.style.display = 'block';
+}
+
+// Allow Enter key for search
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'mapSearchInput') searchMap();
+});
 </script>
 </body>
 </html>
