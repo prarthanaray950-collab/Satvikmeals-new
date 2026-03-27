@@ -12,11 +12,16 @@ const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '3
 async function createUserWithRetry(data, attempts = 5) {
   for (let i = 0; i < attempts; i++) {
     try {
-      return await User.create(data);
+      console.log(`[createUser] Attempt ${i + 1} for email: ${data.email}`);
+      const user = await User.create(data);
+      console.log(`[createUser] Success on attempt ${i + 1}, userId: ${user._id}`);
+      return user;
     } catch (err) {
+      console.error(`[createUser] Attempt ${i + 1} failed — code: ${err.code}, message: ${err.message}`);
+      console.error(`[createUser] keyPattern: ${JSON.stringify(err.keyPattern)}`);
       // E11000 = MongoDB duplicate key error
       if (err.code === 11000 && err.keyPattern?.referralCode && i < attempts - 1) {
-        // referralCode default fn runs fresh on each User.create() call, so just retry
+        console.log(`[createUser] referralCode collision detected, retrying...`);
         continue;
       }
       throw err;
@@ -26,18 +31,23 @@ async function createUserWithRetry(data, attempts = 5) {
 
 // ── GOOGLE AUTH ───────────────────────────────────────────────────────────────
 router.post('/google', async (req, res) => {
+  const step = { current: 'start' };
   try {
     const { idToken, referralCode } = req.body;
+    console.log(`[Google Auth] Request received. referralCode: ${referralCode || 'none'}`);
+
     if (!idToken) return res.status(400).json({ message: 'ID token required.' });
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
+    console.log(`[Google Auth] GOOGLE_CLIENT_ID present: ${!!clientId}`);
+
+    step.current = 'verifyToken';
     const client = new OAuth2Client(clientId);
     let payload;
-
     try {
-      // Always validate audience — never skip it
       const ticket = await client.verifyIdToken({ idToken, audience: clientId });
       payload = ticket.getPayload();
+      console.log(`[Google Auth] Token verified. email: ${payload.email}`);
     } catch (verifyErr) {
       console.error('[Google Auth] Token verification failed:', verifyErr.message);
       return res.status(401).json({ message: 'Google login failed. Please try again.' });
@@ -46,35 +56,59 @@ router.post('/google', async (req, res) => {
     const { sub: googleId, email, name } = payload;
     if (!email) return res.status(400).json({ message: 'Could not get email from Google.' });
 
+    step.current = 'findUser';
+    console.log(`[Google Auth] Looking up user: ${email.toLowerCase()}`);
     let user = await User.findOne({ email: email.toLowerCase() });
     const isNewUser = !user;
+    console.log(`[Google Auth] isNewUser: ${isNewUser}`);
 
     if (!user) {
+      step.current = 'createUser';
+      console.log(`[Google Auth] Creating new user for: ${email.toLowerCase()}`);
       user = await createUserWithRetry({
         googleId,
         email: email.toLowerCase(),
         name,
         referredBy: referralCode || null
       });
+      console.log(`[Google Auth] New user created: ${user._id}`);
 
       if (referralCode) {
+        step.current = 'applyReferral';
+        console.log(`[Google Auth] Applying referral code: ${referralCode}`);
         await User.findOneAndUpdate(
           { referralCode },
           { $push: { referredUsers: { email: email.toLowerCase(), name, joinedAt: new Date() } } }
         );
+        console.log(`[Google Auth] Referral applied.`);
       }
     } else {
-      if (!user.googleId) { user.googleId = googleId; await user.save(); }
+      if (!user.googleId) {
+        step.current = 'linkGoogleId';
+        console.log(`[Google Auth] Linking googleId to existing user: ${user._id}`);
+        user.googleId = googleId;
+        await user.save();
+      }
     }
 
+    step.current = 'signToken';
     const token = signToken(user._id);
+    console.log(`[Google Auth] Login successful for: ${email}`);
+
     res.json({
       token, isNewUser,
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, referralCode: user.referralCode, coins: user.coins }
     });
   } catch (err) {
-    console.error('[Google Auth] Error:', err.message);
-    res.status(500).json({ message: 'Login failed. Please try again.' });
+    console.error(`[Google Auth] FATAL at step: "${step.current}"`);
+    console.error(`[Google Auth] Error name: ${err.name}`);
+    console.error(`[Google Auth] Error message: ${err.message}`);
+    console.error(`[Google Auth] Error code: ${err.code}`);
+    console.error(`[Google Auth] keyPattern: ${JSON.stringify(err.keyPattern)}`);
+    console.error(`[Google Auth] keyValue: ${JSON.stringify(err.keyValue)}`);
+    console.error(`[Google Auth] Stack: ${err.stack}`);
+    // Temporarily returns the real error so you can see it in the browser network tab
+    res.status(500).json({ message: `[${step.current}] ${err.message}` });
   }
 });
 
