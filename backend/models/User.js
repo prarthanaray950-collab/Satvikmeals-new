@@ -25,10 +25,20 @@ const referredUserSchema = new mongoose.Schema({
 });
 
 const userSchema = new mongoose.Schema({
-  name:          { type: String, required: true },
-  email:         { type: String, required: true, unique: true, lowercase: true },
-  googleId:      { type: String, sparse: true },
-  phone:         { type: String, validate: { validator: v => !v || /^[6-9]\d{9}$/.test(v), message: 'Invalid phone' } },
+  name:         { type: String, required: true },
+  email:        { type: String, required: true, unique: true, lowercase: true },
+  googleId:     { type: String, sparse: true },
+  // sparse: true means null values are excluded from the unique index
+  // so multiple users without a phone number won't conflict
+  phone:        {
+    type: String,
+    unique: true,
+    sparse: true,
+    validate: {
+      validator: v => !v || /^[6-9]\d{9}$/.test(v),
+      message: 'Invalid phone'
+    }
+  },
   role:          { type: String, enum: ['user','admin'], default: 'user' },
   referralCode:  { type: String, unique: true, default: genCode },
   referredBy:    { type: String, default: null },
