@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const crypto   = require('crypto');
 
-const genCode = () => Math.random().toString(36).substring(2,8).toUpperCase();
+// 8 hex chars = ~4 billion combinations, collision practically impossible
+const genCode = () => crypto.randomBytes(4).toString('hex').toUpperCase();
 
 const subscriptionSchema = new mongoose.Schema({
   planId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Plan' },
