@@ -8,6 +8,22 @@ const router = express.Router();
 
 const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
+// Creates a new user, retrying up to 5 times if referralCode collides
+async function createUserWithRetry(data, attempts = 5) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await User.create(data);
+    } catch (err) {
+      // E11000 = MongoDB duplicate key error
+      if (err.code === 11000 && err.keyPattern?.referralCode && i < attempts - 1) {
+        // referralCode default fn runs fresh on each User.create() call, so just retry
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 // ── GOOGLE AUTH ───────────────────────────────────────────────────────────────
 router.post('/google', async (req, res) => {
   try {
@@ -19,15 +35,12 @@ router.post('/google', async (req, res) => {
     let payload;
 
     try {
+      // Always validate audience — never skip it
       const ticket = await client.verifyIdToken({ idToken, audience: clientId });
       payload = ticket.getPayload();
     } catch (verifyErr) {
-      try {
-        const ticket2 = await client.verifyIdToken({ idToken });
-        payload = ticket2.getPayload();
-      } catch (err2) {
-        return res.status(401).json({ message: 'Google login failed. Please try again.' });
-      }
+      console.error('[Google Auth] Token verification failed:', verifyErr.message);
+      return res.status(401).json({ message: 'Google login failed. Please try again.' });
     }
 
     const { sub: googleId, email, name } = payload;
@@ -37,7 +50,13 @@ router.post('/google', async (req, res) => {
     const isNewUser = !user;
 
     if (!user) {
-      user = await User.create({ googleId, email: email.toLowerCase(), name, referredBy: referralCode || null });
+      user = await createUserWithRetry({
+        googleId,
+        email: email.toLowerCase(),
+        name,
+        referredBy: referralCode || null
+      });
+
       if (referralCode) {
         await User.findOneAndUpdate(
           { referralCode },
@@ -119,7 +138,7 @@ router.post('/dev-login', async (req, res) => {
     const emailLower = email.toLowerCase().trim();
     let user = await User.findOne({ email: emailLower });
     if (!user) {
-      user = await User.create({ name: name.trim(), email: emailLower, referredBy: referralCode || null });
+      user = await createUserWithRetry({ name: name.trim(), email: emailLower, referredBy: referralCode || null });
       if (referralCode) {
         await User.findOneAndUpdate({ referralCode }, { $push: { referredUsers: { email: emailLower, name, joinedAt: new Date() } } });
       }
