@@ -289,9 +289,26 @@
   <!-- MENU -->
   <div class="panel" id="panel-menu">
     <div class="section-bar">
-      <div><div class="page-title">Weekly Menu</div><div class="page-sub">Set meals for each day of the week</div></div>
-      <button class="btn-add" onclick="openMenuModal()">+ New Week</button>
+      <div><div class="page-title">Weekly Menu</div><div class="page-sub">Paste your menu text or fill manually day by day</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-add-sec" onclick="togglePasteBox()">📋 Paste &amp; Auto-Fill</button>
+        <button class="btn-add" onclick="openMenuModal()">+ New Week</button>
+      </div>
     </div>
+
+    <!-- SMART PASTE BOX -->
+    <div id="pasteBox" style="display:none;background:white;border:2px solid var(--g6);border-radius:12px;padding:22px;margin-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:500;color:var(--g9);margin-bottom:4px;">✨ Smart Paste — Auto-Fill Menu</div>
+      <div style="font-size:0.8rem;color:var(--tl);margin-bottom:14px;line-height:1.6;">Paste your weekly menu text below in any format like:<br><code style="background:var(--g0);padding:2px 6px;border-radius:4px;font-size:0.78rem;">Monday\nBreakfast: Poha\nLunch: Dal + Rice\nDinner: Roti + Sabji</code></div>
+      <textarea id="pasteArea" style="width:100%;min-height:260px;padding:13px 15px;border:1.5px solid var(--bd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.855rem;line-height:1.75;outline:none;resize:vertical;color:var(--td);" placeholder="Monday&#10;Breakfast: Aloo Paratha + Curd&#10;Lunch: Dal + Hari Sabji + Roti/Rice + Salad&#10;Dinner: Dal + Hari Sabji + Roti + Salad&#10;&#10;Tuesday&#10;Breakfast: Vegetable Poha&#10;Lunch: Chhola + Roti/Rice + Salad&#10;Dinner: Dal + Aloo Bhujiya + Roti + Salad&#10;&#10;Wednesday&#10;...and so on for each day"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn-add" onclick="parsePaste()">✨ Auto-Fill from Text</button>
+        <button class="btn-add-sec" onclick="document.getElementById('pasteArea').value='';">Clear Text</button>
+        <button style="height:38px;padding:0 16px;background:none;border:1px solid var(--bd);border-radius:7px;font-size:0.78rem;cursor:pointer;color:var(--tl);font-family:'DM Sans',sans-serif;" onclick="togglePasteBox()">Close</button>
+      </div>
+      <div id="pasteStatus" style="margin-top:10px;font-size:0.82rem;padding:10px 14px;border-radius:7px;display:none;"></div>
+    </div>
+
     <div id="menuWeekSelect" style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;"></div>
     <div id="menuEditor"></div>
   </div>
@@ -725,6 +742,115 @@ async function saveMenu() {
 }
 
 function openMenuModal() { document.getElementById('menuModal').classList.add('open'); }
+
+// ── SMART PASTE ──
+function togglePasteBox() {
+  const box = document.getElementById('pasteBox');
+  const isOpen = box.style.display !== 'none';
+  box.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) setTimeout(() => document.getElementById('pasteArea').focus(), 100);
+}
+
+function parsePaste() {
+  const text = document.getElementById('pasteArea').value.trim();
+  if (!text) { showPasteStatus('Please paste your menu text first.', 'error'); return; }
+
+  const DAY_MAP = {
+    monday:'Mon', tuesday:'Tue', wednesday:'Wed', thursday:'Thu',
+    friday:'Fri', saturday:'Sat', sunday:'Sun',
+    // Hindi/short forms
+    mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun'
+  };
+  const MEAL_MAP = {
+    breakfast:  ['breakfast','सुबह','morning'],
+    lunch:      ['lunch','दोपहर','afternoon','दोपहर का खाना'],
+    dinner:     ['dinner','रात','evening','रात का खाना','night']
+  };
+
+  // Parse: split by day headings
+  const parsed = {}; // { Mon: {breakfastItems, lunchItems, dinnerItems} }
+  let curDay = null, curMeal = null;
+
+  const lines = text.split('\n');
+  lines.forEach(rawLine => {
+    const line = rawLine.trim();
+    if (!line) return;
+
+    // Check if line is a day heading
+    const lineLow = line.toLowerCase().replace(/[^a-z]/g, ' ').trim().split(/\s+/)[0];
+    if (DAY_MAP[lineLow]) {
+      curDay = DAY_MAP[lineLow];
+      if (!parsed[curDay]) parsed[curDay] = {breakfastItems:[], lunchItems:[], dinnerItems:[]};
+      curMeal = null;
+      return;
+    }
+
+    if (!curDay) return;
+
+    // Check if line starts a meal section
+    const lineL = line.toLowerCase();
+    let foundMeal = null;
+    Object.entries(MEAL_MAP).forEach(([meal, keywords]) => {
+      keywords.forEach(kw => {
+        if (lineL.startsWith(kw)) foundMeal = meal;
+      });
+    });
+
+    if (foundMeal) {
+      curMeal = foundMeal;
+      // Extract items after the colon
+      const colonIdx = line.indexOf(':');
+      if (colonIdx !== -1) {
+        const items = line.substring(colonIdx + 1).trim();
+        if (items) {
+          const splitItems = items.split(/\+|,/).map(s => s.trim()).filter(Boolean);
+          parsed[curDay][curMeal + 'Items'].push(...splitItems);
+        }
+      }
+      return;
+    }
+
+    // If no meal keyword found, append to current meal as continuation
+    if (curMeal && line) {
+      const items = line.split(/\+|,/).map(s => s.trim()).filter(Boolean);
+      parsed[curDay][curMeal + 'Items'].push(...items);
+    }
+  });
+
+  const daysFound = Object.keys(parsed);
+  if (!daysFound.length) {
+    showPasteStatus('❌ Could not parse any days. Make sure each day starts with its name (Monday, Tuesday, etc.)', 'error');
+    return;
+  }
+
+  // Fill into the current menu editor
+  let filled = 0;
+  daysFound.forEach(day => {
+    const b = document.getElementById(day + '-breakfast');
+    const l = document.getElementById(day + '-lunch');
+    const d = document.getElementById(day + '-dinner');
+    const data = parsed[day];
+    if (b) { b.value = data.breakfastItems.join(', '); document.getElementById('day-' + day).classList.add('open'); filled++; }
+    if (l) { l.value = data.lunchItems.join(', '); }
+    if (d) { d.value = data.dinnerItems.join(', '); }
+  });
+
+  if (filled > 0) {
+    showPasteStatus(`✅ Auto-filled ${daysFound.length} day(s): ${daysFound.map(d => DAY_NAMES[d]||d).join(', ')}. Review the fields below and click Save Menu.`, 'success');
+    document.getElementById('menuEditor').scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    showPasteStatus('⚠️ Days were found but no menu fields are open. Make sure a week is selected first.', 'warn');
+  }
+}
+
+function showPasteStatus(msg, type) {
+  const el = document.getElementById('pasteStatus');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? 'var(--g0)' : type === 'error' ? '#FFF5F5' : '#FFFBEB';
+  el.style.color = type === 'success' ? 'var(--g8)' : type === 'error' ? '#c53030' : '#92400E';
+  el.style.border = type === 'success' ? '1px solid var(--g1)' : type === 'error' ? '1px solid #FED7D7' : '1px solid #FCD34D';
+}
 
 async function createMenuWeek() {
   const date = document.getElementById('menuWeekDate').value;
