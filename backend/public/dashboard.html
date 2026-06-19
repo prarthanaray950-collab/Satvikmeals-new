@@ -969,8 +969,8 @@ async function loadPlans() {
   } catch(e){g.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load plans</div></div>';}
 }
 function subscribePlan(id,name,price) {
-  showToast('Redirecting to payment…');
-  setTimeout(()=>window.location.href=`payment.html?planId=${id}&planName=${encodeURIComponent(name)}&price=${price}`,800);
+  showToast('Redirecting to plans…');
+  setTimeout(()=>window.location.href=`plans.html`,500);
 }
 
 // ── ORDERS ──
