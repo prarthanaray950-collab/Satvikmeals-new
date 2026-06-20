@@ -37,6 +37,10 @@ app.use(helmet({
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://satvikmeals.in,https://www.satvikmeals.in,http://localhost:3000,http://localhost:5000')
   .split(',').map(o => o.trim());
 
+// Body parsers must come first so Google callback can read req.body
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true }));
+
 // Google OAuth callback: POSTed by accounts.google.com — must skip CORS entirely
 app.post('/api/auth/google/callback', require('./routes/auth').googleCallback);
 
@@ -49,9 +53,6 @@ app.use(cors({
   },
   credentials: true
 }));
-
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ extended: true }));
 
 // ── NoSQL injection prevention — strips $ and . from req.body/query/params ───
 app.use(mongoSanitize());
