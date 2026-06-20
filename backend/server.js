@@ -16,7 +16,7 @@ const userRoutes      = require('./routes/user');
 const adminRoutes     = require('./routes/admin');
 const orderRoutes     = require('./routes/orders');
 const complaintRoutes = require('./routes/complaints');
-const { connect: connectWA } = require('./utils/whatsapp');
+const { autoReconnectIfSessionExists } = require('./utils/whatsapp');
 const { startCron }          = require('./utils/cron');
 const { startReminderCron }  = require('./utils/reminders');
 const { startReportCron }    = require('./utils/dailyReport');
@@ -125,7 +125,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('MongoDB connected');
     await fixPhoneIndex();
-    connectWA();           // start Baileys WA sender (non-blocking)
+    autoReconnectIfSessionExists();  // reconnect WA only if a session already exists in MongoDB
     startCron();            // daily expiry check
     startReminderCron();    // scheduled WhatsApp reminders
     startReportCron();      // daily admin report
