@@ -37,16 +37,23 @@ async function createUserWithRetry(data, attempts = 5) {
 // Also exported directly so server.js can mount it before CORS middleware
 const googleCallback = async (req, res) => {
   try {
+    console.log('[Google CB] body keys:', Object.keys(req.body || {}));
     const credential = req.body.credential;
-    if (!credential) return res.redirect('/login.html?error=no_credential');
+    if (!credential) {
+      console.error('[Google CB] No credential in body');
+      return res.redirect('/login.html?error=no_credential');
+    }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
+    console.log('[Google CB] clientId present:', !!clientId);
     const client = new OAuth2Client(clientId);
     let payload;
     try {
       const ticket = await client.verifyIdToken({ idToken: credential, audience: clientId });
       payload = ticket.getPayload();
+      console.log('[Google CB] token verified, email:', payload.email);
     } catch (e) {
+      console.error('[Google CB] token verify failed:', e.message);
       return res.redirect('/login.html?error=invalid_token');
     }
 
