@@ -78,9 +78,8 @@ const googleCallback = async (req, res) => {
     console.error('[Google Callback]', err.message);
     res.redirect('/login.html?error=server_error');
   }
-});
+};
 
-// ── GOOGLE AUTH ───────────────────────────────────────────────────────────────
 // mounted separately in server.js before CORS
 router.post('/google/callback', googleCallback);
 
