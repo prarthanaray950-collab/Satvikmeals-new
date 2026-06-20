@@ -8,6 +8,7 @@ const subscriptionSchema = new mongoose.Schema({
   planId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Plan' },
   planName:  String,
   planType:  String,
+  price:     { type: Number, default: 0 },  // used for monthly invoice generation
   startDate: Date,
   endDate:   Date,
   status:    { type: String, enum: ['active','paused','expired','cancelled'], default: 'active' },

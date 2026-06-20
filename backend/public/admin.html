@@ -221,9 +221,11 @@
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     Orders
   </div>
-  <div class="side-item" onclick="show('payments',this)">
-    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-    Payments
+
+  <div class="side-section-title">Tools</div>
+  <div class="side-item" onclick="show('broadcast',this)">
+    <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+    Broadcast
   </div>
 </aside>
 
@@ -237,9 +239,9 @@
     <div class="page-sub">SatvikMeals dashboard summary</div>
     <div class="stat-row">
       <div class="stat-card"><div class="stat-n" id="sTotalUsers">—</div><div class="stat-l">Total Users</div></div>
-      <div class="stat-card"><div class="stat-n" id="sTotalOrders">—</div><div class="stat-l">Total Orders</div></div>
-      <div class="stat-card"><div class="stat-n" id="sTotalRev">—</div><div class="stat-l">Total Revenue</div></div>
-      <div class="stat-card"><div class="stat-n" id="sActivePlans">—</div><div class="stat-l">Active Plans</div></div>
+      <div class="stat-card"><div class="stat-n" id="sActivePlans" style="color:#1B4332">—</div><div class="stat-l">Active Subscribers</div></div>
+      <div class="stat-card"><div class="stat-n" id="sExpiringSoon" style="color:#E8650A">—</div><div class="stat-l">Expiring in 3 Days</div></div>
+      <div class="stat-card"><div class="stat-n" id="sTodaySignups" style="color:#1A5276">—</div><div class="stat-l">Today's Signups</div></div>
     </div>
     <div style="font-size:0.9rem;font-weight:500;color:var(--g9);margin-bottom:12px;">Recent Orders</div>
     <div class="table-wrap">
@@ -266,9 +268,50 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Location</th><th>Role</th><th>Coins</th><th>Joined</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Location</th><th>Plan</th><th>Coins</th><th>Joined</th><th>Actions</th></tr></thead>
         <tbody id="usersBody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- BROADCAST -->
+  <div class="panel" id="panel-broadcast">
+    <div class="section-bar">
+      <div><div class="page-title">Broadcast</div><div class="page-sub">Send messages to users via Email &amp; WhatsApp</div></div>
+    </div>
+    <div style="max-width:600px;">
+      <div style="margin-bottom:16px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#1B4332;display:block;margin-bottom:6px;">Target Audience</label>
+        <select id="bcTarget" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;">
+          <option value="all">All Users</option>
+          <option value="active">Active Subscribers Only</option>
+          <option value="area">By Delivery Area</option>
+        </select>
+      </div>
+      <div id="bcAreaWrap" style="display:none;margin-bottom:16px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#1B4332;display:block;margin-bottom:6px;">Area (keyword match)</label>
+        <input id="bcArea" placeholder="e.g. Boring Road, Kankarbagh" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#1B4332;display:block;margin-bottom:6px;">Email Subject <span style="font-weight:400;color:#888;">(for email channel)</span></label>
+        <input id="bcSubject" placeholder="e.g. Today's SatvikMeals Menu 🌿" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#1B4332;display:block;margin-bottom:6px;">Message</label>
+        <textarea id="bcMessage" rows="6" placeholder="Type your message here. For WhatsApp you can use *bold* and _italic_." style="width:100%;border:1px solid #ddd;border-radius:8px;padding:12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button onclick="sendBroadcast(['email','whatsapp'])" style="height:44px;padding:0 24px;background:#1B4332;color:#fff;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;">
+          📨 Send Email + WhatsApp
+        </button>
+        <button onclick="sendBroadcast(['whatsapp'])" style="height:44px;padding:0 24px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;">
+          💬 WhatsApp Only
+        </button>
+        <button onclick="sendBroadcast(['email'])" style="height:44px;padding:0 24px;background:#1A5276;color:#fff;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;">
+          📧 Email Only
+        </button>
+      </div>
+      <div id="bcStatus" style="margin-top:14px;font-size:0.85rem;color:#1B4332;min-height:20px;"></div>
     </div>
   </div>
 
@@ -430,8 +473,10 @@
 
 <div id="toast"></div>
 
+<script src="csrf.js"></script>
 <script>
 const API = '';
+window.API = API;
 const token = localStorage.getItem('satvikToken');
 if (!token) { window.location.href = 'login.html'; }
 
@@ -468,9 +513,12 @@ function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
 // ── HTTP HELPERS ──
 const get  = url => fetch(API+url, {headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
-const post = (url,body) => fetch(API+url, {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
-const put  = (url,body) => fetch(API+url, {method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
-const del  = url => fetch(API+url, {method:'DELETE',headers:{Authorization:'Bearer '+token}});
+const post = (url,body) => csrfHeaders({'Content-Type':'application/json','Authorization':'Bearer '+token})
+  .then(headers => fetch(API+url, {method:'POST',credentials:'include',headers,body:JSON.stringify(body)}));
+const put  = (url,body) => csrfHeaders({'Content-Type':'application/json','Authorization':'Bearer '+token})
+  .then(headers => fetch(API+url, {method:'PUT',credentials:'include',headers,body:JSON.stringify(body)}));
+const del  = url => csrfHeaders({Authorization:'Bearer '+token})
+  .then(headers => fetch(API+url, {method:'DELETE',credentials:'include',headers}));
 
 // ── MODAL HELPERS ──
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -478,11 +526,10 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 // ── OVERVIEW ──
 async function loadOverview() {
   const d = await get('/api/admin/dashboard');
-  document.getElementById('sTotalUsers').textContent  = d.totalUsers || 0;
-  document.getElementById('sTotalOrders').textContent = d.totalOrders || 0;
-  document.getElementById('sTotalRev').textContent    = '₹' + (d.totalRevenue || 0);
-  const plans = await get('/api/plans');
-  document.getElementById('sActivePlans').textContent = (plans||[]).filter(p=>p.isActive).length;
+  document.getElementById('sTotalUsers').textContent    = d.totalUsers      || 0;
+  document.getElementById('sActivePlans').textContent   = d.activeSubscribers || 0;
+  document.getElementById('sExpiringSoon').textContent  = d.expiringSoon    || 0;
+  document.getElementById('sTodaySignups').textContent  = d.todaySignups    || 0;
   const tbody = document.getElementById('recentOrdersBody');
   const rows = d.recentOrders || [];
   if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--tl);padding:32px;">No orders yet.</td></tr>'; return; }
@@ -599,19 +646,116 @@ function renderUsersTable(users) {
     const locCell = loc
       ? `<a href="https://maps.google.com/?q=${loc.latitude},${loc.longitude}" target="_blank" style="color:var(--g6);font-size:0.78rem;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2C7.58 2 4 5.58 4 10c0 6 8 12 8 12s8-6 8-12c0-4.42-3.58-8-8-8z"/></svg>${(loc.address||'').split(',')[0]||'View Map'}</a>`
       : '<span style="color:var(--tl);font-size:0.75rem">—</span>';
+    const activeSub = (u.subscriptions||[]).find(s=>s.status==='active');
+    const planCell = activeSub
+      ? `<span style="font-size:0.78rem;color:#1B4332;font-weight:600;">${activeSub.planName}<br><span style="font-weight:400;color:#888">until ${new Date(activeSub.endDate).toLocaleDateString('en-IN')}</span></span>`
+      : `<span style="color:#aaa;font-size:0.75rem;">No plan</span>`;
     return `<tr>
     <td><strong>${u.name||'—'}</strong></td>
     <td style="font-size:0.8rem;">${u.email}</td>
     <td>${u.phone||'—'}</td>
-    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${locCell}</td>
-    <td><span class="badge ${u.role||'user'}">${u.role||'user'}</span></td>
+    <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${locCell}</td>
+    <td>${planCell}</td>
     <td>${u.coins||0}</td>
     <td>${new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
     <td><div class="td-actions">
+      <button class="btn-sm" onclick="openAssignPlan('${u._id}','${(u.name||'').replace(/'/g,'')}')">Assign Plan</button>
       <button class="btn-sm" onclick="viewUser('${u._id}')">View</button>
     </div></td>
   </tr>`;
   }).join('');
+}
+
+// ── ASSIGN PLAN MODAL ──
+let assignUserId = null;
+function openAssignPlan(userId, userName) {
+  assignUserId = userId;
+  document.getElementById('apUserName').textContent = userName;
+  // Populate plan dropdown
+  const sel = document.getElementById('apPlanName');
+  sel.innerHTML = allPlans.filter(p=>p.isActive).map(p=>`<option value="${p.name}" data-price="${p.price}">${p.name} (₹${p.price})</option>`).join('');
+  if (!sel.options.length) sel.innerHTML = '<option value="">No active plans</option>';
+  // Set default start = today, end = 30 days from now
+  const today = new Date().toISOString().split('T')[0];
+  const end30 = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+  document.getElementById('apStartDate').value = today;
+  document.getElementById('apEndDate').value   = end30;
+  document.getElementById('apStatus').textContent = '';
+  document.getElementById('assignPlanModal').classList.add('open');
+}
+
+async function confirmAssignPlan() {
+  const sel       = document.getElementById('apPlanName');
+  const planName  = sel.value;
+  const price     = Number(sel.selectedOptions[0]?.dataset.price || 0);
+  const startDate = document.getElementById('apStartDate').value;
+  const endDate   = document.getElementById('apEndDate').value;
+  const statusEl  = document.getElementById('apStatus');
+  if (!planName || !endDate) { statusEl.textContent = 'Please fill all fields.'; return; }
+  const btn = document.getElementById('apConfirmBtn');
+  btn.disabled = true; btn.textContent = 'Assigning…';
+  try {
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    const r = await fetch(API + `/api/admin/assign-plan/${assignUserId}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify({ planName, startDate, endDate, price })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      statusEl.style.color = '#1B4332';
+      statusEl.textContent = `✅ Plan assigned! Email & WhatsApp sent to user.`;
+      setTimeout(() => { closeModal('assignPlanModal'); loadUsers(); }, 1800);
+    } else {
+      statusEl.style.color = '#c53030';
+      statusEl.textContent = d.message || 'Failed to assign plan.';
+    }
+  } catch(e) {
+    statusEl.style.color = '#c53030';
+    statusEl.textContent = 'Network error.';
+  }
+  btn.disabled = false; btn.textContent = 'Confirm & Assign';
+}
+
+// ── BROADCAST ──
+document.addEventListener('DOMContentLoaded', () => {
+  const bcTarget = document.getElementById('bcTarget');
+  if (bcTarget) {
+    bcTarget.addEventListener('change', function() {
+      document.getElementById('bcAreaWrap').style.display = this.value === 'area' ? 'block' : 'none';
+    });
+  }
+});
+
+async function sendBroadcast(channels) {
+  const subject = document.getElementById('bcSubject').value.trim();
+  const message = document.getElementById('bcMessage').value.trim();
+  const target  = document.getElementById('bcTarget').value;
+  const area    = document.getElementById('bcArea')?.value.trim() || '';
+  const statusEl = document.getElementById('bcStatus');
+  if (!message) { statusEl.textContent = 'Please enter a message.'; return; }
+  if (channels.includes('email') && !subject) { statusEl.textContent = 'Please enter an email subject.'; return; }
+  statusEl.textContent = '⏳ Sending… this may take a moment.';
+  try {
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    const r = await fetch(API + '/api/admin/broadcast', {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify({ subject, message, target, area, channels })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      const em = d.result?.email ? `Email: ${d.result.email.sent} sent` : '';
+      const wa = d.result?.whatsapp ? `WhatsApp: ${d.result.whatsapp.sent} sent` : '';
+      statusEl.textContent = `✅ Broadcast complete — ${[em,wa].filter(Boolean).join(' · ')} (${d.userCount} users targeted)`;
+    } else {
+      statusEl.textContent = '❌ ' + (d.message || 'Broadcast failed.');
+    }
+  } catch(e) {
+    statusEl.textContent = '❌ Network error.';
+  }
 }
 
 function filterUsers() {
@@ -647,9 +791,11 @@ async function createUser() {
 
   // Save phone if provided
   if (phone && userData.token) {
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userData.token });
     await fetch(API+'/api/auth/save-phone', {
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+userData.token},
+      credentials:'include',
+      headers,
       body: JSON.stringify({ phone })
     });
   }
@@ -923,5 +1069,35 @@ document.querySelectorAll('.modal-bg').forEach(bg => {
 // Init
 loadOverview();
 </script>
+
+<!-- ASSIGN PLAN MODAL -->
+<div class="modal-bg" id="assignPlanModal">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">Assign Plan</div>
+      <button class="modal-close" onclick="closeModal('assignPlanModal')">×</button>
+    </div>
+    <div style="font-size:0.85rem;color:#666;margin-bottom:20px;">Assigning plan to: <strong id="apUserName"></strong></div>
+    <div class="form-row">
+      <label>Plan Name</label>
+      <select id="apPlanName" style="width:100%;height:42px;border:1px solid var(--bd);border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;">
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Start Date</label>
+      <input type="date" id="apStartDate" style="width:100%;height:42px;border:1px solid var(--bd);border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+    </div>
+    <div class="form-row">
+      <label>Expiry Date</label>
+      <input type="date" id="apEndDate" style="width:100%;height:42px;border:1px solid var(--bd);border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+    </div>
+    <div id="apStatus" style="font-size:0.82rem;min-height:18px;margin-bottom:10px;"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('assignPlanModal')">Cancel</button>
+      <button class="btn-save" id="apConfirmBtn" onclick="confirmAssignPlan()">Confirm &amp; Assign</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

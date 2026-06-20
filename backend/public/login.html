@@ -83,6 +83,12 @@ h1 em{font-style:italic;color:var(--g6);}
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px;}
 .modal-overlay.open{display:flex;}
+/* Phone input */
+.phone-row{display:flex;height:50px;border:2px solid var(--bd);border-radius:11px;overflow:hidden;transition:border-color 0.2s;margin-bottom:8px;}
+.phone-row:focus-within{border-color:var(--g6);}
+.phone-prefix{display:flex;align-items:center;padding:0 14px;background:var(--g0);border-right:1px solid var(--bd);font-size:0.95rem;font-weight:600;color:var(--g8);white-space:nowrap;flex-shrink:0;}
+.phone-input{flex:1;border:none;outline:none;padding:0 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;color:var(--g8);background:white;-webkit-appearance:none;}
+.phone-error{font-size:0.75rem;color:#c53030;text-align:left;min-height:18px;}
 .modal-box{background:white;border-radius:20px;padding:32px 24px;max-width:480px;width:100%;text-align:center;animation:popIn 0.3s ease both;box-shadow:var(--shadow-xl);max-height:90vh;overflow-y:auto;}
 .modal-icon{width:60px;height:60px;background:var(--g0);border:2px solid var(--g1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
 .modal-icon svg{width:28px;height:28px;stroke:var(--g7);fill:none;stroke-width:2;}
@@ -123,7 +129,7 @@ h1 em{font-style:italic;color:var(--g6);}
   <div class="sub">Sign in to manage your subscription, fresh meals &amp; delivery — all in one place.</div>
 
   <div class="benefits">
-    <div class="benefit">First week free</div>
+    <div class="benefit">Pure Veg Kitchen</div>
     <div class="benefit">Manage deliveries</div>
     <div class="benefit">Pause anytime</div>
     <div class="benefit">Secure sign-in</div>
@@ -165,6 +171,29 @@ h1 em{font-style:italic;color:var(--g6);}
   </div>
 </div>
 
+<!-- PHONE MODAL -->
+<div class="modal-overlay" id="phoneModal">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 2 2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    </div>
+    <div class="modal-title">Your Mobile Number</div>
+    <div class="modal-desc">We'll send your order updates and delivery info to this number. No spam, ever.</div>
+    <div class="phone-row">
+      <div class="phone-prefix">🇮🇳 +91</div>
+      <input class="phone-input" type="tel" id="phoneInput" placeholder="98765 43210" maxlength="10" inputmode="numeric"/>
+    </div>
+    <div class="phone-error" id="phoneError"></div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-m-yes" id="btnSavePhone" onclick="savePhone()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
+        Save &amp; Continue
+      </button>
+      <button class="btn-m-skip" onclick="skipPhone()">Skip for now</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOCATION MODAL -->
 <div class="modal-overlay" id="locModal">
   <div class="modal-box">
@@ -197,8 +226,10 @@ h1 em{font-style:italic;color:var(--g6);}
   </div>
 </div>
 
+<script src="csrf.js"></script>
 <script>
 const API = '';
+window.API = API;
 const GID = '213132143602-an29ji4fuv3393o62bq1ke8roak4q7u8.apps.googleusercontent.com';
 
 if (localStorage.getItem('satvikToken')) {
@@ -268,15 +299,67 @@ let pToken = null, pDest = null;
 function loginSuccess(d) {
   localStorage.setItem('satvikToken', d.token);
   localStorage.setItem('satvikUser', JSON.stringify(d.user));
+  // Cache name/phone/area for plans.html WhatsApp pre-fill
+  if (d.user.name)  localStorage.setItem('satvikName',  d.user.name);
+  if (d.user.phone) localStorage.setItem('satvikPhone', d.user.phone);
+  if (d.user.location && d.user.location.address) localStorage.setItem('satvikArea', d.user.location.address);
   showStatus('✅ Welcome to SatvikMeals!', 'success');
   const dest = d.user.role === 'admin' ? 'admin.html' : (new URLSearchParams(location.search).get('redirect') || 'dashboard.html');
   if (d.isNewUser) {
     pToken = d.token; pDest = dest;
-    setTimeout(() => document.getElementById('locModal').classList.add('open'), 700);
+    // Show phone modal first — location modal follows after phone is saved
+    if (!d.user.phone) {
+      setTimeout(() => document.getElementById('phoneModal').classList.add('open'), 700);
+    } else {
+      setTimeout(() => document.getElementById('locModal').classList.add('open'), 700);
+    }
   } else {
     setTimeout(() => location.href = dest, 900);
   }
 }
+
+// ── Phone modal ──────────────────────────────────────────────
+function savePhone() {
+  const val = document.getElementById('phoneInput').value.trim().replace(/\D/g,'');
+  const errEl = document.getElementById('phoneError');
+  if (val.length !== 10) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+  errEl.textContent = '';
+  const btn = document.getElementById('btnSavePhone');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const t = pToken || localStorage.getItem('satvikToken');
+  csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }).then(headers =>
+    fetch(API + '/api/auth/phone', {
+      method: 'PATCH',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify({ phone: val })
+    })
+  )
+  .then(r => r.json())
+  .then(d => {
+    localStorage.setItem('satvikPhone', val);
+    if (d.user) localStorage.setItem('satvikUser', JSON.stringify(d.user));
+    document.getElementById('phoneModal').classList.remove('open');
+    document.getElementById('locModal').classList.add('open');
+  })
+  .catch(() => {
+    // Still proceed even if save fails
+    localStorage.setItem('satvikPhone', val);
+    document.getElementById('phoneModal').classList.remove('open');
+    document.getElementById('locModal').classList.add('open');
+  });
+}
+
+function skipPhone() {
+  document.getElementById('phoneModal').classList.remove('open');
+  document.getElementById('locModal').classList.add('open');
+}
+
+// Only allow digits in phone input
+document.getElementById('phoneInput').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'').slice(0,10);
+  document.getElementById('phoneError').textContent = '';
+});
 
 // Location
 let mLat = 25.5941, mLng = 85.1376;
@@ -325,7 +408,10 @@ async function confirmMap() {
 function skipLoc() { document.getElementById('locModal').classList.remove('open'); location.href = pDest || 'dashboard.html'; }
 async function saveLoc(lat, lng, address) {
   const t = pToken || localStorage.getItem('satvikToken'); if (!t) return;
-  try { await fetch(API+'/api/auth/location',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({latitude:lat,longitude:lng,address})}); } catch(_){}
+  try {
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t });
+    await fetch(API + '/api/auth/location', { method: 'POST', credentials: 'include', headers, body: JSON.stringify({ latitude: lat, longitude: lng, address }) });
+  } catch(_){}
 }
 function showStatus(msg, type) {
   const s = document.getElementById('status');

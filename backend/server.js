@@ -1,34 +1,96 @@
 require('dotenv').config();
-const express  = require('express');
-const cors     = require('cors');
-const mongoose = require('mongoose');
-const path     = require('path');
+const express      = require('express');
+const cors         = require('cors');
+const mongoose     = require('mongoose');
+const path         = require('path');
+const helmet       = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const rateLimit    = require('express-rate-limit');
+const xssClean     = require('./middleware/xssClean');
+const csrf         = require('./middleware/csrf');
 
 const authRoutes      = require('./routes/auth');
-const paymentRoutes   = require('./routes/payment');
 const planRoutes      = require('./routes/plans');
 const menuRoutes      = require('./routes/menu');
 const userRoutes      = require('./routes/user');
 const adminRoutes     = require('./routes/admin');
 const orderRoutes     = require('./routes/orders');
 const complaintRoutes = require('./routes/complaints');
+const { connect: connectWA } = require('./utils/whatsapp');
+const { startCron }          = require('./utils/cron');
+const { startReminderCron }  = require('./utils/reminders');
+const { startReportCron }    = require('./utils/dailyReport');
+const { startInvoiceCron }   = require('./utils/invoice');
 
 const app = express();
 
-app.use(cors({ origin: '*', credentials: true }));
+// ── Trust proxy (needed for correct IP detection behind Render/Heroku/Nginx) ──
+app.set('trust proxy', 1);
+
+// ── Security headers ───────────────────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: false, // keep disabled — site uses inline scripts/styles on many pages
+  crossOriginEmbedderPolicy: false,
+}));
+
+// ── CORS — restrict to known origins instead of wildcard ─────────────────────
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://satvikmeals.in,https://www.satvikmeals.in,http://localhost:3000,http://localhost:5000')
+  .split(',').map(o => o.trim());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`[CORS] Blocked request from origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
+
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// ── NoSQL injection prevention — strips $ and . from req.body/query/params ───
+app.use(mongoSanitize());
+
+// ── XSS prevention — sanitizes script/html tags from string inputs ───────────
+app.use(xssClean());
+
+// ── Rate limiting — prevents brute force / abuse ─────────────────────────────
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // 15 minutes
+  max: 300,                    // 300 requests per IP per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests. Please try again later.' }
+});
+app.use('/api/', generalLimiter);
+
+// Stricter limiter for auth endpoints — prevents credential stuffing / OTP abuse
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many auth attempts. Please try again in 15 minutes.' }
+});
+app.use('/api/auth/', authLimiter);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── CSRF protection — issues + validates token for state-changing requests ───
+app.use(csrf.attachToken);   // sets req.csrfToken() and a readable cookie
+app.get('/api/csrf-token', (req, res) => res.json({ csrfToken: req.csrfToken() }));
+
 app.use('/api/auth',    authRoutes);
-app.use('/api/payment', paymentRoutes);
 app.use('/api/plans',   planRoutes);
 app.use('/api/menu',    menuRoutes);
-app.use('/api/user',    userRoutes);
-app.use('/api/admin',   adminRoutes);
-app.use('/api/orders',  orderRoutes);
-app.use('/api',         complaintRoutes);
+app.use('/api/user',    csrf.verifyToken, userRoutes);
+app.use('/api/admin',   csrf.verifyToken, adminRoutes);
+app.use('/api/orders',  csrf.verifyToken, orderRoutes);
+app.use('/api',         csrf.verifyToken, complaintRoutes);
+// Note: /api/auth is NOT globally CSRF-protected because /google and /dev-login
+// are unauthenticated entry points with no prior session to carry a token.
+// The phone/location routes inside auth.js are protected individually below.
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'SatvikMeals' }));
 
@@ -63,6 +125,11 @@ mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('MongoDB connected');
     await fixPhoneIndex();
+    connectWA();           // start Baileys WA sender (non-blocking)
+    startCron();            // daily expiry check
+    startReminderCron();    // scheduled WhatsApp reminders
+    startReportCron();      // daily admin report
+    startInvoiceCron();     // monthly invoice generation
     app.listen(process.env.PORT || 5000, () =>
       console.log(`SatvikMeals running on port ${process.env.PORT || 5000}`)
     );

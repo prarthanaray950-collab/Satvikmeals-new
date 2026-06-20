@@ -3,7 +3,10 @@ const { OAuth2Client } = require('google-auth-library');
 const jwt  = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { verifyToken: csrfVerify } = require('../middleware/csrf');
 const { sendTelegramMessage } = require('../utils/telegram');
+const { sendWelcomeEmail, sendAdminSignupAlert } = require('../utils/resend');
+const { sendWelcomeWA, sendAdminSignupWA }       = require('../utils/whatsapp');
 const router = express.Router();
 
 const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -73,6 +76,12 @@ router.post('/google', async (req, res) => {
       });
       console.log(`[Google Auth] New user created: ${user._id}`);
 
+      // Fire welcome email to user + admin alert — non-blocking
+      sendWelcomeEmail(user).catch(e => console.error('[Resend] welcome email failed:', e.message));
+      sendAdminSignupAlert(user).catch(e => console.error('[Resend] admin alert failed:', e.message));
+      sendWelcomeWA(user).catch(e => console.error('[WhatsApp] welcome WA failed:', e.message));
+      sendAdminSignupWA(user).catch(e => console.error('[WhatsApp] admin signup WA failed:', e.message));
+
       if (referralCode) {
         step.current = 'applyReferral';
         console.log(`[Google Auth] Applying referral code: ${referralCode}`);
@@ -133,11 +142,11 @@ async function savePhone(req, res) {
   }
 }
 
-router.patch('/phone', protect, savePhone);
-router.post('/save-phone', protect, savePhone);
+router.patch('/phone', protect, csrfVerify, savePhone);
+router.post('/save-phone', protect, csrfVerify, savePhone);
 
 // ── SAVE LOCATION ─────────────────────────────────────────────────────────────
-router.post('/location', protect, async (req, res) => {
+router.post('/location', protect, csrfVerify, async (req, res) => {
   try {
     const { latitude, longitude, address } = req.body;
     if (!latitude || !longitude) return res.status(400).json({ message: 'lat/lng required.' });
@@ -147,11 +156,15 @@ router.post('/location', protect, async (req, res) => {
     });
 
     const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+
+    // Refresh user to get latest phone (may have been added in phone modal)
+    const freshUser = await User.findById(req.user._id);
+
     await sendTelegramMessage(
       `📍 NEW USER SIGNUP\n\n` +
-      `👤 Name: ${req.user.name}\n` +
-      `📧 Email: ${req.user.email}\n` +
-      `📱 Phone: ${req.user.phone || 'Not added yet'}\n` +
+      `👤 Name: ${freshUser.name}\n` +
+      `📧 Email: ${freshUser.email}\n` +
+      `📱 Phone: ${freshUser.phone || 'Not added yet'}\n` +
       `🗓 Joined: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n\n` +
       `📌 Location: ${address || 'Unknown'}\n` +
       `🗺 Maps: ${mapsLink}`

@@ -782,8 +782,10 @@ textarea{resize:vertical;min-height:110px;}
 
 <div id="toast"></div>
 
+<script src="csrf.js"></script>
 <script>
 const API = '';
+window.API = API;
 const token = localStorage.getItem('satvikToken');
 if (!token) window.location.href = 'login.html?redirect=dashboard.html';
 
@@ -885,11 +887,13 @@ function renderHomeSubs(subs) {
 }
 
 async function pauseSub(id) {
-  const r = await fetch(`${API}/api/user/subscription/${id}/pause`,{method:'POST',headers:{Authorization:'Bearer '+token}});
+  const headers = await csrfHeaders({ Authorization: 'Bearer ' + token });
+  const r = await fetch(`${API}/api/user/subscription/${id}/pause`,{method:'POST',credentials:'include',headers});
   const d = await r.json(); showToast(d.message); init();
 }
 async function resumeSub(id) {
-  const r = await fetch(`${API}/api/user/subscription/${id}/resume`,{method:'POST',headers:{Authorization:'Bearer '+token}});
+  const headers = await csrfHeaders({ Authorization: 'Bearer ' + token });
+  const r = await fetch(`${API}/api/user/subscription/${id}/resume`,{method:'POST',credentials:'include',headers});
   const d = await r.json(); showToast(d.message); init();
 }
 
@@ -897,7 +901,8 @@ async function resumeSub(id) {
 async function savePhone() {
   const phone = (document.getElementById('phoneInput')||{}).value?.trim();
   if (!phone || phone.length!==10 || !/^[6-9]/.test(phone)) { showToast('Enter a valid 10-digit mobile number'); return; }
-  const r = await fetch(API+'/api/auth/phone',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({phone})});
+  const headers = await csrfHeaders({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token });
+  const r = await fetch(API+'/api/auth/phone',{method:'PATCH',credentials:'include',headers,body:JSON.stringify({phone})});
   const d = await r.json();
   if (r.ok) { document.getElementById('phoneAlertBox').style.display='none'; showToast('✓ Phone saved!'); userData.phone=phone; }
   else showToast(d.message||'Failed to save phone');
@@ -906,7 +911,8 @@ async function savePhoneFromProfile() {
   const input = document.getElementById('profilePhoneInput');
   const phone = input?.value.trim();
   if (!phone||phone.length!==10||!/^[6-9]/.test(phone)) { showToast('Enter a valid 10-digit number'); return; }
-  const r = await fetch(API+'/api/auth/phone',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({phone})});
+  const headers = await csrfHeaders({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token });
+  const r = await fetch(API+'/api/auth/phone',{method:'PATCH',credentials:'include',headers,body:JSON.stringify({phone})});
   const d = await r.json();
   if (r.ok) {
     showToast('✓ Phone updated!'); userData.phone=phone;
@@ -1099,7 +1105,8 @@ function generateRecs(d,bmi) {
 }
 async function confirmReport() {
   try {
-    await fetch(API+'/api/health-report',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({data:bmiReport.data,confirmed:true})});
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token });
+    await fetch(API+'/api/health-report',{method:'POST',credentials:'include',headers,body:JSON.stringify({data:bmiReport.data,confirmed:true})});
   } catch(e) {}
   document.getElementById('bmiSuccess').style.display='block';
   showToast('Report sent to kitchen!');
@@ -1113,7 +1120,8 @@ async function submitComplaint() {
   const btn=document.getElementById('complaintBtn'); btn.disabled=true; btn.querySelector('span')&&(btn.querySelector('span').textContent='Submitting…');
   try {
     const body={text:`[${type}]\n\n${text}`,...await getMediaPayload('complaintFile')};
-    const r=await fetch(API+'/api/complaint',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token });
+    const r=await fetch(API+'/api/complaint',{method:'POST',credentials:'include',headers,body:JSON.stringify(body)});
     const d=await r.json();
     document.getElementById('complaintSuccess').style.display='block';
     document.getElementById('complaintText').value='';
@@ -1128,7 +1136,8 @@ async function submitSuggestion() {
   const btn=document.getElementById('suggestionBtn'); btn.disabled=true;
   try {
     const body={text:`[${type}]\n\n${text}`,...await getMediaPayload('suggestionFile')};
-    const r=await fetch(API+'/api/suggestion',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token });
+    const r=await fetch(API+'/api/suggestion',{method:'POST',credentials:'include',headers,body:JSON.stringify(body)});
     const d=await r.json();
     document.getElementById('suggestionSuccess').style.display='block';
     document.getElementById('suggestionText').value='';
