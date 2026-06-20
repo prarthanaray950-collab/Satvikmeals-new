@@ -32,6 +32,53 @@ async function createUserWithRetry(data, attempts = 5) {
   }
 }
 
+// ── GOOGLE REDIRECT CALLBACK (ux_mode: 'redirect') ───────────────────────────
+// Google POSTs credential here as form body after account picker
+router.post('/google/callback', async (req, res) => {
+  try {
+    const credential = req.body.credential;
+    if (!credential) return res.redirect('/login.html?error=no_credential');
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const client = new OAuth2Client(clientId);
+    let payload;
+    try {
+      const ticket = await client.verifyIdToken({ idToken: credential, audience: clientId });
+      payload = ticket.getPayload();
+    } catch (e) {
+      return res.redirect('/login.html?error=invalid_token');
+    }
+
+    const { sub: googleId, email, name } = payload;
+    if (!email) return res.redirect('/login.html?error=no_email');
+
+    let user = await User.findOne({ email: email.toLowerCase() });
+    const isNewUser = !user;
+
+    if (!user) {
+      user = await createUserWithRetry({ googleId, email: email.toLowerCase(), name });
+      sendWelcomeEmail(user).catch(() => {});
+      sendAdminSignupAlert(user).catch(() => {});
+      sendWelcomeWA(user).catch(() => {});
+      sendAdminSignupWA(user).catch(() => {});
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    const token = signToken(user._id);
+    const userPayload = encodeURIComponent(JSON.stringify({
+      id: user._id, name: user.name, email: user.email,
+      phone: user.phone, role: user.role, referralCode: user.referralCode, coins: user.coins
+    }));
+
+    res.redirect(`/login.html?gtoken=${token}&guser=${userPayload}&newUser=${isNewUser}`);
+  } catch (err) {
+    console.error('[Google Callback]', err.message);
+    res.redirect('/login.html?error=server_error');
+  }
+});
+
 // ── GOOGLE AUTH ───────────────────────────────────────────────────────────────
 router.post('/google', async (req, res) => {
   const step = { current: 'start' };
