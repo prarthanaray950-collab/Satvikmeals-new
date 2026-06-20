@@ -241,6 +241,16 @@ if (localStorage.getItem('satvikToken')) {
 const rc = new URLSearchParams(location.search).get('ref') || '';
 if (rc) document.getElementById('refInput').value = rc.toUpperCase();
 
+// Handle credential posted back after Google redirect
+(function() {
+  const params = new URLSearchParams(location.search);
+  const credential = params.get('credential');
+  if (credential) {
+    history.replaceState({}, '', location.pathname);
+    onGoogleToken({ credential });
+  }
+})();
+
 // Load Google Sign-In
 (function() {
   const s = document.createElement('script');
@@ -256,7 +266,9 @@ function initGSI() {
     google.accounts.id.initialize({
       client_id: GID,
       callback: onGoogleToken,
-      auto_select: false
+      auto_select: false,
+      ux_mode: 'redirect',
+      login_uri: window.location.origin + window.location.pathname
     });
     const w = Math.min(document.querySelector('.card').offsetWidth - 56, 400);
     google.accounts.id.renderButton(
