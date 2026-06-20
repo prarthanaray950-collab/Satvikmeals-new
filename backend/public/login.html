@@ -256,8 +256,7 @@ function initGSI() {
     google.accounts.id.initialize({
       client_id: GID,
       callback: onGoogleToken,
-      auto_select: false,
-      ux_mode: 'popup'
+      auto_select: false
     });
     const w = Math.min(document.querySelector('.card').offsetWidth - 56, 400);
     google.accounts.id.renderButton(
