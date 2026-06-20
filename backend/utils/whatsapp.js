@@ -1,80 +1,153 @@
 'use strict';
 /**
- * SatvikMeals — WhatsApp sender via Baileys
- * Install: npm install @whiskeysockets/baileys qrcode-terminal
- * Env vars needed:
- *   WA_SESSION_PATH  — folder to persist session, e.g. ./wa-session
- *   ADMIN_WA_NUMBER  — admin's WhatsApp number, 10 digits e.g. 9031447621
+ * SatvikMeals — WhatsApp sender via Baileys, with MongoDB-persisted session.
  *
- * First run: scan the QR code printed in terminal with the SatvikMeals
- * WhatsApp number. Session is saved and no further scanning is needed.
+ * Unlike the old file-based version, this:
+ *   1. Stores the WhatsApp session in MongoDB (survives Render restarts).
+ *   2. Does NOT force a fresh QR scan on every restart — if a session
+ *      already exists in MongoDB, the server reconnects automatically.
+ *   3. Lets the admin start a brand-new connection (and scan a QR shown
+ *      directly in the admin panel) or disconnect/wipe the session,
+ *      entirely from the browser — no server console access needed.
+ *
+ * Install: npm install @whiskeysockets/baileys @hapi/boom qrcode
  */
 
-const path = require('path');
-const qrcode = require('qrcode-terminal');
+const { useMongoAuthState } = require('./waAuthState');
+const WaSession = require('../models/WaSession');
 
-let sock = null;        // Baileys socket instance
-let isReady = false;    // true once connection is open
-const msgQueue = [];    // queued messages waiting for connection
+let sock = null;          // Baileys socket instance
+let isReady = false;      // true once connection is open
+let isConnecting = false; // true while a connect() call is in progress
+let lastQr = null;        // most recent QR string (raw, for re-encoding to image)
+let lastStatus = 'disconnected'; // 'disconnected' | 'connecting' | 'qr_pending' | 'connected'
+let lastError = null;
+const msgQueue = [];      // queued messages waiting for connection
 
-// ── Connect (call once at server startup) ─────────────────────────────────────
-async function connect() {
-  if (!process.env.WA_SESSION_PATH) {
-    console.log('[WhatsApp] WA_SESSION_PATH not set — WhatsApp sender disabled.');
-    return;
+// ── Public status (used by admin API) ─────────────────────────────────────────
+function getStatus() {
+  return { status: lastStatus, hasQr: !!lastQr, error: lastError, queueLength: msgQueue.length };
+}
+
+// ── Get current QR as a data:image/png base64 string (or null) ───────────────
+async function getQrImage() {
+  if (!lastQr) return null;
+  let QRCode;
+  try {
+    QRCode = require('qrcode');
+  } catch (e) {
+    console.error('[WhatsApp] qrcode package not installed. Run: npm install qrcode');
+    return null;
   }
+  try {
+    return await QRCode.toDataURL(lastQr, { width: 280, margin: 1 });
+  } catch (e) {
+    console.error('[WhatsApp] Failed to render QR image:', e.message);
+    return null;
+  }
+}
 
-  let makeWASocket, useMultiFileAuthState, DisconnectReason, Boom;
+// ── Connect — called by admin clicking "Connect WhatsApp" ────────────────────
+async function connect() {
+  if (isConnecting || isReady) {
+    return getStatus();
+  }
+  isConnecting = true;
+  lastStatus = 'connecting';
+  lastError = null;
+
+  let makeWASocket, DisconnectReason;
   try {
     ({ default: makeWASocket } = await import('@whiskeysockets/baileys'));
-    ({ useMultiFileAuthState } = await import('@whiskeysockets/baileys'));
     ({ DisconnectReason } = await import('@whiskeysockets/baileys'));
-    ({ Boom } = await import('@hapi/boom'));
   } catch (e) {
-    console.error('[WhatsApp] Baileys not installed. Run: npm install @whiskeysockets/baileys qrcode-terminal @hapi/boom');
-    return;
+    console.error('[WhatsApp] Baileys not installed. Run: npm install @whiskeysockets/baileys @hapi/boom qrcode');
+    isConnecting = false;
+    lastStatus = 'disconnected';
+    lastError = 'Baileys package not installed on server.';
+    return getStatus();
   }
 
-  const sessionPath = path.resolve(process.env.WA_SESSION_PATH || './wa-session');
-  const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+  try {
+    const { state, saveCreds } = await useMongoAuthState();
 
-  sock = makeWASocket({
-    auth: state,
-    printQRInTerminal: false,   // we handle QR ourselves below
-    browser: ['SatvikMeals', 'Chrome', '1.0.0'],
-    getMessage: async () => undefined,
-  });
+    sock = makeWASocket({
+      auth: state,
+      printQRInTerminal: false,
+      browser: ['SatvikMeals', 'Chrome', '1.0.0'],
+      getMessage: async () => undefined,
+    });
 
-  sock.ev.on('creds.update', saveCreds);
+    sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
-    if (qr) {
-      console.log('\n[WhatsApp] Scan this QR code with the SatvikMeals WhatsApp number:\n');
-      qrcode.generate(qr, { small: true });
-    }
+    sock.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect, qr } = update;
 
-    if (connection === 'open') {
-      isReady = true;
-      console.log('[WhatsApp] ✅ Connected and ready to send messages.');
-      // Flush queued messages
-      while (msgQueue.length) {
-        const { jid, text } = msgQueue.shift();
-        await _send(jid, text).catch(e => console.error('[WhatsApp] Queue flush error:', e.message));
+      if (qr) {
+        lastQr = qr;
+        lastStatus = 'qr_pending';
+        console.log('[WhatsApp] QR code ready — scan from the admin panel (WhatsApp tab).');
       }
-    }
 
-    if (connection === 'close') {
-      isReady = false;
-      const statusCode = lastDisconnect?.error?.output?.statusCode;
-      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-      console.log(`[WhatsApp] Connection closed (code ${statusCode}). Reconnect: ${shouldReconnect}`);
-      if (shouldReconnect) {
-        setTimeout(connect, 5000);   // retry after 5s
-      } else {
-        console.log('[WhatsApp] Logged out. Delete session folder and restart to re-scan QR.');
+      if (connection === 'open') {
+        isReady = true;
+        isConnecting = false;
+        lastQr = null;
+        lastStatus = 'connected';
+        lastError = null;
+        console.log('[WhatsApp] ✅ Connected and ready to send messages.');
+        while (msgQueue.length) {
+          const { jid, text } = msgQueue.shift();
+          await _send(jid, text).catch(e => console.error('[WhatsApp] Queue flush error:', e.message));
+        }
       }
+
+      if (connection === 'close') {
+        isReady = false;
+        isConnecting = false;
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const loggedOut = statusCode === DisconnectReason.loggedOut;
+        console.log(`[WhatsApp] Connection closed (code ${statusCode}). Logged out: ${loggedOut}`);
+
+        if (loggedOut) {
+          lastStatus = 'disconnected';
+          lastQr = null;
+          await WaSession.deleteMany({}).catch(() => {});
+          console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
+        } else {
+          lastStatus = 'connecting';
+          setTimeout(connect, 5000);
+        }
+      }
+    });
+
+    return getStatus();
+  } catch (err) {
+    console.error('[WhatsApp] Connect error:', err.message);
+    isConnecting = false;
+    lastStatus = 'disconnected';
+    lastError = err.message;
+    return getStatus();
+  }
+}
+
+// ── Disconnect — called by admin clicking "Disconnect WhatsApp" ──────────────
+async function disconnect() {
+  try {
+    if (sock) {
+      try { await sock.logout(); } catch (e) { /* ignore — may already be closed */ }
+      sock = null;
     }
-  });
+  } finally {
+    isReady = false;
+    isConnecting = false;
+    lastQr = null;
+    lastStatus = 'disconnected';
+    lastError = null;
+    await WaSession.deleteMany({});
+    console.log('[WhatsApp] Session disconnected and cleared from MongoDB by admin.');
+  }
+  return getStatus();
 }
 
 // ── Internal send ─────────────────────────────────────────────────────────────
@@ -93,7 +166,6 @@ function toJid(phone) {
 
 // ── Safe public send — queues if not yet connected ────────────────────────────
 async function sendWA(phone, text) {
-  if (!process.env.WA_SESSION_PATH) return;
   if (!phone) { console.log('[WhatsApp] No phone — skipping message.'); return; }
   const jid = toJid(phone);
   try {
@@ -215,8 +287,30 @@ async function sendBroadcastWA(users, message) {
   return { sent, skipped };
 }
 
+// ── Auto-reconnect at server startup IF a session already exists in Mongo ────
+// After the first QR scan, future Render restarts reconnect silently using
+// the saved Mongo session — no QR needed again unless the admin explicitly
+// disconnects or the phone itself logs the session out.
+async function autoReconnectIfSessionExists() {
+  try {
+    const hasCreds = await WaSession.findOne({ category: 'creds' }).lean();
+    if (hasCreds) {
+      console.log('[WhatsApp] Existing session found in MongoDB — reconnecting automatically.');
+      await connect();
+    } else {
+      console.log('[WhatsApp] No existing session in MongoDB — waiting for admin to connect via admin panel.');
+    }
+  } catch (err) {
+    console.error('[WhatsApp] autoReconnectIfSessionExists error:', err.message);
+  }
+}
+
 module.exports = {
   connect,
+  disconnect,
+  getStatus,
+  getQrImage,
+  autoReconnectIfSessionExists,
   sendWA,
   sendWelcomeWA,
   sendPlanActivatedWA,
