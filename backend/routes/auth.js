@@ -34,7 +34,8 @@ async function createUserWithRetry(data, attempts = 5) {
 
 // ── GOOGLE REDIRECT CALLBACK (ux_mode: 'redirect') ───────────────────────────
 // Google POSTs credential here as form body after account picker
-router.post('/google/callback', async (req, res) => {
+// Also exported directly so server.js can mount it before CORS middleware
+const googleCallback = async (req, res) => {
   try {
     const credential = req.body.credential;
     if (!credential) return res.redirect('/login.html?error=no_credential');
@@ -80,6 +81,9 @@ router.post('/google/callback', async (req, res) => {
 });
 
 // ── GOOGLE AUTH ───────────────────────────────────────────────────────────────
+// mounted separately in server.js before CORS
+router.post('/google/callback', googleCallback);
+
 router.post('/google', async (req, res) => {
   const step = { current: 'start' };
   try {
@@ -245,3 +249,4 @@ router.post('/dev-login', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.googleCallback = googleCallback;
