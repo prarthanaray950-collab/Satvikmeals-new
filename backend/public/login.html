@@ -241,24 +241,6 @@ if (localStorage.getItem('satvikToken')) {
 const rc = new URLSearchParams(location.search).get('ref') || '';
 if (rc) document.getElementById('refInput').value = rc.toUpperCase();
 
-// Handle token redirected back from backend after Google auth
-(function() {
-  const params = new URLSearchParams(location.search);
-  const gtoken = params.get('gtoken');
-  const gerror = params.get('error');
-  if (gtoken) {
-    history.replaceState({}, '', location.pathname);
-    const guser = JSON.parse(decodeURIComponent(params.get('guser') || '{}'));
-    const isNew = params.get('newUser') === 'true';
-    loginSuccess({ token: gtoken, user: guser, isNewUser: isNew });
-    return;
-  }
-  if (gerror) {
-    history.replaceState({}, '', location.pathname);
-    showStatus('\u274c Google sign-in failed. Please try again.', 'error');
-  }
-})();
-
 // Load Google Sign-In
 (function() {
   const s = document.createElement('script');
@@ -318,6 +300,24 @@ async function onGoogleToken(resp) {
 }
 
 let pToken = null, pDest = null;
+
+// Handle token redirected back from backend after Google redirect
+(function() {
+  const params = new URLSearchParams(location.search);
+  const gtoken = params.get('gtoken');
+  const gerror = params.get('error');
+  if (gtoken) {
+    history.replaceState({}, '', location.pathname);
+    const guser = JSON.parse(decodeURIComponent(params.get('guser') || '{}'));
+    const isNew = params.get('newUser') === 'true';
+    loginSuccess({ token: gtoken, user: guser, isNewUser: isNew });
+    return;
+  }
+  if (gerror) {
+    history.replaceState({}, '', location.pathname);
+    showStatus('❌ Google sign-in failed. Please try again.', 'error');
+  }
+})();
 function loginSuccess(d) {
   localStorage.setItem('satvikToken', d.token);
   localStorage.setItem('satvikUser', JSON.stringify(d.user));
