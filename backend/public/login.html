@@ -241,13 +241,21 @@ if (localStorage.getItem('satvikToken')) {
 const rc = new URLSearchParams(location.search).get('ref') || '';
 if (rc) document.getElementById('refInput').value = rc.toUpperCase();
 
-// Handle credential posted back after Google redirect
+// Handle token redirected back from backend after Google auth
 (function() {
   const params = new URLSearchParams(location.search);
-  const credential = params.get('credential');
-  if (credential) {
+  const gtoken = params.get('gtoken');
+  const gerror = params.get('error');
+  if (gtoken) {
     history.replaceState({}, '', location.pathname);
-    onGoogleToken({ credential });
+    const guser = JSON.parse(decodeURIComponent(params.get('guser') || '{}'));
+    const isNew = params.get('newUser') === 'true';
+    loginSuccess({ token: gtoken, user: guser, isNewUser: isNew });
+    return;
+  }
+  if (gerror) {
+    history.replaceState({}, '', location.pathname);
+    showStatus('\u274c Google sign-in failed. Please try again.', 'error');
   }
 })();
 
@@ -268,7 +276,7 @@ function initGSI() {
       callback: onGoogleToken,
       auto_select: false,
       ux_mode: 'redirect',
-      login_uri: window.location.origin + window.location.pathname
+      login_uri: window.location.origin + '/api/auth/google/callback'
     });
     const w = Math.min(document.querySelector('.card').offsetWidth - 56, 400);
     google.accounts.id.renderButton(
