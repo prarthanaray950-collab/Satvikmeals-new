@@ -3,7 +3,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 const { Plan, Menu, Order, Payment } = require('../models/index');
 const User = require('../models/User');
 const { sendPlanActivatedEmail, sendBroadcastEmail } = require('../utils/resend');
-const { sendPlanActivatedWA, sendBroadcastWA }       = require('../utils/whatsapp');
+const { sendPlanActivatedWA, sendBroadcastWA, connect: waConnect, disconnect: waDisconnect, getStatus: waGetStatus, getQrImage: waGetQrImage } = require('../utils/whatsapp');
 const router = express.Router();
 router.use(protect, adminOnly);
 
@@ -118,6 +118,53 @@ router.post('/broadcast', async (req, res) => {
     res.json({ success: true, userCount: users.length, result });
   } catch (err) {
     console.error('[Admin/broadcast]', err.message);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ── WHATSAPP SESSION MANAGEMENT ───────────────────────────────────────────────
+// Admin can connect/disconnect the SatvikMeals WhatsApp number entirely from
+// the browser. The session is stored in MongoDB so it survives Render
+// restarts — no need to keep server console access open to scan a QR.
+
+// Returns current connection status + QR image (if one is pending)
+router.get('/whatsapp/status', async (req, res) => {
+  try {
+    const status = waGetStatus();
+    const qrImage = status.status === 'qr_pending' ? await waGetQrImage() : null;
+    res.json({ ...status, qrImage });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Starts a new connection attempt — triggers QR generation if no valid session exists
+router.post('/whatsapp/connect', async (req, res) => {
+  try {
+    const status = await waConnect();
+    res.json(status);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Polls for the QR code once connect() has been triggered (QR may take a second to arrive)
+router.get('/whatsapp/qr', async (req, res) => {
+  try {
+    const status = waGetStatus();
+    const qrImage = await waGetQrImage();
+    res.json({ ...status, qrImage });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Logs out and wipes the session from MongoDB — admin can then connect a different number
+router.post('/whatsapp/disconnect', async (req, res) => {
+  try {
+    const status = await waDisconnect();
+    res.json({ success: true, ...status });
+  } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
