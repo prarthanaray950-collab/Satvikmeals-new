@@ -22,6 +22,7 @@ let isConnecting = false; // true while a connect() call is in progress
 let lastQr = null;        // most recent QR string (raw, for re-encoding to image)
 let lastStatus = 'disconnected'; // 'disconnected' | 'connecting' | 'qr_pending' | 'connected'
 let lastError = null;
+let reconnectTimer = null; // tracks pending reconnect so disconnect() can cancel it
 const msgQueue = [];      // queued messages waiting for connection
 
 // ── Public status (used by admin API) ─────────────────────────────────────────
@@ -49,6 +50,8 @@ async function getQrImage() {
 
 // ── Connect — called by admin clicking "Connect WhatsApp" ────────────────────
 async function connect() {
+  // Cancel any pending auto-reconnect timer
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (isConnecting || isReady) {
     return getStatus();
   }
@@ -116,7 +119,8 @@ async function connect() {
           console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
         } else {
           lastStatus = 'connecting';
-          setTimeout(connect, 5000);
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(connect, 5000);
         }
       }
     });
@@ -133,20 +137,22 @@ async function connect() {
 
 // ── Disconnect — called by admin clicking "Disconnect WhatsApp" ──────────────
 async function disconnect() {
+  // Cancel any pending reconnect timer so it doesn't restart after we clear
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  // Force-reset state immediately so connect() won't return early
+  isReady = false;
+  isConnecting = false;
   try {
     if (sock) {
-      try { await sock.logout(); } catch (e) { /* ignore — may already be closed */ }
+      try { sock.ev.removeAllListeners(); await sock.end(); } catch (e) { /* ignore */ }
       sock = null;
     }
-  } finally {
-    isReady = false;
-    isConnecting = false;
-    lastQr = null;
-    lastStatus = 'disconnected';
-    lastError = null;
-    await WaSession.deleteMany({});
-    console.log('[WhatsApp] Session disconnected and cleared from MongoDB by admin.');
-  }
+  } catch (e) { /* ignore */ }
+  lastQr = null;
+  lastStatus = 'disconnected';
+  lastError = null;
+  await WaSession.deleteMany({});
+  console.log('[WhatsApp] Session disconnected and cleared from MongoDB by admin.');
   return getStatus();
 }
 
