@@ -75,13 +75,21 @@ function divider() {
 }
 
 // ── Safe send wrapper — never crash the main flow ─────────────────────────────
-async function send({ to, subject, html }) {
+async function send({ to, subject, html, headers = {} }) {
   if (!process.env.RESEND_API_KEY) {
     console.log(`[Resend] RESEND_API_KEY not set — skipping email to ${to}`);
     return;
   }
   try {
-    const r = await resend.emails.send({ from: FROM, to, subject, html });
+    // Transactional headers help Gmail route to Primary tab, not Promotions
+    const r = await resend.emails.send({
+      from: FROM, to, subject, html,
+      headers: {
+        'X-Entity-Ref-ID': Date.now().toString(),
+        'Precedence': 'bulk',
+        ...headers
+      }
+    });
     console.log(`[Resend] Sent "${subject}" to ${to} — id: ${r.id}`);
   } catch (err) {
     console.error(`[Resend] Failed to send "${subject}" to ${to}:`, err.message);
@@ -110,7 +118,7 @@ async function sendWelcomeEmail(user) {
     </ul>
     ${ctaButton('View Our Plans', 'https://satvikmeals.in/plans.html')}
     <p style="margin:20px 0 0;font-size:12px;color:#9A9A8E;text-align:center;">To confirm a plan, just WhatsApp us or call — we'll activate it for you.</p>`;
-  await send({ to: user.email, subject: 'Welcome to SatvikMeals 🌿', html: layout('Welcome to SatvikMeals', body) });
+  await send({ to: user.email, subject: 'Your SatvikMeals account is ready', html: layout('Welcome to SatvikMeals', body) });
 }
 
 // ── 2. Plan activated — sent to user when admin assigns a plan ────────────────
