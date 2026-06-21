@@ -115,14 +115,20 @@ async function connect() {
         isReady = false;
         isConnecting = false;
         const statusCode = lastDisconnect?.error?.output?.statusCode;
-        const loggedOut = statusCode === DisconnectReason.loggedOut;
+        const errMsg = lastDisconnect?.error?.message || '';
+        const loggedOut = statusCode === DisconnectReason?.loggedOut;
+        const isCryptoCorrupt = errMsg.includes('ERR_INVALID_ARG_TYPE') || errMsg.includes('"data" argument');
         console.log(`[WhatsApp] Connection closed (code ${statusCode}). Logged out: ${loggedOut}`);
 
-        if (loggedOut) {
+        if (loggedOut || isCryptoCorrupt) {
           lastStatus = 'disconnected';
           lastQr = null;
           await WaSession.deleteMany({}).catch(() => {});
-          console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
+          if (isCryptoCorrupt) {
+            console.log('[WhatsApp] Corrupted session detected — cleared from MongoDB. Admin must reconnect with a new QR.');
+          } else {
+            console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
+          }
         } else {
           lastStatus = 'connecting';
           if (reconnectTimer) clearTimeout(reconnectTimer);
