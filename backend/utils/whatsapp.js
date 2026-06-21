@@ -17,11 +17,13 @@ const { useMongoAuthState } = require('./waAuthState');
 const WaSession = require('../models/WaSession');
 
 // Require Baileys at top-level (CJS — dynamic import does not work)
-let makeWASocket, DisconnectReason;
+let makeWASocket, DisconnectReason, Browsers, fetchLatestWaWebVersion;
 try {
   const baileys = require('@whiskeysockets/baileys');
   makeWASocket = baileys.default || baileys.makeWASocket;
   DisconnectReason = baileys.DisconnectReason;
+  Browsers = baileys.Browsers;
+  fetchLatestWaWebVersion = baileys.fetchLatestWaWebVersion;
 } catch (e) {
   console.error('[WhatsApp] Baileys not installed:', e.message);
 }
@@ -80,10 +82,21 @@ async function connect() {
   try {
     const { state, saveCreds } = await useMongoAuthState();
 
+    // Fetch latest WA Web version so WhatsApp doesn't reject as outdated client
+    let waVersion;
+    try {
+      const { version } = await fetchLatestWaWebVersion();
+      waVersion = version;
+      console.log('[WhatsApp] Using WA Web version:', version.join('.'));
+    } catch (e) {
+      waVersion = [2, 3000, 1015901307]; // fallback
+    }
+
     sock = makeWASocket({
       auth: state,
       printQRInTerminal: false,
-      browser: ['SatvikMeals', 'Chrome', '1.0.0'],
+      browser: Browsers.macOS('Chrome'),
+      version: waVersion,
       getMessage: async () => undefined,
     });
 
