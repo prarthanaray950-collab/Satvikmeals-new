@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.7.9",
+    "@whiskeysockets/baileys": "6.7.8",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -23,5 +23,8 @@
     "node-cron": "^3.0.3",
     "qrcode": "^1.5.3",
     "resend": "^3.2.0"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
