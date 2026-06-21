@@ -65,10 +65,7 @@ const googleCallback = async (req, res) => {
 
     if (!user) {
       user = await createUserWithRetry({ googleId, email: email.toLowerCase(), name });
-      sendWelcomeEmail(user).catch(() => {});
-      sendAdminSignupAlert(user).catch(() => {});
-      sendWelcomeWA(user).catch(() => {});
-      sendAdminSignupWA(user).catch(() => {});
+      // Welcome messages sent after location saved (user has phone+location then)
     } else if (!user.googleId) {
       user.googleId = googleId;
       await user.save();
@@ -134,10 +131,7 @@ router.post('/google', async (req, res) => {
       console.log(`[Google Auth] New user created: ${user._id}`);
 
       // Fire welcome email to user + admin alert — non-blocking
-      sendWelcomeEmail(user).catch(e => console.error('[Resend] welcome email failed:', e.message));
-      sendAdminSignupAlert(user).catch(e => console.error('[Resend] admin alert failed:', e.message));
-      sendWelcomeWA(user).catch(e => console.error('[WhatsApp] welcome WA failed:', e.message));
-      sendAdminSignupWA(user).catch(e => console.error('[WhatsApp] admin signup WA failed:', e.message));
+      // Welcome messages sent after location saved (user has phone+location then)
 
       if (referralCode) {
         step.current = 'applyReferral';
@@ -226,6 +220,15 @@ router.post('/location', protect, csrfVerify, async (req, res) => {
       `📌 Location: ${address || 'Unknown'}\n` +
       `🗺 Maps: ${mapsLink}`
     );
+
+    // Send welcome messages NOW — user has phone + location filled
+    const isNewUser = !freshUser.subscriptions?.length && freshUser.createdAt > new Date(Date.now() - 10 * 60 * 1000);
+    if (isNewUser || req.body.isNewUser) {
+      sendWelcomeEmail(freshUser).catch(e => console.error('[Welcome Email]', e.message));
+      sendAdminSignupAlert(freshUser).catch(e => console.error('[Admin Alert Email]', e.message));
+      sendWelcomeWA(freshUser).catch(e => console.error('[Welcome WA]', e.message));
+      sendAdminSignupWA(freshUser).catch(e => console.error('[Admin Alert WA]', e.message));
+    }
 
     res.json({ success: true });
   } catch (err) {
