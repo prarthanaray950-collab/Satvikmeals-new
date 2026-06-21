@@ -299,7 +299,7 @@ async function onGoogleToken(resp) {
   }
 }
 
-let pToken = null, pDest = null;
+let pToken = null, pDest = null, pIsNewUser = false;
 
 // Handle token redirected back from backend after Google redirect
 (function() {
@@ -328,7 +328,7 @@ function loginSuccess(d) {
   showStatus('✅ Welcome to SatvikMeals!', 'success');
   const dest = d.user.role === 'admin' ? 'admin.html' : (new URLSearchParams(location.search).get('redirect') || 'dashboard.html');
   if (d.isNewUser) {
-    pToken = d.token; pDest = dest;
+    pToken = d.token; pDest = dest; pIsNewUser = !!d.isNewUser;
     // Show phone modal first — location modal follows after phone is saved
     if (!d.user.phone) {
       setTimeout(() => document.getElementById('phoneModal').classList.add('open'), 700);
@@ -432,7 +432,7 @@ async function saveLoc(lat, lng, address) {
   const t = pToken || localStorage.getItem('satvikToken'); if (!t) return;
   try {
     const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t });
-    await fetch(API + '/api/auth/location', { method: 'POST', credentials: 'include', headers, body: JSON.stringify({ latitude: lat, longitude: lng, address }) });
+    await fetch(API + '/api/auth/location', { method: 'POST', credentials: 'include', headers, body: JSON.stringify({ latitude: lat, longitude: lng, address, isNewUser: pIsNewUser }) });
   } catch(_){}
 }
 function showStatus(msg, type) {
