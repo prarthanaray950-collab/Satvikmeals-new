@@ -19,27 +19,17 @@
 
 const WaSession = require('../models/WaSession');
 
-// ── Buffer-safe JSON serialization ────────────────────────────────────────────
-function replacer(key, value) {
-  if (value && value.type === 'Buffer' && Array.isArray(value.data)) return value; // already serialized
-  if (Buffer.isBuffer(value)) return { type: 'Buffer', data: value.toString('base64'), __b64: true };
-  if (value instanceof Uint8Array) return { type: 'Buffer', data: Buffer.from(value).toString('base64'), __b64: true };
-  return value;
-}
-
-function reviver(key, value) {
-  if (value && value.__b64 && value.type === 'Buffer' && typeof value.data === 'string') {
-    return Buffer.from(value.data, 'base64');
-  }
-  return value;
-}
+// ── Buffer-safe JSON serialization using Baileys' own BufferJSON ─────────────
+// IMPORTANT: Must use Baileys' BufferJSON — custom revivers fail to restore
+// crypto keys as proper Buffers, causing aesEncryptGCM to crash on reconnect.
+const { BufferJSON } = require('@whiskeysockets/baileys');
 
 function serialize(obj) {
-  return JSON.stringify(obj, replacer);
+  return JSON.stringify(obj, BufferJSON.replacer);
 }
 
 function deserialize(str) {
-  return JSON.parse(str, reviver);
+  return JSON.parse(str, BufferJSON.reviver);
 }
 
 // ── Read/write helpers against the WaSession collection ──────────────────────
