@@ -3,7 +3,8 @@ const { protect, adminOnly } = require('../middleware/auth');
 const { Plan, Menu, Order, Payment } = require('../models/index');
 const User = require('../models/User');
 const { sendPlanActivatedEmail, sendBroadcastEmail } = require('../utils/resend');
-const { sendPlanActivatedWA, sendBroadcastWA, connect: waConnect, disconnect: waDisconnect, getStatus: waGetStatus, getQrImage: waGetQrImage } = require('../utils/whatsapp');
+const { Resend } = require('resend');
+const { sendPlanActivatedWA, sendBroadcastWA, sendWA, connect: waConnect, disconnect: waDisconnect, getStatus: waGetStatus, getQrImage: waGetQrImage } = require('../utils/whatsapp');
 const router = express.Router();
 router.use(protect, adminOnly);
 
@@ -123,6 +124,45 @@ router.post('/broadcast', async (req, res) => {
 });
 
 // ── WHATSAPP SESSION MANAGEMENT ───────────────────────────────────────────────
+// ── TEST MESSAGE — send to a specific phone/email ────────────────────────────
+router.post('/test-message', async (req, res) => {
+  try {
+    const { phone, email, message, channel } = req.body;
+    const result = {};
+
+    if ((channel === 'whatsapp' || channel === 'both') && phone) {
+      try {
+        await sendWA(phone, message || 'Test message from SatvikMeals ✅');
+        result.whatsapp = { success: true, to: phone };
+        console.log(`[Test] WA sent to ${phone}`);
+      } catch (e) {
+        result.whatsapp = { success: false, error: e.message };
+      }
+    }
+
+    if ((channel === 'email' || channel === 'both') && email) {
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const FROM = process.env.RESEND_FROM || 'SatvikMeals <hello@satvikmeals.in>';
+        await resend.emails.send({
+          from: FROM, to: email,
+          subject: 'Test Email from SatvikMeals',
+          html: `<p>This is a test email from SatvikMeals admin panel.</p><p>${message || 'Test message ✅'}</p>`
+        });
+        result.email = { success: true, to: email };
+        console.log(`[Test] Email sent to ${email}`);
+      } catch (e) {
+        result.email = { success: false, error: e.message };
+      }
+    }
+
+    res.json({ success: true, result });
+  } catch (err) {
+    console.error('[Test Message]', err.message);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Admin can connect/disconnect the SatvikMeals WhatsApp number entirely from
 // the browser. The session is stored in MongoDB so it survives Render
 // restarts — no need to keep server console access open to scan a QR.
