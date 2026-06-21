@@ -39,7 +39,7 @@ const msgQueue = [];      // queued messages waiting for connection
 
 // ── Public status (used by admin API) ─────────────────────────────────────────
 function getStatus() {
-  return { status: lastStatus, hasQr: !!lastQr, error: lastError, queueLength: msgQueue.length };
+  return { status: lastStatus, hasQr: !!lastQr, error: lastError, queueLength: msgQueue.length, isReady };
 }
 
 // ── Get current QR as a data:image/png base64 string (or null) ───────────────
@@ -306,16 +306,28 @@ async function sendAdminSignupWA(user) {
 
 // ── 6. Broadcast to list of users ─────────────────────────────────────────────
 async function sendBroadcastWA(users, message) {
-  let sent = 0, skipped = 0;
+  console.log(`[WhatsApp] Broadcast start — isReady: ${isReady}, users: ${users.length}`);
+  if (!isReady) {
+    console.error('[WhatsApp] Broadcast skipped — not connected. Connect WhatsApp first.');
+    return { sent: 0, skipped: users.length, error: 'WhatsApp not connected' };
+  }
+  let sent = 0, skipped = 0, failed = 0;
   for (const user of users) {
     if (!user.phone) { skipped++; continue; }
-    await sendWA(user.phone, message);
-    sent++;
+    try {
+      const jid = toJid(user.phone);
+      await _send(jid, message);
+      console.log(`[WhatsApp] ✅ Broadcast sent to ${user.phone}`);
+      sent++;
+    } catch (err) {
+      console.error(`[WhatsApp] ❌ Broadcast failed to ${user.phone}:`, err.message);
+      failed++;
+    }
     // Delay to avoid spam detection
     await new Promise(r => setTimeout(r, 1500));
   }
-  console.log(`[WhatsApp] Broadcast done — sent: ${sent}, skipped (no phone): ${skipped}`);
-  return { sent, skipped };
+  console.log(`[WhatsApp] Broadcast done — sent: ${sent}, failed: ${failed}, skipped (no phone): ${skipped}`);
+  return { sent, failed, skipped };
 }
 
 // ── Auto-reconnect at server startup IF a session already exists in Mongo ────
