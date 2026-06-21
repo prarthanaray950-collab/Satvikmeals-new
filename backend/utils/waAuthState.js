@@ -68,8 +68,8 @@ async function deleteDoc(category, keyId) {
 
 // ── Main export — mirrors useMultiFileAuthState's interface ──────────────────
 async function useMongoAuthState() {
-  // Lazily require so this file can be imported even before Baileys is installed
-  const { initAuthCreds, BufferJSON } = await import('@whiskeysockets/baileys');
+  // Use require (CJS) — dynamic import does not work for this CJS package
+  const { initAuthCreds } = require('@whiskeysockets/baileys');
 
   let creds = await readDoc('creds');
   if (!creds) {
