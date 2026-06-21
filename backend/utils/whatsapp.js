@@ -61,8 +61,10 @@ async function connect() {
 
   let makeWASocket, DisconnectReason;
   try {
-    ({ default: makeWASocket } = await import('@whiskeysockets/baileys'));
-    ({ DisconnectReason } = await import('@whiskeysockets/baileys'));
+    const baileys = await import('@whiskeysockets/baileys');
+    // Baileys may export as default or named depending on version
+    makeWASocket = baileys.default || baileys.makeWASocket || baileys;
+    DisconnectReason = baileys.DisconnectReason;
   } catch (e) {
     console.error('[WhatsApp] Baileys not installed. Run: npm install @whiskeysockets/baileys @hapi/boom qrcode');
     isConnecting = false;
