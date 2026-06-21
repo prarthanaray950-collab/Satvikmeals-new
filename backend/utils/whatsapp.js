@@ -16,6 +16,16 @@
 const { useMongoAuthState } = require('./waAuthState');
 const WaSession = require('../models/WaSession');
 
+// Require Baileys at top-level (CJS — dynamic import does not work)
+let makeWASocket, DisconnectReason;
+try {
+  const baileys = require('@whiskeysockets/baileys');
+  makeWASocket = baileys.default || baileys.makeWASocket;
+  DisconnectReason = baileys.DisconnectReason;
+} catch (e) {
+  console.error('[WhatsApp] Baileys not installed:', e.message);
+}
+
 let sock = null;          // Baileys socket instance
 let isReady = false;      // true once connection is open
 let isConnecting = false; // true while a connect() call is in progress
@@ -59,14 +69,8 @@ async function connect() {
   lastStatus = 'connecting';
   lastError = null;
 
-  let makeWASocket, DisconnectReason;
-  try {
-    const baileys = await import('@whiskeysockets/baileys');
-    // Baileys may export as default or named depending on version
-    makeWASocket = baileys.default || baileys.makeWASocket || baileys;
-    DisconnectReason = baileys.DisconnectReason;
-  } catch (e) {
-    console.error('[WhatsApp] Baileys not installed. Run: npm install @whiskeysockets/baileys @hapi/boom qrcode');
+  if (!makeWASocket) {
+    console.error('[WhatsApp] Baileys not available');
     isConnecting = false;
     lastStatus = 'disconnected';
     lastError = 'Baileys package not installed on server.';
