@@ -14,8 +14,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — SatvikMeals</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-<link rel="icon" type="image/png" sizes="512x512" href="/logo.jpg"/>
-<link rel="apple-touch-icon" href="/logo.jpg"/>
+<link rel="icon" type="image/png" sizes="512x512" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjE4IiBmaWxsPSIjMUI0MzMyIi8+PHRleHQgeD0iNTAiIHk9IjcyIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfjL88L3RleHQ+PC9zdmc+"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjE4IiBmaWxsPSIjMUI0MzMyIi8+PHRleHQgeD0iNTAiIHk9IjcyIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfjL88L3RleHQ+PC9zdmc+"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     :root{
@@ -186,7 +186,7 @@
       <span></span><span></span><span></span>
     </button>
     <a href="index.html" class="logo">
-      <img src="/logo.jpg" alt="SatvikMeals"/>
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjE4IiBmaWxsPSIjMUI0MzMyIi8+PHRleHQgeD0iNTAiIHk9IjcyIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfjL88L3RleHQ+PC9zdmc+" alt="SatvikMeals"/>
       SatvikMeals
     </a>
     <span class="admin-badge">Admin</span>
@@ -229,6 +229,10 @@
   <div class="side-item" onclick="show('broadcast',this)">
     <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
     Broadcast
+  </div>
+  <div class="side-item" onclick="show('test-message',this)">
+    <span>🧪</span>
+    Test Message
   </div>
   <div class="side-item" onclick="show('whatsapp',this)">
     <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -323,6 +327,36 @@
   </div>
 
   <!-- WHATSAPP SESSION -->
+  <div class="panel" id="panel-test-message" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:28px;">
+      <div><div class="page-title">Test Message</div><div class="page-sub">Send a test WhatsApp or Email to any number/address</div></div>
+    </div>
+    <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:20px;max-width:520px;">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#555;display:block;margin-bottom:6px;">Channel</label>
+        <select id="testChannel" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;">
+          <option value="whatsapp">💬 WhatsApp</option>
+          <option value="email">📧 Email</option>
+          <option value="both">📨 Both</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#555;display:block;margin-bottom:6px;">Phone (for WhatsApp)</label>
+        <input id="testPhone" placeholder="e.g. 9876543210" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#555;display:block;margin-bottom:6px;">Email (for Email)</label>
+        <input id="testEmail" type="email" placeholder="e.g. test@gmail.com" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#555;display:block;margin-bottom:6px;">Message</label>
+        <textarea id="testMessage" rows="4" placeholder="Test message..." style="width:100%;border:1px solid #ddd;border-radius:8px;padding:12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
+      </div>
+      <button onclick="sendTestMessage()" style="height:44px;padding:0 28px;background:#1B4332;color:#fff;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;">🚀 Send Test</button>
+      <div id="testStatus" style="margin-top:14px;font-size:0.85rem;color:#1B4332;"></div>
+    </div>
+  </div>
+
   <div class="panel" id="panel-whatsapp">
     <div class="section-bar">
       <div><div class="page-title">WhatsApp Connection</div><div class="page-sub">Connect or disconnect the SatvikMeals WhatsApp number used for sending messages</div></div>
@@ -804,6 +838,34 @@ async function sendBroadcast(channels) {
     }
   } catch(e) {
     statusEl.textContent = '❌ Network error.';
+  }
+}
+
+// ── TEST MESSAGE ─────────────────────────────────────────────────────────────
+async function sendTestMessage() {
+  const channel = document.getElementById('testChannel').value;
+  const phone   = document.getElementById('testPhone').value.trim();
+  const email   = document.getElementById('testEmail').value.trim();
+  const message = document.getElementById('testMessage').value.trim() || 'Test message from SatvikMeals ✅';
+  const statusEl = document.getElementById('testStatus');
+  statusEl.textContent = '⏳ Sending…';
+  try {
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    const r = await fetch(API + '/api/admin/test-message', {
+      method: 'POST', credentials: 'include', headers,
+      body: JSON.stringify({ phone, email, message, channel })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      const parts = [];
+      if (d.result?.whatsapp) parts.push(d.result.whatsapp.success ? `✅ WA sent to ${d.result.whatsapp.to}` : `❌ WA failed: ${d.result.whatsapp.error}`);
+      if (d.result?.email)    parts.push(d.result.email.success    ? `✅ Email sent to ${d.result.email.to}`   : `❌ Email failed: ${d.result.email.error}`);
+      statusEl.textContent = parts.join(' · ') || 'Done';
+    } else {
+      statusEl.textContent = '❌ ' + (d.message || 'Failed');
+    }
+  } catch(e) {
+    statusEl.textContent = '❌ Network error';
   }
 }
 
