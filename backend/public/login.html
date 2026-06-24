@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Sign In — SatvikMeals</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link rel="icon" type="image/png" sizes="512x512" href="/logo.jpg"/>
+<link rel="apple-touch-icon" href="/logo.jpg"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--g9:#0A2318;--g8:#143D2A;--g7:#1E5C3F;--g6:#2E7D55;--g5:#3DAA70;--g1:#C8F2D8;--g0:#E8FAF0;--saffron:#E8871A;--saffron-l:#FFF0D6;--cream:#FEFCF7;--bd:#D8EBE0;--tl:#6B8070;--shadow-xl:0 40px 120px rgba(10,35,24,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 16px 40px;overflow-x:hidden;position:relative;}
+body::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 15% 40%,rgba(30,92,63,0.08) 0%,transparent 55%),radial-gradient(ellipse at 85% 15%,rgba(52,201,112,0.06) 0%,transparent 50%);}
+.nav{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(254,252,247,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 20px;justify-content:space-between;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--g8);}
+.nav-logo img{width:32px;height:32px;border-radius:8px;object-fit:cover;}
+.nav-logo-text{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;}
+.nav-back{font-size:0.8rem;color:var(--tl);text-decoration:none;display:flex;align-items:center;gap:5px;font-weight:500;padding:6px 12px;border:1px solid var(--bd);border-radius:8px;transition:all 0.2s;}
+.nav-back:hover{color:var(--g7);border-color:var(--g6);}
+.card{background:white;border:1px solid var(--bd);border-radius:24px;padding:40px 28px;width:100%;max-width:460px;text-align:center;box-shadow:var(--shadow-xl);position:relative;animation:popIn 0.4s ease both;}
+@media(min-width:500px){.card{padding:52px 44px;}}
+@keyframes popIn{from{opacity:0;transform:scale(0.96) translateY(16px)}to{opacity:1;transform:none}}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:26px;}
+.brand img{width:42px;height:42px;border-radius:11px;object-fit:cover;box-shadow:0 4px 14px rgba(10,35,24,0.15);}
+.brand span{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--g8);}
+h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#0A2318;margin-bottom:8px;line-height:1.2;}
+h1 em{font-style:italic;color:var(--g6);}
+.sub{font-size:0.875rem;color:var(--tl);line-height:1.7;margin-bottom:26px;}
+.benefits{background:var(--g0);border:1px solid var(--g1);border-radius:12px;padding:14px 16px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;}
+.benefit{display:flex;align-items:center;gap:7px;font-size:0.78rem;color:var(--g8);font-weight:500;}
+.benefit::before{content:'✓';color:var(--g5);font-weight:800;font-size:0.75rem;}
+.ref-box{background:var(--saffron-l);border:1px solid rgba(232,135,26,0.25);border-radius:12px;padding:13px 15px;margin-bottom:22px;text-align:left;}
+.ref-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--saffron);margin-bottom:5px;}
+.ref-input{width:100%;height:40px;border:1px solid rgba(232,135,26,0.3);border-radius:8px;padding:0 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;background:white;outline:none;text-transform:uppercase;letter-spacing:0.08em;-webkit-appearance:none;}
+.ref-input:focus{border-color:var(--saffron);}
+.ref-note{font-size:0.68rem;color:var(--saffron);margin-top:4px;}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bd);}
+.divider span{font-size:0.72rem;color:var(--tl);font-weight:500;white-space:nowrap;}
+
+/* === GOOGLE BUTTON - BIG & ATTRACTIVE === */
+#gsiWrap{width:100%;display:flex;justify-content:center;margin-bottom:8px;}
+#gsiWrap > div{width:100%!important;}
+#gsiWrap iframe{width:100%!important;}
+.btn-google{
+  width:100%;height:60px;
+  background:white;color:#1a1a1a;
+  border:2px solid #E0E0E0;
+  border-radius:14px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:1.05rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  cursor:pointer;
+  transition:all 0.25s;
+  box-shadow:0 4px 16px rgba(0,0,0,0.07),0 1px 4px rgba(0,0,0,0.05);
+  letter-spacing:0.01em;
+  margin-bottom:6px;
+  position:relative;overflow:hidden;
+}
+.btn-google:hover{
+  box-shadow:0 8px 28px rgba(0,0,0,0.14);
+  border-color:#bbb;
+  transform:translateY(-2px);
+  background:#fafafa;
+}
+.btn-google:active{transform:translateY(0);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+.btn-google:disabled{opacity:0.65;cursor:default;transform:none;}
+.g-logo-box{width:44px;height:44px;border-radius:10px;background:white;border:1px solid #E8E8E8;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.g-logo-box svg{width:24px;height:24px;}
+.btn-google-note{font-size:0.74rem;color:var(--tl);text-align:center;margin-bottom:4px;}
+
+#status{padding:12px 14px;border-radius:10px;font-size:0.845rem;margin-top:12px;display:none;text-align:left;font-weight:500;line-height:1.5;}
+#status.success{background:var(--g0);color:var(--g8);border:1px solid var(--g1);}
+#status.error{background:#FFF5F5;color:#c53030;border:1px solid #FED7D7;}
+#status.loading{background:#F5F5F5;color:var(--tl);}
+.terms{font-size:0.7rem;color:var(--tl);line-height:1.6;margin-top:16px;}
+.terms a{color:var(--g6);text-decoration:none;font-weight:500;}
+.social-proof{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:20px;padding-top:18px;border-top:1px solid var(--bd);}
+.sp-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g7),var(--g5));color:white;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;margin-left:-8px;}
+.sp-av:first-child{margin-left:0;}
+.sp-text{font-size:0.73rem;color:var(--tl);margin-left:5px;}
+.sp-text strong{color:var(--g8);font-weight:700;}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px;}
+.modal-overlay.open{display:flex;}
+/* Phone input */
+.phone-row{display:flex;height:50px;border:2px solid var(--bd);border-radius:11px;overflow:hidden;transition:border-color 0.2s;margin-bottom:8px;}
+.phone-row:focus-within{border-color:var(--g6);}
+.phone-prefix{display:flex;align-items:center;padding:0 14px;background:var(--g0);border-right:1px solid var(--bd);font-size:0.95rem;font-weight:600;color:var(--g8);white-space:nowrap;flex-shrink:0;}
+.phone-input{flex:1;border:none;outline:none;padding:0 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;color:var(--g8);background:white;-webkit-appearance:none;}
+.phone-error{font-size:0.75rem;color:#c53030;text-align:left;min-height:18px;}
+.modal-box{background:white;border-radius:20px;padding:32px 24px;max-width:480px;width:100%;text-align:center;animation:popIn 0.3s ease both;box-shadow:var(--shadow-xl);max-height:90vh;overflow-y:auto;}
+.modal-icon{width:60px;height:60px;background:var(--g0);border:2px solid var(--g1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.modal-icon svg{width:28px;height:28px;stroke:var(--g7);fill:none;stroke-width:2;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:#0A2318;margin-bottom:8px;}
+.modal-desc{font-size:0.845rem;color:var(--tl);line-height:1.75;margin-bottom:20px;}
+.modal-btns{display:flex;flex-direction:column;gap:9px;}
+.btn-m-yes{height:50px;background:linear-gradient(135deg,var(--g8),var(--g7));color:white;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;transition:all 0.2s;}
+.btn-m-yes:disabled{opacity:0.65;cursor:default;}
+.btn-m-map{height:50px;background:transparent;color:var(--g8);border:2px solid var(--g8);border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s;}
+.btn-m-map:hover{background:var(--g0);}
+.btn-m-skip{height:36px;background:transparent;color:var(--tl);border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;cursor:pointer;text-decoration:underline;}
+#mapPicker{display:none;margin-top:12px;text-align:left;}
+.map-hint{font-size:0.78rem;color:var(--tl);margin-bottom:8px;background:var(--g0);border:1px solid var(--g1);padding:9px 12px;border-radius:8px;}
+.map-row{display:flex;gap:8px;margin-top:8px;}
+.map-input{flex:1;height:40px;border:1px solid var(--bd);border-radius:8px;padding:0 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.845rem;outline:none;-webkit-appearance:none;}
+.map-input:focus{border-color:var(--g6);}
+.btn-map-go{height:40px;padding:0 14px;background:var(--g7);color:white;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;}
+.map-addr{font-size:0.75rem;color:var(--g7);margin-top:6px;padding:8px 10px;background:var(--g0);border-radius:6px;min-height:30px;word-break:break-word;}
+.map-confirm-row{display:flex;gap:10px;margin-top:10px;}
+.btn-map-confirm{flex:1;height:44px;background:var(--g8);color:white;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;}
+.btn-map-back{height:44px;padding:0 14px;background:transparent;color:var(--tl);border:1.5px solid var(--bd);border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo"><img src="/logo.jpg" alt="SatvikMeals"/><span class="nav-logo-text">SatvikMeals</span></a>
+  <a href="index.html" class="nav-back">← Back to Home</a>
+</nav>
+
+<div class="card">
+  <a href="index.html" class="brand">
+    <img src="/logo.jpg" alt="SatvikMeals"/>
+    <span>SatvikMeals</span>
+  </a>
+
+  <h1>Welcome <em>back.</em></h1>
+  <div class="sub">Sign in to manage your subscription, fresh meals &amp; delivery — all in one place.</div>
+
+  <div class="benefits">
+    <div class="benefit">Pure Veg Kitchen</div>
+    <div class="benefit">Manage deliveries</div>
+    <div class="benefit">Pause anytime</div>
+    <div class="benefit">Secure sign-in</div>
+  </div>
+
+  <div class="ref-box">
+    <div class="ref-label">🎁 Referral Code (Optional)</div>
+    <input class="ref-input" type="text" id="refInput" placeholder="ENTER CODE" maxlength="8"/>
+    <div class="ref-note">Have a friend's referral code? Enter it here for bonus rewards.</div>
+  </div>
+
+  <div class="divider"><span>Continue with your Google account</span></div>
+
+  <!-- Google GSI renders here -->
+  <div id="gsiWrap"></div>
+
+  <!-- Fallback: shown until/if GSI loads -->
+  <button class="btn-google" id="customGBtn" onclick="triggerGoogle()">
+    <div class="g-logo-box">
+      <svg viewBox="0 0 48 48">
+        <path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/>
+        <path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.3 2 9.7 7.4 6.3 14.7z"/>
+        <path fill="#FBBC05" d="M24 46c5.9 0 10.9-2 14.5-5.4l-6.7-5.5C29.9 36.9 27.1 38 24 38c-6 0-11.1-4-12.9-9.6l-7 5.4C7.6 41.4 15.3 46 24 46z"/>
+        <path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.6 2.8-2.3 5.2-4.7 6.8l6.7 5.5c3.9-3.6 6.2-9 6.2-15.8 0-1.3-.2-2.7-.5-4z"/>
+      </svg>
+    </div>
+    Sign in with Google
+  </button>
+  <div class="btn-google-note">One click — no password needed · Fast &amp; secure</div>
+
+  <div id="status"></div>
+
+  <div class="terms">By continuing you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</div>
+
+  <div class="social-proof">
+    <div class="sp-av">R</div><div class="sp-av">P</div><div class="sp-av">A</div>
+    <div class="sp-av">S</div><div class="sp-av">M</div>
+    <div class="sp-text"><strong>200+</strong> happy subscribers in Patna</div>
+  </div>
+</div>
+
+<!-- PHONE MODAL -->
+<div class="modal-overlay" id="phoneModal">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 2 2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    </div>
+    <div class="modal-title">Your Mobile Number</div>
+    <div class="modal-desc">Required to place orders and receive delivery updates. We'll never spam you.</div>
+    <div class="phone-row">
+      <div class="phone-prefix">🇮🇳 +91</div>
+      <input class="phone-input" type="tel" id="phoneInput" placeholder="98765 43210" maxlength="10" inputmode="numeric"/>
+    </div>
+    <div class="phone-error" id="phoneError"></div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-m-yes" id="btnSavePhone" onclick="savePhone()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
+        Save &amp; Continue
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION MODAL -->
+<div class="modal-overlay" id="locModal">
+  <div class="modal-box">
+    <div class="modal-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+    <div class="modal-title">Where should we deliver?</div>
+    <div class="modal-desc">Required so we know where to deliver your tiffin. Share your location or pick it on the map.</div>
+    <div class="modal-btns">
+      <button class="btn-m-yes" id="btnLoc" onclick="useCurrentLoc()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        Use My Current Location
+      </button>
+      <button class="btn-m-map" id="btnPickMap" onclick="showMap()">📍 Pick on Map</button>
+      <div id="mapPicker">
+        <div class="map-hint">📌 Search your area below, then confirm.</div>
+        <div class="map-row">
+          <input type="text" class="map-input" id="mapQ" placeholder="Boring Road, Patna…"/>
+          <button class="btn-map-go" onclick="searchMap()">Search</button>
+        </div>
+        <iframe id="mapF" width="100%" height="240" frameborder="0"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=85.05%2C25.50%2C85.25%2C25.68&layer=mapnik&marker=25.5941%2C85.1376"
+          style="border:none;border-radius:10px;display:block;width:100%;margin-top:10px;"></iframe>
+        <div class="map-addr" id="mapAddr">📍 Patna, Bihar — search above to change</div>
+        <div class="map-confirm-row">
+          <button class="btn-map-confirm" onclick="confirmMap()">✅ Confirm Location</button>
+          <button class="btn-map-back" onclick="hideMap()">← Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="csrf.js"></script>
+<script>
+const API = '';
+window.API = API;
+const GID = '213132143602-an29ji4fuv3393o62bq1ke8roak4q7u8.apps.googleusercontent.com';
+
+if (localStorage.getItem('satvikToken')) {
+  window.location.href = new URLSearchParams(location.search).get('redirect') || 'dashboard.html';
+}
+const rc = new URLSearchParams(location.search).get('ref') || '';
+if (rc) document.getElementById('refInput').value = rc.toUpperCase();
+
+// Load Google Sign-In
+(function() {
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.async = true; s.defer = true;
+  s.onload = initGSI;
+  s.onerror = () => {}; // keep custom button
+  document.head.appendChild(s);
+})();
+
+function initGSI() {
+  try {
+    google.accounts.id.initialize({
+      client_id: GID,
+      callback: onGoogleToken,
+      auto_select: false,
+      ux_mode: 'popup'
+    });
+    const w = Math.min(document.querySelector('.card').offsetWidth - 56, 400);
+    google.accounts.id.renderButton(
+      document.getElementById('gsiWrap'),
+      {theme:'outline', size:'large', width:w, text:'continue_with', shape:'rectangular', logo_alignment:'left'}
+    );
+    // Hide custom button if GSI renders
+    setTimeout(() => {
+      const iframe = document.querySelector('#gsiWrap iframe');
+      if (iframe) document.getElementById('customGBtn').style.display = 'none';
+    }, 800);
+  } catch(e) {}
+}
+
+function triggerGoogle() {
+  try {
+    google.accounts.id.prompt();
+  } catch(e) {
+    showStatus('❌ Google Sign-In unavailable. Please ensure pop-ups are allowed in your browser settings.', 'error');
+  }
+}
+
+async function onGoogleToken(resp) {
+  showStatus('Signing in with Google…', 'loading');
+  document.getElementById('customGBtn').disabled = true;
+  const ref = document.getElementById('refInput').value.trim().toUpperCase();
+  try {
+    const r = await fetch(API + '/api/auth/google', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({idToken: resp.credential, referralCode: ref})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Login failed');
+    loginSuccess(d);
+  } catch(e) {
+    showStatus('❌ ' + (e.message || 'Sign-in failed. Please try again.'), 'error');
+    document.getElementById('customGBtn').disabled = false;
+  }
+}
+
+let pToken = null, pDest = null;
+function loginSuccess(d) {
+  localStorage.setItem('satvikToken', d.token);
+  localStorage.setItem('satvikUser', JSON.stringify(d.user));
+  // Cache name/phone/area for plans.html WhatsApp pre-fill
+  if (d.user.name)  localStorage.setItem('satvikName',  d.user.name);
+  if (d.user.phone) localStorage.setItem('satvikPhone', d.user.phone);
+  if (d.user.location && d.user.location.address) localStorage.setItem('satvikArea', d.user.location.address);
+  showStatus('✅ Welcome to SatvikMeals!', 'success');
+  const dest = d.user.role === 'admin' ? 'admin.html' : (new URLSearchParams(location.search).get('redirect') || 'dashboard.html');
+
+  // Phone and location are mandatory for every account — checked on every
+  // login (not just new signups), so accounts created before this rule
+  // existed are also brought up to date before reaching the dashboard.
+  const hasPhone = !!d.user.phone;
+  const hasLocation = !!(d.user.location && d.user.location.latitude);
+
+  pToken = d.token; pDest = dest;
+  if (!hasPhone) {
+    setTimeout(() => document.getElementById('phoneModal').classList.add('open'), 700);
+  } else if (!hasLocation) {
+    setTimeout(() => document.getElementById('locModal').classList.add('open'), 700);
+  } else {
+    setTimeout(() => location.href = dest, 900);
+  }
+}
+
+// ── Phone modal ──────────────────────────────────────────────
+function savePhone() {
+  const val = document.getElementById('phoneInput').value.trim().replace(/\D/g,'');
+  const errEl = document.getElementById('phoneError');
+  if (val.length !== 10 || !/^[6-9]/.test(val)) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+  errEl.textContent = '';
+  const btn = document.getElementById('btnSavePhone');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const t = pToken || localStorage.getItem('satvikToken');
+  csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }).then(headers =>
+    fetch(API + '/api/auth/phone', {
+      method: 'PATCH',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify({ phone: val })
+    })
+  )
+  .then(async r => {
+    if (!r.ok) throw new Error('save failed');
+    return r.json();
+  })
+  .then(d => {
+    localStorage.setItem('satvikPhone', val);
+    if (d.user) localStorage.setItem('satvikUser', JSON.stringify(d.user));
+    document.getElementById('phoneModal').classList.remove('open');
+    document.getElementById('locModal').classList.add('open');
+    btn.disabled = false; btn.textContent = 'Save & Continue';
+  })
+  .catch(() => {
+    errEl.textContent = 'Could not save your number. Please check your connection and try again.';
+    btn.disabled = false; btn.textContent = 'Save & Continue';
+  });
+}
+
+// Only allow digits in phone input
+document.getElementById('phoneInput').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'').slice(0,10);
+  document.getElementById('phoneError').textContent = '';
+});
+
+// Location
+let mLat = 25.5941, mLng = 85.1376;
+async function useCurrentLoc() {
+  if (!navigator.geolocation) { showMap(); return; }
+  const btn = document.getElementById('btnLoc');
+  btn.textContent = '📡 Getting location…'; btn.disabled = true;
+  try {
+    const p = await new Promise((res,rej) => navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000,enableHighAccuracy:true}));
+    let addr = 'Patna, Bihar';
+    try { const g = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${p.coords.latitude}&lon=${p.coords.longitude}&format=json`)).json(); addr = g.display_name || addr; } catch(_){}
+    await saveLoc(p.coords.latitude, p.coords.longitude, addr);
+    document.getElementById('locModal').classList.remove('open');
+    location.href = pDest || 'dashboard.html';
+  } catch(e) {
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Use My Current Location`;
+    btn.disabled = false; showMap();
+  }
+}
+function showMap() {
+  document.getElementById('mapPicker').style.display = 'block';
+  document.getElementById('btnLoc').style.display = 'none';
+  document.getElementById('btnPickMap').style.display = 'none';
+}
+function hideMap() {
+  document.getElementById('mapPicker').style.display = 'none';
+  document.getElementById('btnLoc').style.display = 'flex';
+  document.getElementById('btnPickMap').style.display = 'block';
+}
+async function searchMap() {
+  const q = document.getElementById('mapQ').value.trim(); if (!q) return;
+  try {
+    const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+' Patna Bihar')}&format=json&limit=1`)).json();
+    if (res.length) {
+      mLat = parseFloat(res[0].lat); mLng = parseFloat(res[0].lon);
+      document.getElementById('mapAddr').textContent = '📍 ' + res[0].display_name;
+      document.getElementById('mapF').src = `https://www.openstreetmap.org/export/embed.html?bbox=${mLng-0.03}%2C${mLat-0.02}%2C${mLng+0.03}%2C${mLat+0.02}&layer=mapnik&marker=${mLat}%2C${mLng}`;
+    } else document.getElementById('mapAddr').textContent = '❌ Not found. Try a more specific name.';
+  } catch(e) { document.getElementById('mapAddr').textContent = '❌ Search failed.'; }
+}
+async function confirmMap() {
+  await saveLoc(mLat, mLng, document.getElementById('mapAddr').textContent.replace('📍 ',''));
+  document.getElementById('locModal').classList.remove('open');
+  location.href = pDest || 'dashboard.html';
+}
+async function saveLoc(lat, lng, address) {
+  const t = pToken || localStorage.getItem('satvikToken'); if (!t) return;
+  try {
+    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t });
+    await fetch(API + '/api/auth/location', { method: 'POST', credentials: 'include', headers, body: JSON.stringify({ latitude: lat, longitude: lng, address }) });
+  } catch(_){}
+}
+function showStatus(msg, type) {
+  const s = document.getElementById('status');
+  s.textContent = msg; s.className = type; s.style.display = 'block';
+}
+document.addEventListener('keydown', e => { if (e.key==='Enter' && document.activeElement.id==='mapQ') searchMap(); });
+</script>
+</body>
+</html>

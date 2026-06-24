@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plans — SatvikMeals</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link rel="icon" type="image/png" sizes="512x512" href="/logo.jpg"/>
+<link rel="apple-touch-icon" href="/logo.jpg"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--g9:#0F2D1F;--g8:#1B4332;--g7:#2D6A4F;--g6:#40916C;--g1:#D8F3DC;--g0:#F0FAF2;--cream:#FAF8F3;--ww:#FDFCF8;--td:#1A1A16;--tm:#3D3D35;--tl:#7A7A6E;--bd:#E5E2D8;--gold:#B5965A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--ww);color:var(--td)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(253,252,248,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);height:68px;display:flex;align-items:center;padding:0 32px;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--g8);font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600}
+.logo-mark{width:36px;height:36px;background:var(--g8);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:20px;height:20px;fill:var(--cream)}
+.nav-links{display:flex;gap:24px;list-style:none;align-items:center}
+.nav-links a{font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--tm);text-decoration:none}
+.btn-nav{background:var(--g8)!important;color:var(--cream)!important;padding:8px 18px;border-radius:6px}
+.coins-badge{background:var(--gold);color:white;padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:500;display:none}
+main{padding-top:68px}
+.hero{background:var(--g9);padding:80px 32px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-bg-circle{position:absolute;width:600px;height:600px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);top:50%;left:50%;transform:translate(-50%,-50%)}
+.hero-bg-circle2{position:absolute;width:400px;height:400px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);top:50%;left:50%;transform:translate(-50%,-50%)}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;color:white;margin-bottom:16px;position:relative;animation:fadeUp 0.7s ease both}
+.hero h1 em{font-style:italic;color:#D8F3DC}
+.hero p{color:rgba(255,255,255,0.55);font-size:0.95rem;font-weight:300;position:relative;animation:fadeUp 0.7s 0.1s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.coins-bar{background:linear-gradient(135deg,#2d1a00,#5c3a00);border-bottom:1px solid #8B6914;padding:14px 32px;text-align:center;display:none}
+.coins-bar p{color:#f0c040;font-size:0.875rem;font-weight:300}
+.coins-bar strong{font-weight:500}
+.toggle-wrap{display:flex;justify-content:center;padding:36px 32px 0;gap:12px;flex-wrap:wrap;animation:fadeUp 0.6s 0.2s both}
+.toggle{display:inline-flex;background:white;border:1px solid var(--bd);border-radius:8px;padding:4px}
+.toggle button{padding:9px 24px;border:none;background:transparent;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;color:var(--tl);transition:all 0.2s}
+.toggle button.active{background:var(--g8);color:white}
+.use-coins-toggle{display:none;align-items:center;gap:10px;background:white;border:1px solid var(--bd);border-radius:8px;padding:8px 18px;cursor:pointer}
+.use-coins-toggle input{width:16px;height:16px;accent-color:var(--g8)}
+.use-coins-toggle label{font-size:0.8rem;color:var(--tm);cursor:pointer}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:36px auto 80px;padding:0 32px}
+.plan-card{background:white;border:1px solid var(--bd);border-radius:14px;padding:36px 28px;position:relative;transition:border-color 0.25s,box-shadow 0.25s,transform 0.25s;animation:fadeUp 0.6s ease both}
+.plan-card:hover{border-color:var(--g6);box-shadow:0 12px 40px rgba(27,67,50,0.12);transform:translateY(-3px)}
+.plan-card.featured{border-color:var(--g7);box-shadow:0 4px 20px rgba(27,67,50,0.08)}
+.badge-top{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--g7);color:white;font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:5px 16px;border-radius:20px;white-space:nowrap}
+.plan-header{margin-bottom:20px}
+.plan-type{font-size:0.67rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--g6);margin-bottom:6px}
+.plan-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:var(--g9);margin-bottom:6px}
+.plan-desc{font-size:0.845rem;color:var(--tl);font-weight:300;line-height:1.65}
+.plan-price{margin:20px 0}
+.price-original{font-size:0.85rem;color:var(--tl);text-decoration:line-through;display:none}
+.price-main{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--g9);line-height:1}
+.price-period{font-size:0.78rem;color:var(--tl);font-weight:300;margin-left:3px}
+.coin-saving{font-size:0.75rem;color:var(--gold);font-weight:500;margin-top:4px;display:none}
+.plan-meals{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.meal-tag{font-size:0.65rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:4px 10px;border-radius:4px;background:var(--g0);color:var(--g7);border:1px solid var(--g1)}
+.plan-validity{font-size:0.78rem;color:var(--tl);font-weight:300;margin-bottom:16px}
+.plan-feats{list-style:none;margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.plan-feats li{font-size:0.845rem;color:var(--tm);font-weight:300;display:flex;align-items:center;gap:8px}
+.plan-feats li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--g6);flex-shrink:0}
+.btn-plan{width:100%;height:46px;background:var(--g8);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,transform 0.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-plan:hover{background:var(--g7);transform:scale(1.01)}
+.btn-plan svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--g8);color:white;padding:13px 26px;border-radius:8px;font-size:0.855rem;display:none;z-index:999;animation:fadeUp 0.3s ease}
+.loading{text-align:center;padding:80px;color:var(--tl)}
+@media(max-width:768px){nav{padding:0 14px;height:56px}.logo{font-size:1.05rem}.logo img{width:28px;height:28px}.nav-links{gap:10px}.nav-links a{font-size:0.68rem;letter-spacing:0.02em}.btn-nav{padding:6px 12px;font-size:0.68rem}.coins-badge{display:none!important}}.nav-links li:last-child a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo"><img src="/logo.jpg" alt="SatvikMeals" style="width:36px;height:36px;border-radius:8px;object-fit:cover;"/>SatvikMeals</a>
+  <ul class="nav-links">
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="plans.html">Plans</a></li>
+    <li><span class="coins-badge" id="coinsBadge">0 coins</span></li>
+    <li id="loginLi"><a href="login.html" class="btn-nav">Login</a></li>
+    <li id="dashLi" style="display:none"><a href="dashboard.html" class="btn-nav">Dashboard</a></li>
+  </ul>
+</nav>
+<main>
+  <div class="hero">
+    <div class="hero-bg-circle"></div><div class="hero-bg-circle2"></div>
+    <h1>Honest, <em>simple pricing.</em></h1>
+    <p>Choose a plan. Pause or cancel anytime from your dashboard.</p>
+  </div>
+  <div class="coins-bar" id="coinsBar">
+    <p>You have <strong id="coinsCount">0</strong> coins. Use them as discount on your purchase.</p>
+  </div>
+  <div class="toggle-wrap">
+    <div class="toggle">
+      <button class="active" onclick="filter('all',this)">All</button>
+      <button onclick="filter('satvik',this)">Satvik</button>
+      <button onclick="filter('regular',this)">Regular</button>
+    </div>
+    <div class="use-coins-toggle" id="coinsToggle">
+      <input type="checkbox" id="useCoinsCheck" onchange="renderPlans()"/>
+      <label for="useCoinsCheck">Use my coins for discount</label>
+    </div>
+  </div>
+  <div class="plans-grid" id="plansGrid"><div class="loading">Loading plans...</div></div>
+</main>
+<div id="toast"></div>
+<script>
+const API = '';
+let allPlans = [], userCoins = 0, currentFilter = 'all';
+const token = localStorage.getItem('satvikToken');
+
+async function init() {
+  if (token) {
+    document.getElementById('loginLi').style.display='none';
+    document.getElementById('dashLi').style.display='block';
+    try {
+      const r = await fetch(API+'/api/user/dashboard',{headers:{Authorization:'Bearer '+token}});
+      const d = await r.json();
+      userCoins = d.coins||0;
+      if (userCoins>0) {
+        document.getElementById('coinsBadge').textContent=userCoins+' coins';
+        document.getElementById('coinsBadge').style.display='block';
+        document.getElementById('coinsBar').style.display='block';
+        document.getElementById('coinsCount').textContent=userCoins;
+        document.getElementById('coinsToggle').style.display='flex';
+      }
+    } catch(e){}
+  }
+  const r = await fetch(API+'/api/plans');
+  allPlans = await r.json();
+  renderPlans();
+}
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.toggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlans();
+}
+
+function renderPlans() {
+  const useCoins = document.getElementById('useCoinsCheck')?.checked && userCoins > 0;
+  const grid = document.getElementById('plansGrid');
+  const filtered = currentFilter==='all' ? allPlans : allPlans.filter(p=>p.mealType===currentFilter||p.mealType==='both');
+  if (!filtered.length) { grid.innerHTML='<div class="loading">No plans found.</div>'; return; }
+
+  grid.innerHTML = filtered.map((p,i)=>{
+    const maxDiscount = Math.floor(p.price*0.5);
+    const coinsApplied = useCoins ? Math.min(userCoins, maxDiscount) : 0;
+    const finalPrice = p.price - coinsApplied;
+    const meals = (p.meals||['lunch','dinner']).map(m=>`<span class="meal-tag">${m}</span>`).join('');
+    return `<div class="plan-card ${p.type==='monthly'?'featured':''}" style="animation-delay:${i*0.08}s">
+      ${p.type==='monthly'?'<div class="badge-top">Best Value</div>':''}
+      <div class="plan-header">
+        <div class="plan-type">${p.type} &bull; ${p.mealType}</div>
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-desc">${p.description||''}</div>
+      </div>
+      <div class="plan-price">
+        ${coinsApplied>0?`<div class="price-original" style="display:block">&#8377;${p.price}</div>`:''}
+        <div><span class="price-main">&#8377;${finalPrice}</span><span class="price-period">/ ${p.type==='weekly'?'week':'month'}</span></div>
+        ${coinsApplied>0?`<div class="coin-saving" style="display:block">&#8377;${coinsApplied} saved using ${coinsApplied} coins</div>`:''}
+      </div>
+      <div class="plan-meals">${meals}</div>
+      <div class="plan-validity">Valid for ${p.validityDays||30} days</div>
+      <ul class="plan-feats">${(p.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul>
+      <button class="btn-plan" onclick="subscribe('${p._id}','${p.name}',${p.price},${coinsApplied})">
+        Subscribe Now
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+let selectedPlan = {};
+
+function subscribe(planId, planName, price, coinsApplied) {
+  if (!token) { showToast('Please login first'); setTimeout(()=>window.location.href='login.html?redirect=plans.html',1200); return; }
+  selectedPlan = { planId, planName, price, coinsApplied };
+  // Populate modal
+  document.getElementById('modalPlanName').textContent = planName;
+  const finalPrice = price - coinsApplied;
+  document.getElementById('modalPlanPrice').textContent = '₹' + finalPrice + (coinsApplied > 0 ? ` (₹${coinsApplied} coins applied)` : '');
+  // Fill user info from stored data
+  const userName  = localStorage.getItem('satvikName') || '';
+  const userPhone = localStorage.getItem('satvikPhone') || '';
+  const userArea  = localStorage.getItem('satvikArea') || '';
+  document.getElementById('modalUserInfo').textContent =
+    [userName, userPhone, userArea].filter(Boolean).join(' · ') || 'Your account details';
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').style.display = 'none';
+}
+
+function confirmWhatsApp() {
+  const userName  = localStorage.getItem('satvikName') || 'Customer';
+  const userPhone = localStorage.getItem('satvikPhone') || 'Not provided';
+  const userArea  = localStorage.getItem('satvikArea') || 'Not provided';
+  const finalPrice = selectedPlan.price - (selectedPlan.coinsApplied || 0);
+  const msg = encodeURIComponent(
+    `Hi SatvikMeals! I want to confirm my plan.\n\n` +
+    `Name: ${userName}\n` +
+    `Mobile: ${userPhone}\n` +
+    `Location: ${userArea}\n` +
+    `Plan: ${selectedPlan.planName} — ₹${finalPrice}\n\n` +
+    `Please confirm my subscription.`
+  );
+  window.open(`https://wa.me/919031447621?text=${msg}`, '_blank');
+  closeModal();
+}
+
+function confirmCall() {
+  window.location.href = 'tel:+919031447621';
+  closeModal();
+}
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+init();
+</script>
+
+<!-- CONFIRM PLAN MODAL -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:16px;padding:32px 28px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative">
+    <button onclick="closeModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888">×</button>
+    <div style="font-size:0.7rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#40916C;margin-bottom:8px">Confirm Your Plan</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:500;color:#0F2D1F;margin-bottom:4px" id="modalPlanName"></div>
+    <div style="font-size:1.1rem;font-weight:500;color:#1B4332;margin-bottom:8px" id="modalPlanPrice"></div>
+    <div style="font-size:0.82rem;color:#7A7A6E;margin-bottom:24px" id="modalUserInfo"></div>
+    <p style="font-size:0.85rem;color:#3D3D35;margin-bottom:22px;line-height:1.6">Contact us to confirm your plan. We'll activate it after you reach out:</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button onclick="confirmWhatsApp()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:50px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;letter-spacing:0.03em">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </button>
+      <button onclick="confirmCall()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:50px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;letter-spacing:0.03em">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 2 2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Call Us
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
