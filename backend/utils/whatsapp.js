@@ -24,6 +24,12 @@ let lastStatus = 'disconnected'; // 'disconnected' | 'connecting' | 'qr_pending'
 let lastError = null;
 const msgQueue = [];      // queued messages waiting for connection
 
+// Incremented every time connect() starts a brand-new socket. Event handlers
+// from an OLD socket capture the generation they belong to and check it
+// before mutating shared state — this stops a late/stale event from a
+// previous (possibly corrupted) connection from clobbering a newer attempt.
+let connGeneration = 0;
+
 // ── Public status (used by admin API) ─────────────────────────────────────────
 function getStatus() {
   return { status: lastStatus, hasQr: !!lastQr, error: lastError, queueLength: msgQueue.length };
@@ -55,6 +61,12 @@ async function connect() {
   isConnecting = true;
   lastStatus = 'connecting';
   lastError = null;
+  msgQueue.length = 0; // clear any leftover queue from a previous broken session
+
+  // Claim a new generation for this connection attempt. Any event from a
+  // socket created in an earlier generation is ignored below.
+  connGeneration += 1;
+  const myGeneration = connGeneration;
 
   let makeWASocket, DisconnectReason;
   try {
@@ -71,16 +83,25 @@ async function connect() {
   try {
     const { state, saveCreds } = await useMongoAuthState();
 
-    sock = makeWASocket({
+    const newSock = makeWASocket({
       auth: state,
       printQRInTerminal: false,
       browser: ['SatvikMeals', 'Chrome', '1.0.0'],
       getMessage: async () => undefined,
     });
+    sock = newSock;
 
-    sock.ev.on('creds.update', saveCreds);
+    newSock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', async (update) => {
+    newSock.ev.on('connection.update', async (update) => {
+      // Ignore events from a socket that's no longer the current attempt —
+      // this is what prevents a stale/corrupted old session from clobbering
+      // the state of a fresh connect() call.
+      if (myGeneration !== connGeneration) {
+        console.log(`[WhatsApp] Ignoring stale connection.update from generation ${myGeneration} (current: ${connGeneration}).`);
+        return;
+      }
+
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
@@ -116,7 +137,7 @@ async function connect() {
           console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
         } else {
           lastStatus = 'connecting';
-          setTimeout(connect, 5000);
+          setTimeout(() => { if (myGeneration === connGeneration) connect(); }, 5000);
         }
       }
     });
@@ -132,21 +153,39 @@ async function connect() {
 }
 
 // ── Disconnect — called by admin clicking "Disconnect WhatsApp" ──────────────
+// IMPORTANT: we do NOT call sock.logout() here. If the underlying session is
+// already corrupted/stale (e.g. an old broken Mongo session), logout() tries
+// to send a real logout request over that broken connection — it can hang,
+// throw late, or fire its own 'close' event into the SAME connection.update
+// handler that a subsequent connect() call relies on. That race is what
+// caused "stuck on Connecting, no QR, 2 messages queued" after disconnect.
+// Instead we forcibly detach all listeners and end the socket locally, then
+// wipe Mongo — no network round-trip to WhatsApp's servers required.
 async function disconnect() {
+  const oldSock = sock;
+  sock = null; // detach immediately so no other code path can use a stale socket
+  connGeneration += 1; // invalidate any in-flight events from the old socket permanently
+
+  if (oldSock) {
+    try { oldSock.ev.removeAllListeners(); } catch (e) { /* ignore */ }
+    try { oldSock.end(new Error('Disconnected by admin')); } catch (e) { /* ignore — socket may already be dead */ }
+  }
+
+  isReady = false;
+  isConnecting = false;
+  lastQr = null;
+  lastStatus = 'disconnected';
+  lastError = null;
+  msgQueue.length = 0; // drop any stale queued messages from the old/corrupted session
+
   try {
-    if (sock) {
-      try { await sock.logout(); } catch (e) { /* ignore — may already be closed */ }
-      sock = null;
-    }
-  } finally {
-    isReady = false;
-    isConnecting = false;
-    lastQr = null;
-    lastStatus = 'disconnected';
-    lastError = null;
     await WaSession.deleteMany({});
     console.log('[WhatsApp] Session disconnected and cleared from MongoDB by admin.');
+  } catch (err) {
+    console.error('[WhatsApp] Failed to clear session from MongoDB:', err.message);
+    lastError = 'Disconnected locally, but failed to clear MongoDB session: ' + err.message;
   }
+
   return getStatus();
 }
 
