@@ -360,6 +360,14 @@
       <div style="margin-top:28px;padding:16px 18px;background:#FFF8E8;border:1px solid #F3DDA0;border-radius:10px;font-size:0.78rem;color:#7A5C00;line-height:1.6;">
         ⚠️ Disconnecting will remove the saved session from the database. You'll need to scan a fresh QR code to reconnect — either with the same number or a different one.
       </div>
+
+      <div style="margin-top:20px;border-top:1px solid #EEE;padding-top:18px;">
+        <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">Stuck on "Connecting…" with no QR after disconnecting?</div>
+        <button onclick="waForceReset()" style="height:38px;padding:0 18px;background:#fff;color:#C0392B;border:1.5px solid #C0392B;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">
+          🛠 Force Reset Session
+        </button>
+        <div style="font-size:0.74rem;color:#999;margin-top:8px;line-height:1.5;">Wipes the saved session directly from the database, bypassing the WhatsApp connection entirely. After this, redeploy/restart the server once, then click Connect again.</div>
+      </div>
     </div>
 
     <!-- SEND MESSAGE TO ANY USER -->
@@ -969,6 +977,20 @@ async function waStartDisconnect() {
     statusEl.textContent = '✅ Disconnected. Session removed.';
   } catch (e) {
     statusEl.textContent = '❌ Failed to disconnect.';
+  }
+}
+
+async function waForceReset() {
+  if (!confirm('Force reset will wipe the saved WhatsApp session directly from the database, bypassing the live connection. Use this only if Disconnect did not work. Continue?')) return;
+  const statusEl = document.getElementById('waActionStatus');
+  statusEl.textContent = '⏳ Force resetting…';
+  try {
+    const headers = await csrfHeaders({ Authorization: 'Bearer ' + token });
+    const r = await fetch(API + '/api/admin/whatsapp/force-reset', { method: 'POST', credentials: 'include', headers });
+    const d = await r.json();
+    statusEl.textContent = r.ok ? `✅ ${d.message}` : `❌ ${d.message || 'Force reset failed.'}`;
+  } catch (e) {
+    statusEl.textContent = '❌ Network error during force reset.';
   }
 }
 
