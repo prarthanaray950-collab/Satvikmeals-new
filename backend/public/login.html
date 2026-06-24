@@ -181,7 +181,7 @@ h1 em{font-style:italic;color:var(--g6);}
       <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 2 2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
     </div>
     <div class="modal-title">Your Mobile Number</div>
-    <div class="modal-desc">We'll send your order updates and delivery info to this number. No spam, ever.</div>
+    <div class="modal-desc">Required to place orders and receive delivery updates. We'll never spam you.</div>
     <div class="phone-row">
       <div class="phone-prefix">🇮🇳 +91</div>
       <input class="phone-input" type="tel" id="phoneInput" placeholder="98765 43210" maxlength="10" inputmode="numeric"/>
@@ -192,7 +192,6 @@ h1 em{font-style:italic;color:var(--g6);}
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
         Save &amp; Continue
       </button>
-      <button class="btn-m-skip" onclick="skipPhone()">Skip for now</button>
     </div>
   </div>
 </div>
@@ -202,7 +201,7 @@ h1 em{font-style:italic;color:var(--g6);}
   <div class="modal-box">
     <div class="modal-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
     <div class="modal-title">Where should we deliver?</div>
-    <div class="modal-desc">Share your delivery location so we can bring fresh tiffin right to your door.</div>
+    <div class="modal-desc">Required so we know where to deliver your tiffin. Share your location or pick it on the map.</div>
     <div class="modal-btns">
       <button class="btn-m-yes" id="btnLoc" onclick="useCurrentLoc()">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
@@ -224,7 +223,6 @@ h1 em{font-style:italic;color:var(--g6);}
           <button class="btn-map-back" onclick="hideMap()">← Back</button>
         </div>
       </div>
-      <button class="btn-m-skip" onclick="skipLoc()">Skip for now</button>
     </div>
   </div>
 </div>
@@ -308,14 +306,18 @@ function loginSuccess(d) {
   if (d.user.location && d.user.location.address) localStorage.setItem('satvikArea', d.user.location.address);
   showStatus('✅ Welcome to SatvikMeals!', 'success');
   const dest = d.user.role === 'admin' ? 'admin.html' : (new URLSearchParams(location.search).get('redirect') || 'dashboard.html');
-  if (d.isNewUser) {
-    pToken = d.token; pDest = dest;
-    // Show phone modal first — location modal follows after phone is saved
-    if (!d.user.phone) {
-      setTimeout(() => document.getElementById('phoneModal').classList.add('open'), 700);
-    } else {
-      setTimeout(() => document.getElementById('locModal').classList.add('open'), 700);
-    }
+
+  // Phone and location are mandatory for every account — checked on every
+  // login (not just new signups), so accounts created before this rule
+  // existed are also brought up to date before reaching the dashboard.
+  const hasPhone = !!d.user.phone;
+  const hasLocation = !!(d.user.location && d.user.location.latitude);
+
+  pToken = d.token; pDest = dest;
+  if (!hasPhone) {
+    setTimeout(() => document.getElementById('phoneModal').classList.add('open'), 700);
+  } else if (!hasLocation) {
+    setTimeout(() => document.getElementById('locModal').classList.add('open'), 700);
   } else {
     setTimeout(() => location.href = dest, 900);
   }
@@ -325,7 +327,7 @@ function loginSuccess(d) {
 function savePhone() {
   const val = document.getElementById('phoneInput').value.trim().replace(/\D/g,'');
   const errEl = document.getElementById('phoneError');
-  if (val.length !== 10) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+  if (val.length !== 10 || !/^[6-9]/.test(val)) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
   errEl.textContent = '';
   const btn = document.getElementById('btnSavePhone');
   btn.disabled = true; btn.textContent = 'Saving…';
@@ -338,24 +340,21 @@ function savePhone() {
       body: JSON.stringify({ phone: val })
     })
   )
-  .then(r => r.json())
+  .then(async r => {
+    if (!r.ok) throw new Error('save failed');
+    return r.json();
+  })
   .then(d => {
     localStorage.setItem('satvikPhone', val);
     if (d.user) localStorage.setItem('satvikUser', JSON.stringify(d.user));
     document.getElementById('phoneModal').classList.remove('open');
     document.getElementById('locModal').classList.add('open');
+    btn.disabled = false; btn.textContent = 'Save & Continue';
   })
   .catch(() => {
-    // Still proceed even if save fails
-    localStorage.setItem('satvikPhone', val);
-    document.getElementById('phoneModal').classList.remove('open');
-    document.getElementById('locModal').classList.add('open');
+    errEl.textContent = 'Could not save your number. Please check your connection and try again.';
+    btn.disabled = false; btn.textContent = 'Save & Continue';
   });
-}
-
-function skipPhone() {
-  document.getElementById('phoneModal').classList.remove('open');
-  document.getElementById('locModal').classList.add('open');
 }
 
 // Only allow digits in phone input
@@ -367,7 +366,7 @@ document.getElementById('phoneInput').addEventListener('input', function() {
 // Location
 let mLat = 25.5941, mLng = 85.1376;
 async function useCurrentLoc() {
-  if (!navigator.geolocation) { skipLoc(); return; }
+  if (!navigator.geolocation) { showMap(); return; }
   const btn = document.getElementById('btnLoc');
   btn.textContent = '📡 Getting location…'; btn.disabled = true;
   try {
@@ -408,7 +407,6 @@ async function confirmMap() {
   document.getElementById('locModal').classList.remove('open');
   location.href = pDest || 'dashboard.html';
 }
-function skipLoc() { document.getElementById('locModal').classList.remove('open'); location.href = pDest || 'dashboard.html'; }
 async function saveLoc(lat, lng, address) {
   const t = pToken || localStorage.getItem('satvikToken'); if (!t) return;
   try {

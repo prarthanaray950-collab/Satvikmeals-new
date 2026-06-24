@@ -1,80 +1,153 @@
 'use strict';
 /**
- * SatvikMeals — WhatsApp sender via Baileys
- * Install: npm install @whiskeysockets/baileys qrcode-terminal
- * Env vars needed:
- *   WA_SESSION_PATH  — folder to persist session, e.g. ./wa-session
- *   ADMIN_WA_NUMBER  — admin's WhatsApp number, 10 digits e.g. 9031447621
+ * SatvikMeals — WhatsApp sender via Baileys, with MongoDB-persisted session.
  *
- * First run: scan the QR code printed in terminal with the SatvikMeals
- * WhatsApp number. Session is saved and no further scanning is needed.
+ * Unlike the old file-based version, this:
+ *   1. Stores the WhatsApp session in MongoDB (survives Render restarts).
+ *   2. Does NOT force a fresh QR scan on every restart — if a session
+ *      already exists in MongoDB, the server reconnects automatically.
+ *   3. Lets the admin start a brand-new connection (and scan a QR shown
+ *      directly in the admin panel) or disconnect/wipe the session,
+ *      entirely from the browser — no server console access needed.
+ *
+ * Install: npm install @whiskeysockets/baileys @hapi/boom qrcode
  */
 
-const path = require('path');
-const qrcode = require('qrcode-terminal');
+const { useMongoAuthState } = require('./waAuthState');
+const WaSession = require('../models/WaSession');
 
-let sock = null;        // Baileys socket instance
-let isReady = false;    // true once connection is open
-const msgQueue = [];    // queued messages waiting for connection
+let sock = null;          // Baileys socket instance
+let isReady = false;      // true once connection is open
+let isConnecting = false; // true while a connect() call is in progress
+let lastQr = null;        // most recent QR string (raw, for re-encoding to image)
+let lastStatus = 'disconnected'; // 'disconnected' | 'connecting' | 'qr_pending' | 'connected'
+let lastError = null;
+const msgQueue = [];      // queued messages waiting for connection
 
-// ── Connect (call once at server startup) ─────────────────────────────────────
-async function connect() {
-  if (!process.env.WA_SESSION_PATH) {
-    console.log('[WhatsApp] WA_SESSION_PATH not set — WhatsApp sender disabled.');
-    return;
+// ── Public status (used by admin API) ─────────────────────────────────────────
+function getStatus() {
+  return { status: lastStatus, hasQr: !!lastQr, error: lastError, queueLength: msgQueue.length };
+}
+
+// ── Get current QR as a data:image/png base64 string (or null) ───────────────
+async function getQrImage() {
+  if (!lastQr) return null;
+  let QRCode;
+  try {
+    QRCode = require('qrcode');
+  } catch (e) {
+    console.error('[WhatsApp] qrcode package not installed. Run: npm install qrcode');
+    return null;
   }
+  try {
+    return await QRCode.toDataURL(lastQr, { width: 280, margin: 1 });
+  } catch (e) {
+    console.error('[WhatsApp] Failed to render QR image:', e.message);
+    return null;
+  }
+}
 
-  let makeWASocket, useMultiFileAuthState, DisconnectReason, Boom;
+// ── Connect — called by admin clicking "Connect WhatsApp" ────────────────────
+async function connect() {
+  if (isConnecting || isReady) {
+    return getStatus();
+  }
+  isConnecting = true;
+  lastStatus = 'connecting';
+  lastError = null;
+
+  let makeWASocket, DisconnectReason;
   try {
     ({ default: makeWASocket } = await import('@whiskeysockets/baileys'));
-    ({ useMultiFileAuthState } = await import('@whiskeysockets/baileys'));
     ({ DisconnectReason } = await import('@whiskeysockets/baileys'));
-    ({ Boom } = await import('@hapi/boom'));
   } catch (e) {
-    console.error('[WhatsApp] Baileys not installed. Run: npm install @whiskeysockets/baileys qrcode-terminal @hapi/boom');
-    return;
+    console.error('[WhatsApp] Baileys not installed. Run: npm install @whiskeysockets/baileys @hapi/boom qrcode');
+    isConnecting = false;
+    lastStatus = 'disconnected';
+    lastError = 'Baileys package not installed on server.';
+    return getStatus();
   }
 
-  const sessionPath = path.resolve(process.env.WA_SESSION_PATH || './wa-session');
-  const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+  try {
+    const { state, saveCreds } = await useMongoAuthState();
 
-  sock = makeWASocket({
-    auth: state,
-    printQRInTerminal: false,   // we handle QR ourselves below
-    browser: ['SatvikMeals', 'Chrome', '1.0.0'],
-    getMessage: async () => undefined,
-  });
+    sock = makeWASocket({
+      auth: state,
+      printQRInTerminal: false,
+      browser: ['SatvikMeals', 'Chrome', '1.0.0'],
+      getMessage: async () => undefined,
+    });
 
-  sock.ev.on('creds.update', saveCreds);
+    sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
-    if (qr) {
-      console.log('\n[WhatsApp] Scan this QR code with the SatvikMeals WhatsApp number:\n');
-      qrcode.generate(qr, { small: true });
-    }
+    sock.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect, qr } = update;
 
-    if (connection === 'open') {
-      isReady = true;
-      console.log('[WhatsApp] ✅ Connected and ready to send messages.');
-      // Flush queued messages
-      while (msgQueue.length) {
-        const { jid, text } = msgQueue.shift();
-        await _send(jid, text).catch(e => console.error('[WhatsApp] Queue flush error:', e.message));
+      if (qr) {
+        lastQr = qr;
+        lastStatus = 'qr_pending';
+        console.log('[WhatsApp] QR code ready — scan from the admin panel (WhatsApp tab).');
       }
-    }
 
-    if (connection === 'close') {
-      isReady = false;
-      const statusCode = lastDisconnect?.error?.output?.statusCode;
-      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-      console.log(`[WhatsApp] Connection closed (code ${statusCode}). Reconnect: ${shouldReconnect}`);
-      if (shouldReconnect) {
-        setTimeout(connect, 5000);   // retry after 5s
-      } else {
-        console.log('[WhatsApp] Logged out. Delete session folder and restart to re-scan QR.');
+      if (connection === 'open') {
+        isReady = true;
+        isConnecting = false;
+        lastQr = null;
+        lastStatus = 'connected';
+        lastError = null;
+        console.log('[WhatsApp] ✅ Connected and ready to send messages.');
+        while (msgQueue.length) {
+          const { jid, text } = msgQueue.shift();
+          await _send(jid, text).catch(e => console.error('[WhatsApp] Queue flush error:', e.message));
+        }
       }
+
+      if (connection === 'close') {
+        isReady = false;
+        isConnecting = false;
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const loggedOut = statusCode === DisconnectReason.loggedOut;
+        console.log(`[WhatsApp] Connection closed (code ${statusCode}). Logged out: ${loggedOut}`);
+
+        if (loggedOut) {
+          lastStatus = 'disconnected';
+          lastQr = null;
+          await WaSession.deleteMany({}).catch(() => {});
+          console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
+        } else {
+          lastStatus = 'connecting';
+          setTimeout(connect, 5000);
+        }
+      }
+    });
+
+    return getStatus();
+  } catch (err) {
+    console.error('[WhatsApp] Connect error:', err.message);
+    isConnecting = false;
+    lastStatus = 'disconnected';
+    lastError = err.message;
+    return getStatus();
+  }
+}
+
+// ── Disconnect — called by admin clicking "Disconnect WhatsApp" ──────────────
+async function disconnect() {
+  try {
+    if (sock) {
+      try { await sock.logout(); } catch (e) { /* ignore — may already be closed */ }
+      sock = null;
     }
-  });
+  } finally {
+    isReady = false;
+    isConnecting = false;
+    lastQr = null;
+    lastStatus = 'disconnected';
+    lastError = null;
+    await WaSession.deleteMany({});
+    console.log('[WhatsApp] Session disconnected and cleared from MongoDB by admin.');
+  }
+  return getStatus();
 }
 
 // ── Internal send ─────────────────────────────────────────────────────────────
@@ -91,21 +164,35 @@ function toJid(phone) {
   return `${num}@s.whatsapp.net`;
 }
 
-// ── Safe public send — queues if not yet connected ────────────────────────────
+// ── Safe public send — returns {ok, queued, error} so callers can report
+// real success/failure instead of assuming success ─────────────────────────
 async function sendWA(phone, text) {
-  if (!process.env.WA_SESSION_PATH) return;
-  if (!phone) { console.log('[WhatsApp] No phone — skipping message.'); return; }
+  if (!phone) {
+    console.log('[WhatsApp] No phone — skipping message.');
+    return { ok: false, queued: false, error: 'No phone number provided.' };
+  }
   const jid = toJid(phone);
-  try {
-    if (isReady) {
-      await _send(jid, text);
-      console.log(`[WhatsApp] ✅ Sent to ${phone}`);
-    } else {
+
+  if (!isReady) {
+    // Only queue if we are at least mid-connection — if fully disconnected,
+    // queuing silently is what caused "shows broadcasted but nothing sent."
+    // Be honest with the caller instead.
+    if (lastStatus === 'connecting' || lastStatus === 'qr_pending') {
       msgQueue.push({ jid, text });
-      console.log(`[WhatsApp] Queued message for ${phone} (not connected yet).`);
+      console.log(`[WhatsApp] Queued message for ${phone} (connecting, not ready yet).`);
+      return { ok: false, queued: true, error: 'WhatsApp is still connecting — message queued.' };
     }
+    console.log(`[WhatsApp] Not connected — message to ${phone} NOT sent.`);
+    return { ok: false, queued: false, error: 'WhatsApp is not connected.' };
+  }
+
+  try {
+    await _send(jid, text);
+    console.log(`[WhatsApp] ✅ Sent to ${phone}`);
+    return { ok: true, queued: false, error: null };
   } catch (err) {
-    console.error(`[WhatsApp] Failed to send to ${phone}:`, err.message);
+    console.error(`[WhatsApp] ❌ Failed to send to ${phone}:`, err.message);
+    return { ok: false, queued: false, error: err.message };
   }
 }
 
@@ -118,7 +205,7 @@ async function sendAdminWA(text) {
 
 // ── 1. Welcome message to new user ───────────────────────────────────────────
 async function sendWelcomeWA(user) {
-  if (!user.phone) return;
+  if (!user.phone) return { ok: false, error: 'User has no phone number.' };
   const firstName = user.name?.split(' ')[0] || 'there';
   const text =
     `🌿 *Welcome to SatvikMeals, ${firstName}!*\n\n` +
@@ -132,12 +219,12 @@ async function sendWelcomeWA(user) {
     `To confirm a plan, just reply here or call us.\n\n` +
     `👉 View our plans: https://satvikmeals.in/plans.html\n\n` +
     `– Team SatvikMeals`;
-  await sendWA(user.phone, text);
+  return await sendWA(user.phone, text);
 }
 
 // ── 2. Plan activated message to user ────────────────────────────────────────
 async function sendPlanActivatedWA(user, plan) {
-  if (!user.phone) return;
+  if (!user.phone) return { ok: false, error: 'User has no phone number.' };
   const startDate = new Date(plan.startDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
   const endDate   = new Date(plan.endDate).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
   const firstName = user.name?.split(' ')[0] || 'there';
@@ -150,15 +237,16 @@ async function sendPlanActivatedWA(user, plan) {
     `📍 *Delivery Area:* ${user.location?.address?.split(',').slice(0,2).join(',') || 'Your saved location'}\n\n` +
     `Your meals will be delivered daily. If you need to pause or have any questions, just reply here.\n\n` +
     `– Team SatvikMeals 🌿`;
-  await sendWA(user.phone, text);
-  // Also notify admin
-  await sendAdminWA(
+  const result = await sendWA(user.phone, text);
+  // Also notify admin — best-effort, doesn't affect the returned result for the user message
+  sendAdminWA(
     `✅ *Plan Assigned*\n\n` +
     `👤 ${user.name} (${user.email})\n` +
     `📱 ${user.phone}\n` +
     `📋 Plan: ${plan.planName}\n` +
     `📅 Expires: ${endDate}`
-  );
+  ).catch(() => {});
+  return result;
 }
 
 // ── 3. Expiry warning (2 days before) ────────────────────────────────────────
@@ -203,20 +291,47 @@ async function sendAdminSignupWA(user) {
 
 // ── 6. Broadcast to list of users ─────────────────────────────────────────────
 async function sendBroadcastWA(users, message) {
-  let sent = 0, skipped = 0;
+  if (lastStatus !== 'connected') {
+    console.log(`[WhatsApp] Broadcast aborted — WhatsApp status is "${lastStatus}", not connected.`);
+    return { sent: 0, failed: 0, skipped: users.filter(u => !u.phone).length, error: `WhatsApp is not connected (status: ${lastStatus}). Connect it first from the WhatsApp tab.` };
+  }
+
+  let sent = 0, failed = 0, skipped = 0;
   for (const user of users) {
     if (!user.phone) { skipped++; continue; }
-    await sendWA(user.phone, message);
-    sent++;
+    const result = await sendWA(user.phone, message);
+    if (result.ok) sent++; else failed++;
     // Delay to avoid spam detection
     await new Promise(r => setTimeout(r, 1500));
   }
-  console.log(`[WhatsApp] Broadcast done — sent: ${sent}, skipped (no phone): ${skipped}`);
-  return { sent, skipped };
+  console.log(`[WhatsApp] Broadcast done — sent: ${sent}, failed: ${failed}, skipped (no phone): ${skipped}`);
+  return { sent, failed, skipped };
+}
+
+// ── Auto-reconnect at server startup IF a session already exists in Mongo ────
+// After the first QR scan, future Render restarts reconnect silently using
+// the saved Mongo session — no QR needed again unless the admin explicitly
+// disconnects or the phone itself logs the session out.
+async function autoReconnectIfSessionExists() {
+  try {
+    const hasCreds = await WaSession.findOne({ category: 'creds' }).lean();
+    if (hasCreds) {
+      console.log('[WhatsApp] Existing session found in MongoDB — reconnecting automatically.');
+      await connect();
+    } else {
+      console.log('[WhatsApp] No existing session in MongoDB — waiting for admin to connect via admin panel.');
+    }
+  } catch (err) {
+    console.error('[WhatsApp] autoReconnectIfSessionExists error:', err.message);
+  }
 }
 
 module.exports = {
   connect,
+  disconnect,
+  getStatus,
+  getQrImage,
+  autoReconnectIfSessionExists,
   sendWA,
   sendWelcomeWA,
   sendPlanActivatedWA,

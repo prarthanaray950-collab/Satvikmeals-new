@@ -51,7 +51,10 @@ const userSchema = new mongoose.Schema({
     longitude:  { type: Number, default: null },
     address:    { type: String, default: null },
     capturedAt: { type: Date,   default: null }
-  }
+  },
+  // Set once the welcome email/WhatsApp has been sent (after onboarding —
+  // phone + location — is complete). Prevents duplicate welcome messages.
+  welcomeSentAt: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

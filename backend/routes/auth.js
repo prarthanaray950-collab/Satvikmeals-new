@@ -75,12 +75,9 @@ router.post('/google', async (req, res) => {
         referredBy: referralCode || null
       });
       console.log(`[Google Auth] New user created: ${user._id}`);
-
-      // Fire welcome email to user + admin alert — non-blocking
-      sendWelcomeEmail(user).catch(e => console.error('[Resend] welcome email failed:', e.message));
-      sendAdminSignupAlert(user).catch(e => console.error('[Resend] admin alert failed:', e.message));
-      sendWelcomeWA(user).catch(e => console.error('[WhatsApp] welcome WA failed:', e.message));
-      sendAdminSignupWA(user).catch(e => console.error('[WhatsApp] admin signup WA failed:', e.message));
+      // NOTE: Welcome email/WhatsApp + admin alerts now fire from the
+      // /location route below, once onboarding (phone + location) is
+      // actually complete — not here, where phone/location don't exist yet.
 
       if (referralCode) {
         step.current = 'applyReferral';
@@ -106,7 +103,7 @@ router.post('/google', async (req, res) => {
 
     res.json({
       token, isNewUser,
-      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, referralCode: user.referralCode, coins: user.coins }
+      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, referralCode: user.referralCode, coins: user.coins, location: user.location }
     });
   } catch (err) {
     console.error(`[Google Auth] FATAL at step: "${step.current}"`);
@@ -124,7 +121,7 @@ router.post('/google', async (req, res) => {
 // ── GET ME ────────────────────────────────────────────────────────────────────
 router.get('/me', protect, (req, res) => {
   const u = req.user;
-  res.json({ id: u._id, name: u.name, email: u.email, phone: u.phone, role: u.role, referralCode: u.referralCode, coins: u.coins, subscriptions: u.subscriptions });
+  res.json({ id: u._id, name: u.name, email: u.email, phone: u.phone, role: u.role, referralCode: u.referralCode, coins: u.coins, subscriptions: u.subscriptions, location: u.location });
 });
 
 // ── SAVE PHONE ────────────────────────────────────────────────────────────────
@@ -136,7 +133,7 @@ async function savePhone(req, res) {
     if (cleaned.length !== 10 || !/^[6-9]/.test(cleaned))
       return res.status(400).json({ message: 'Enter a valid 10-digit Indian mobile number.' });
     const result = await User.findByIdAndUpdate(req.user._id, { $set: { phone: cleaned } }, { new: true });
-    res.json({ success: true, message: 'Phone saved.', phone: result.phone });
+    res.json({ success: true, message: 'Phone saved.', phone: result.phone, user: { id: result._id, name: result.name, email: result.email, phone: result.phone, role: result.role, location: result.location } });
   } catch (err) {
     res.status(500).json({ message: 'Server error. Please try again.' });
   }
@@ -157,7 +154,7 @@ router.post('/location', protect, csrfVerify, async (req, res) => {
 
     const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
 
-    // Refresh user to get latest phone (may have been added in phone modal)
+    // Refresh user to get latest phone + location (onboarding is now complete)
     const freshUser = await User.findById(req.user._id);
 
     await sendTelegramMessage(
@@ -169,6 +166,16 @@ router.post('/location', protect, csrfVerify, async (req, res) => {
       `📌 Location: ${address || 'Unknown'}\n` +
       `🗺 Maps: ${mapsLink}`
     );
+
+    // Onboarding (phone + location) is complete — this is the real signal to
+    // welcome the user. Only fire once: guarded by welcomeSentAt on the user.
+    if (!freshUser.welcomeSentAt) {
+      await User.findByIdAndUpdate(freshUser._id, { $set: { welcomeSentAt: new Date() } });
+      sendWelcomeEmail(freshUser).catch(e => console.error('[Resend] welcome email failed:', e.message));
+      sendAdminSignupAlert(freshUser).catch(e => console.error('[Resend] admin alert failed:', e.message));
+      sendWelcomeWA(freshUser).catch(e => console.error('[WhatsApp] welcome WA failed:', e.message));
+      sendAdminSignupWA(freshUser).catch(e => console.error('[WhatsApp] admin signup WA failed:', e.message));
+    }
 
     res.json({ success: true });
   } catch (err) {

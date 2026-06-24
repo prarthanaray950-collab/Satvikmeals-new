@@ -16,7 +16,7 @@ const userRoutes      = require('./routes/user');
 const adminRoutes     = require('./routes/admin');
 const orderRoutes     = require('./routes/orders');
 const complaintRoutes = require('./routes/complaints');
-const { connect: connectWA } = require('./utils/whatsapp');
+const { autoReconnectIfSessionExists } = require('./utils/whatsapp');
 const { startCron }          = require('./utils/cron');
 const { startReminderCron }  = require('./utils/reminders');
 const { startReportCron }    = require('./utils/dailyReport');
@@ -31,17 +31,36 @@ app.set('trust proxy', 1);
 app.use(helmet({
   contentSecurityPolicy: false, // keep disabled — site uses inline scripts/styles on many pages
   crossOriginEmbedderPolicy: false,
+  // 'same-origin' (helmet's default) blocks the Google Sign-In popup's
+  // postMessage back to this window, causing a blank/frozen screen after
+  // choosing a Google account. 'same-origin-allow-popups' keeps the same
+  // protection level for everything else while permitting that handshake.
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
 }));
 
 // ── CORS — restrict to known origins instead of wildcard ─────────────────────
+// IMPORTANT: set ALLOWED_ORIGINS in your Render environment to your exact
+// live domain(s), comma-separated, e.g.:
+//   ALLOWED_ORIGINS=https://satvikmeals.in,https://www.satvikmeals.in
+// If this env var is missing or wrong, every API call (including Google
+// Sign-In) gets silently blocked and the page appears to freeze/blank out
+// after picking a Google account. The fallback list below is just for local
+// dev — do not rely on it in production.
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://satvikmeals.in,https://www.satvikmeals.in,http://localhost:3000,http://localhost:5000')
-  .split(',').map(o => o.trim());
+  .split(',').map(o => o.trim()).filter(Boolean);
+console.log('[CORS] Allowed origins:', allowedOrigins);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, server-to-server)
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    console.warn(`[CORS] Blocked request from origin: ${origin}`);
-    return callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (mobile apps, curl, server-to-server, same-origin page loads)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`[CORS] Blocked request from unexpected origin: "${origin}". ` +
+      `If this is your real domain, add it to ALLOWED_ORIGINS in Render env vars.`);
+    // Fail OPEN with a warning rather than throwing — an unexpected-but-legit
+    // origin (e.g. you testing on the .onrender.com URL before DNS cutover)
+    // should not silently break login. Tighten this once your domain is confirmed.
+    return callback(null, true);
   },
   credentials: true
 }));
@@ -125,7 +144,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('MongoDB connected');
     await fixPhoneIndex();
-    connectWA();           // start Baileys WA sender (non-blocking)
+    autoReconnectIfSessionExists();  // reconnect WA only if a session already exists in MongoDB
     startCron();            // daily expiry check
     startReminderCron();    // scheduled WhatsApp reminders
     startReportCron();      // daily admin report

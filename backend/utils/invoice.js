@@ -44,16 +44,17 @@ function invoiceHtml({ user, lineItems, total, periodLabel, invoiceNo }) {
 
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"/></head>
-<body style="margin:0;padding:0;background:#F5F5F0;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F5F0;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#FEFCF7;font-family:'Plus Jakarta Sans',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#FEFCF7;padding:32px 16px;">
 <tr><td align="center">
-<table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
-  <tr><td style="background:linear-gradient(135deg,#1B4332,#40916C);padding:28px 36px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,45,31,0.08);border:1px solid #D8EBE0;">
+  <tr><td style="background:linear-gradient(135deg,#143D2A,#2E7D55);padding:24px 36px;">
     <table width="100%"><tr>
-      <td style="color:#fff;font-size:20px;font-weight:700;">🌿 SatvikMeals</td>
+      <td><img src="${process.env.LOGO_URL || 'https://satvikmeals.in/logo.jpg'}" width="32" height="32" style="border-radius:8px;vertical-align:middle;margin-right:10px;"/><span style="color:#fff;font-size:18px;font-weight:700;vertical-align:middle;font-family:Georgia,serif;">SatvikMeals</span></td>
       <td style="color:rgba(255,255,255,0.8);font-size:13px;text-align:right;">Invoice #${invoiceNo}</td>
     </tr></table>
   </td></tr>
+  <tr><td style="height:4px;background:#E8650A;"></td></tr>
   <tr><td style="padding:32px 36px;">
     <h2 style="margin:0 0 4px;font-size:20px;color:#0F2D1F;">Monthly Invoice</h2>
     <p style="margin:0 0 24px;font-size:13px;color:#6B7280;">Billing period: ${periodLabel}</p>
