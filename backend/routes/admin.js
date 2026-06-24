@@ -169,6 +169,29 @@ router.post('/whatsapp/disconnect', async (req, res) => {
   }
 });
 
+// ── FORCE RESET — last resort if "Disconnect" itself appears stuck ───────────
+// Wipes the WaSession collection directly via Mongoose, bypassing the
+// Baileys socket entirely (no .logout(), no .end(), no event handlers
+// touched). Use this if you were already stuck on "Connecting…" with no QR
+// before this fix was deployed — a normal Disconnect click may not fully
+// recover from that state since the in-memory module was already wedged.
+// After calling this, restart the server once (Render: Manual Deploy or
+// just wait for the next natural restart) so the WhatsApp module reloads
+// with totally clean in-memory state, then click Connect again.
+router.post('/whatsapp/force-reset', async (req, res) => {
+  try {
+    const WaSession = require('../models/WaSession');
+    const result = await WaSession.deleteMany({});
+    res.json({
+      success: true,
+      message: `Force reset complete. Removed ${result.deletedCount} session document(s) from MongoDB. ` +
+        `Please restart the server (redeploy on Render) and then click "Connect WhatsApp" again.`
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ── SEND A MESSAGE — used by the admin panel's "Send a Message" tool ─────────
 // type: 'test' | 'custom' | 'welcome' | 'plan'
 //   test    → sends a short confirmation message to ADMIN_WA_NUMBER (no userId needed)
