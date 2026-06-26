@@ -20,10 +20,28 @@
 const WaSession = require('../models/WaSession');
 
 // ── Buffer-safe JSON serialization ────────────────────────────────────────────
+// CRITICAL: Node's Buffer has a built-in toJSON() that JSON.stringify calls
+// BEFORE this replacer ever sees the value — it silently converts every
+// Buffer into a plain {type:'Buffer', data:[<array of byte numbers>]}
+// object first. So `Buffer.isBuffer(value)` below NEVER actually fires for
+// nested Buffers (e.g. creds.noiseKey.private) — by the time we see them
+// they're already that plain object shape. The old version of this file
+// detected that shape and returned it UNCHANGED, assuming it was already
+// "serialized" — but it wasn't tagged with __b64, so the reviver could
+// never turn it back into a real Buffer. That produced silent corruption:
+// every noise/identity/signed key got stored as a plain JS object instead
+// of a Buffer, which crashed deep inside Baileys' crypto code with
+// "data argument must be of type string or Buffer... Received Object."
 function replacer(key, value) {
-  if (value && value.type === 'Buffer' && Array.isArray(value.data)) return value; // already serialized
-  if (Buffer.isBuffer(value)) return { type: 'Buffer', data: value.toString('base64'), __b64: true };
-  if (value instanceof Uint8Array) return { type: 'Buffer', data: Buffer.from(value).toString('base64'), __b64: true };
+  // This is the shape Buffer.prototype.toJSON() produces automatically —
+  // re-encode it properly as compact base64 with our __b64 marker.
+  if (value && value.type === 'Buffer' && Array.isArray(value.data)) {
+    return { type: 'Buffer', data: Buffer.from(value.data).toString('base64'), __b64: true };
+  }
+  // Uint8Array has no built-in toJSON, so it reaches us as a real Uint8Array.
+  if (value instanceof Uint8Array) {
+    return { type: 'Buffer', data: Buffer.from(value).toString('base64'), __b64: true };
+  }
   return value;
 }
 
@@ -47,11 +65,29 @@ async function readDoc(category, keyId = null) {
   const doc = await WaSession.findOne({ category, keyId }).lean();
   if (!doc) return null;
   try {
-    return deserialize(doc.data);
+    const value = deserialize(doc.data);
+    if (hasCorruptedBuffers(value)) {
+      console.error(`[WaAuthState] Detected corrupted (non-Buffer) key data for ${category}/${keyId} — discarding so Baileys treats it as missing instead of crashing.`);
+      await WaSession.deleteOne({ category, keyId }).catch(() => {});
+      return null;
+    }
+    return value;
   } catch (e) {
     console.error(`[WaAuthState] Failed to parse stored doc (${category}/${keyId}):`, e.message);
     return null;
   }
+}
+
+// Recursively checks for the tell-tale shape of a Buffer that failed to
+// revive properly: {type:'Buffer', data:[...]} without our __b64 marker
+// (i.e. exactly the corruption this file used to produce before the fix
+// above). If found anywhere in the value, the whole entry is considered
+// unsafe to hand to Baileys.
+function hasCorruptedBuffers(value, depth = 0) {
+  if (depth > 6 || value === null || typeof value !== 'object') return false;
+  if (value.type === 'Buffer' && Array.isArray(value.data) && !value.__b64) return true;
+  if (Array.isArray(value)) return value.some(v => hasCorruptedBuffers(v, depth + 1));
+  return Object.values(value).some(v => hasCorruptedBuffers(v, depth + 1));
 }
 
 async function writeDoc(category, keyId, value) {
