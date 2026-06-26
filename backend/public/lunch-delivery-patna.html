@@ -80,7 +80,30 @@
     .btn-call{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;font-size:0.88rem;font-weight:600;}
     footer{background:var(--g9);color:rgba(255,255,255,0.55);text-align:center;padding:22px;font-size:0.78rem;}
     footer a{color:rgba(255,255,255,0.8);}
+    .kitchen-gallery{padding:48px 5vw;background:#F9FBF9;}
+    .kitchen-gallery-inner{max-width:920px;margin:0 auto;}
+    .kg-eyebrow{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2E7D55;text-align:center;margin-bottom:8px;}
+    .kg-title{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.8vw,1.8rem);color:#143D2A;text-align:center;margin-bottom:32px;font-weight:700;}
+    .kg-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
+    @media(max-width:680px){.kg-grid{grid-template-columns:1fr;}}
+    .kg-photo{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(20,61,42,0.12);background:#fff;}
+    .kg-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+    .kg-photo.kg-main{aspect-ratio:4/3.1;}
+    .kg-photo.kg-side{aspect-ratio:4/3.1;}
+    .kg-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(10,35,24,0.82),transparent);padding:18px 20px 14px;}
+    .kg-caption span{color:#fff;font-size:0.82rem;font-weight:600;letter-spacing:0.01em;}
+
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://satvikmeals.in/"},
+      {"@type": "ListItem", "position": 2, "name": "Lunch Delivery Patna", "item": "https://satvikmeals.in/lunch-delivery-patna.html"}
+    ]
+  }
+  </script>
 </head>
 <body>
 <nav>
@@ -109,11 +132,25 @@
     <span class="badge">⚡ Same-Day Delivery</span>
     <span class="badge">📍 All Patna Areas</span>
   </div>
-<!-- KITCHEN PHOTO STRIP -->
-<div style="background:#fff;padding:0;">
-  <img src="/kitchen2.png" alt="SatvikMeals kitchen — fresh pure veg cooking" style="width:100%;max-height:340px;object-fit:cover;display:block;"/>
 </div>
-</div>
+
+<!-- KITCHEN PHOTO GALLERY -->
+<section class="kitchen-gallery">
+  <div class="kitchen-gallery-inner">
+    <div class="kg-eyebrow">Inside Our Kitchen</div>
+    <div class="kg-title">Where your meals are made, fresh every day</div>
+    <div class="kg-grid">
+      <div class="kg-photo kg-main">
+        <img src="/kitchen1.png" alt="SatvikMeals kitchen — fresh pure vegetarian cooking in Patna" onerror="this.closest('.kg-photo').style.display='none';console.warn('Kitchen photo not found: ' + this.src);"/>
+        <div class="kg-caption"><span>🌿 Our pure vegetarian kitchen, Patna</span></div>
+      </div>
+      <div class="kg-photo kg-side">
+        <img src="/kitchen2.png" alt="SatvikMeals fresh meal preparation" onerror="this.closest('.kg-photo').style.display='none';console.warn('Kitchen photo not found: ' + this.src);"/>
+        <div class="kg-caption"><span>🍱 Cooked fresh, delivered daily</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 <section style="background:#fff;">
   <div class="container">
     <h2>Lunch Delivery Timing in Patna</h2>
@@ -198,7 +235,8 @@
     <a href="no-onion-garlic-food-patna.html">No Onion-Garlic Food</a> ·
     <a href="pure-veg-tiffin-patna.html">Pure Veg Tiffin Patna</a> · 
     <a href="student-meals-patna.html">Student Meals Patna</a> ·
-    <a href="faq.html">FAQ</a>
+    <a href="faq.html">FAQ</a> ·
+    <a href="blog.html">Blog</a>
   </p>
 </footer>
 </body>
