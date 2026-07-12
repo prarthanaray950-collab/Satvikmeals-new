@@ -50,8 +50,19 @@ function attachToken(req, res, next) {
 
   if (!token) {
     token = generateToken();
-    res.setHeader('Set-Cookie',
-      `${COOKIE_NAME}=${token}; Path=/; SameSite=Strict; Secure; Max-Age=86400`
+
+    // Only mark the cookie Secure over real HTTPS. If it were always Secure,
+    // the browser would silently drop it on http:// (localhost / http preview),
+    // so the double-submit header could never match the (missing) cookie and
+    // EVERY write returned 403. `req.secure` is true behind Render/Nginx because
+    // `app.set('trust proxy', 1)` makes Express honor X-Forwarded-Proto.
+    const isHttps = req.secure || req.headers['x-forwarded-proto'] === 'https';
+    const secureAttr = isHttps ? ' Secure;' : '';
+
+    // Use res.append (not res.setHeader) so we don't clobber any other
+    // Set-Cookie header a downstream handler may add on the same response.
+    res.append('Set-Cookie',
+      `${COOKIE_NAME}=${token}; Path=/; SameSite=Strict;${secureAttr} Max-Age=86400`
     );
   }
 
@@ -61,8 +72,8 @@ function attachToken(req, res, next) {
 
 // ── Middleware 2: verify token on state-changing requests ────────────────────
 function verifyToken(req, res, next) {
-  const safeMetho = ['GET', 'HEAD', 'OPTIONS'];
-  if (safeMetho.includes(req.method)) return next();
+  const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
+  if (safeMethods.includes(req.method)) return next();
 
   const cookies = parseCookies(req);
   const cookieToken  = cookies[COOKIE_NAME];

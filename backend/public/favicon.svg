@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SatvikMeals">
+  <rect width="64" height="64" rx="14" fill="#143D2A"/>
+  <!-- serving bowl -->
+  <path d="M14 32h36a18 18 0 0 1-18 18 18 18 0 0 1-18-18Z" fill="#FEFCF7"/>
+  <path d="M12 30h40a2 2 0 0 1 0 4H12a2 2 0 0 1 0-4Z" fill="#E8871A"/>
+  <!-- rising steam -->
+  <path d="M27 22c-2-3 1-5 0-8" fill="none" stroke="#3DAA70" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M37 22c-2-3 1-5 0-8" fill="none" stroke="#3DAA70" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- tulsi leaf -->
+  <path d="M32 15c4 0 7 3 7 7-4 0-7-3-7-7Z" fill="#52C985"/>
+</svg>

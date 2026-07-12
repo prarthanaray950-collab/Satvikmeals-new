@@ -185,7 +185,7 @@
     <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
-    <a href="index.html" class="logo">
+    <a href="/" class="logo">
       <img src="/logo.jpg" alt="SatvikMeals"/>
       SatvikMeals
     </a>
@@ -233,6 +233,12 @@
   <div class="side-item" onclick="show('whatsapp',this)">
     <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
     WhatsApp
+  </div>
+
+  <div class="side-section-title">B2B / Bulk</div>
+  <div class="side-item" onclick="show('b2b',this)">
+    <svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M18 21V11M3 7l9-4 9 4M9 21v-4a3 3 0 016 0v4"/></svg>
+    PG / Hostel Leads
   </div>
 </aside>
 
@@ -360,6 +366,14 @@
       <div style="margin-top:28px;padding:16px 18px;background:#FFF8E8;border:1px solid #F3DDA0;border-radius:10px;font-size:0.78rem;color:#7A5C00;line-height:1.6;">
         ⚠️ Disconnecting will remove the saved session from the database. You'll need to scan a fresh QR code to reconnect — either with the same number or a different one.
       </div>
+
+      <div style="margin-top:20px;border-top:1px solid #EEE;padding-top:18px;">
+        <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">Stuck on "Connecting…" with no QR after disconnecting?</div>
+        <button onclick="waForceReset()" style="height:38px;padding:0 18px;background:#fff;color:#C0392B;border:1.5px solid #C0392B;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">
+          🛠 Force Reset Session
+        </button>
+        <div style="font-size:0.74rem;color:#999;margin-top:8px;line-height:1.5;">Wipes the saved session directly from the database, bypassing the WhatsApp connection entirely. After this, redeploy/restart the server once, then click Connect again.</div>
+      </div>
     </div>
 
     <!-- SEND MESSAGE TO ANY USER -->
@@ -412,6 +426,65 @@
         📤 Send Message
       </button>
       <div id="waSendStatus" style="margin-top:12px;font-size:0.85rem;color:#1B4332;min-height:20px;"></div>
+    </div>
+  </div>
+
+  <!-- B2B / BULK TIFFIN LEADS -->
+  <div class="panel" id="panel-b2b">
+    <div class="section-bar">
+      <div><div class="page-title">PG / Hostel Leads</div><div class="page-sub">Bulk-tiffin B2B pipeline — capture PG, hostel &amp; office owners and reach them over Email + WhatsApp</div></div>
+      <button class="btn-add" onclick="openB2BLeadModal()">+ Add Lead</button>
+    </div>
+
+    <!-- Filters -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <input class="search-input" id="b2bSearch" placeholder="Search business, owner, phone, email…" style="flex:1;min-width:200px;" oninput="renderB2BTable()"/>
+      <select id="b2bFilterType" onchange="renderB2BTable()" style="height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.88rem;">
+        <option value="">All types</option>
+        <option value="pg">PG</option><option value="hostel">Hostel</option><option value="office">Office</option>
+        <option value="mess">Mess</option><option value="canteen">Canteen</option><option value="gym">Gym</option><option value="other">Other</option>
+      </select>
+      <select id="b2bFilterStatus" onchange="renderB2BTable()" style="height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.88rem;">
+        <option value="">All statuses</option>
+        <option value="new">New</option><option value="contacted">Contacted</option><option value="negotiating">Negotiating</option>
+        <option value="converted">Converted</option><option value="lost">Lost</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:34px;"><input type="checkbox" id="b2bSelectAll" onchange="b2bToggleAll(this)"/></th>
+          <th>Business</th><th>Owner</th><th>Type</th><th>Area</th><th>Cap/day</th><th>Phone</th><th>Status</th><th>Last contacted</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="b2bBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Outreach -->
+    <div style="max-width:640px;margin-top:34px;border-top:1px solid #EBF3EE;padding-top:26px;">
+      <div class="page-title" style="font-size:1.05rem;margin-bottom:4px;">Send Bulk Outreach</div>
+      <div class="page-sub" style="margin-bottom:16px;">Emails checked leads (or everything matching the filters above if none are checked). Leave subject/message blank to use the ready-made bulk-tiffin pitch.</div>
+
+      <div style="margin-bottom:14px;font-size:0.82rem;color:#1B4332;background:#F6FBF7;border:1px solid #D0EAD8;border-radius:8px;padding:10px 14px;" id="b2bAudienceNote">Audience: all leads matching current filters.</div>
+
+      <div style="display:flex;gap:18px;margin-bottom:14px;font-size:0.86rem;color:#1B4332;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="b2bChEmail" checked/> Email</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="b2bChWa" checked/> WhatsApp</label>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#1B4332;display:block;margin-bottom:6px;">Email Subject <span style="font-weight:400;color:#888;">(blank = default)</span></label>
+        <input id="b2bSubject" placeholder="Bulk pure-veg tiffins for your PG / hostel — SatvikMeals" style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;"/>
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-size:0.8rem;font-weight:600;color:#1B4332;display:block;margin-bottom:6px;">Message <span style="font-weight:400;color:#888;">(blank = default B2B pitch; *bold* works on WhatsApp)</span></label>
+        <textarea id="b2bMessage" rows="5" placeholder="Leave blank to send the ready-made bulk-tiffin pitch, or write your own…" style="width:100%;border:1px solid #ddd;border-radius:8px;padding:12px;font-family:inherit;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
+      </div>
+      <button onclick="sendB2BOutreach()" style="height:44px;padding:0 26px;background:#1B4332;color:#fff;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;">
+        📤 Send Outreach
+      </button>
+      <div id="b2bOutreachStatus" style="margin-top:12px;font-size:0.85rem;color:#1B4332;min-height:20px;"></div>
     </div>
   </div>
 
@@ -574,12 +647,51 @@
 
 <div id="toast"></div>
 
+<!-- B2B LEAD MODAL -->
+<div class="modal-bg" id="b2bLeadModal">
+  <div class="modal">
+    <h2 id="b2bModalTitle">Add Lead</h2>
+    <input type="hidden" id="b2bEditId"/>
+    <div class="form-2col">
+      <div class="form-row"><label>Business Name *</label><input id="b2bBusiness" placeholder="e.g. Sunrise Boys PG"/></div>
+      <div class="form-row"><label>Owner Name</label><input id="b2bOwner" placeholder="e.g. Mr. Verma"/></div>
+    </div>
+    <div class="form-2col">
+      <div class="form-row"><label>Phone</label><input id="b2bPhone" placeholder="10-digit mobile" maxlength="12"/></div>
+      <div class="form-row"><label>Email</label><input id="b2bEmail" type="email" placeholder="owner@email.com"/></div>
+    </div>
+    <div class="form-2col">
+      <div class="form-row"><label>Type</label>
+        <select id="b2bType">
+          <option value="pg">PG</option><option value="hostel">Hostel</option><option value="office">Office</option>
+          <option value="mess">Mess</option><option value="canteen">Canteen</option><option value="gym">Gym</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Status</label>
+        <select id="b2bStatus">
+          <option value="new">New</option><option value="contacted">Contacted</option><option value="negotiating">Negotiating</option>
+          <option value="converted">Converted</option><option value="lost">Lost</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-2col">
+      <div class="form-row"><label>Area</label><input id="b2bArea" placeholder="e.g. Boring Road, Patna"/></div>
+      <div class="form-row"><label>Capacity (meals/day)</label><input id="b2bCapacity" type="number" min="0" placeholder="e.g. 40"/></div>
+    </div>
+    <div class="form-row"><label>Notes</label><input id="b2bNotes" placeholder="Any context — best time to call, pricing discussed, etc."/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('b2bLeadModal')">Cancel</button>
+      <button class="btn-save" onclick="saveB2BLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
 <script src="csrf.js"></script>
 <script>
 const API = '';
 window.API = API;
 const token = localStorage.getItem('satvikToken');
-if (!token) { window.location.href = 'login.html'; }
+if (!token) { window.location.href = 'login'; }
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const DAY_NAMES = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
@@ -608,10 +720,11 @@ function show(section, el) {
   if (section === 'users')    loadUsers();
   if (section === 'orders')   loadOrders();
   if (section === 'payments') loadPayments();
+  if (section === 'b2b')      loadB2BLeads();
   if (section === 'whatsapp') { waLoadStatus(); waToggleMsgFields(); if (allUsers.length) waPopulateUserPicker(); else loadUsers().then(waPopulateUserPicker); }
 }
 
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+function logout() { localStorage.clear(); window.location.href = 'login'; }
 
 // ── HTTP HELPERS ──
 const get  = url => fetch(API+url, {headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
@@ -624,6 +737,144 @@ const del  = url => csrfHeaders({Authorization:'Bearer '+token})
 
 // ── MODAL HELPERS ──
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── B2B / BULK TIFFIN LEADS ──
+let allB2BLeads = [];
+async function loadB2BLeads() {
+  allB2BLeads = await get('/api/admin/b2b-leads');
+  renderB2BTable();
+}
+function renderB2BTable() {
+  const q      = (document.getElementById('b2bSearch').value || '').toLowerCase().trim();
+  const fType  = document.getElementById('b2bFilterType').value;
+  const fStat  = document.getElementById('b2bFilterStatus').value;
+  const rows = allB2BLeads.filter(l => {
+    if (fType && l.type !== fType) return false;
+    if (fStat && l.status !== fStat) return false;
+    if (q) {
+      const hay = `${l.businessName||''} ${l.ownerName||''} ${l.phone||''} ${l.email||''} ${l.area||''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const tbody = document.getElementById('b2bBody');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No leads yet. Click "+ Add Lead" to add PG / hostel owners.</td></tr>'; updateB2BAudienceNote(); return; }
+  tbody.innerHTML = rows.map(l => `<tr>
+    <td><input type="checkbox" class="b2bChk" value="${l._id}" onchange="updateB2BAudienceNote()"/></td>
+    <td><strong>${esc(l.businessName)}</strong></td>
+    <td>${esc(l.ownerName)||'—'}</td>
+    <td>${l.type}</td>
+    <td>${esc(l.area)||'—'}</td>
+    <td>${l.capacity||'—'}</td>
+    <td>${l.phone?('+91 '+esc(l.phone)):'—'}</td>
+    <td><span class="badge ${l.status==='converted'?'active':(l.status==='lost'?'inactive':'pending')}">${l.status}</span></td>
+    <td>${l.lastContactedAt?new Date(l.lastContactedAt).toLocaleDateString('en-IN'):'—'}${l.contactCount?` (${l.contactCount})`:''}</td>
+    <td><div class="td-actions">
+      <button class="btn-edit" onclick="editB2BLead('${l._id}')">Edit</button>
+      <button class="btn-del"  onclick="deleteB2BLead('${l._id}')">Delete</button>
+    </div></td>
+  </tr>`).join('');
+  document.getElementById('b2bSelectAll').checked = false;
+  updateB2BAudienceNote();
+}
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function b2bToggleAll(el){ document.querySelectorAll('.b2bChk').forEach(c=>c.checked=el.checked); updateB2BAudienceNote(); }
+function b2bCheckedIds(){ return Array.from(document.querySelectorAll('.b2bChk:checked')).map(c=>c.value); }
+function updateB2BAudienceNote(){
+  const n = b2bCheckedIds().length;
+  const note = document.getElementById('b2bAudienceNote');
+  if (!note) return;
+  note.textContent = n ? `Audience: ${n} selected lead${n>1?'s':''}.` : 'Audience: all leads matching current filters.';
+}
+
+function openB2BLeadModal() {
+  document.getElementById('b2bModalTitle').textContent = 'Add Lead';
+  ['b2bEditId','b2bBusiness','b2bOwner','b2bPhone','b2bEmail','b2bArea','b2bCapacity','b2bNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('b2bType').value = 'pg';
+  document.getElementById('b2bStatus').value = 'new';
+  document.getElementById('b2bLeadModal').classList.add('open');
+}
+function editB2BLead(id) {
+  const l = allB2BLeads.find(x=>x._id===id); if(!l) return;
+  document.getElementById('b2bModalTitle').textContent = 'Edit Lead';
+  document.getElementById('b2bEditId').value  = id;
+  document.getElementById('b2bBusiness').value= l.businessName||'';
+  document.getElementById('b2bOwner').value   = l.ownerName||'';
+  document.getElementById('b2bPhone').value   = l.phone||'';
+  document.getElementById('b2bEmail').value   = l.email||'';
+  document.getElementById('b2bType').value    = l.type||'pg';
+  document.getElementById('b2bStatus').value  = l.status||'new';
+  document.getElementById('b2bArea').value    = l.area||'';
+  document.getElementById('b2bCapacity').value= l.capacity||'';
+  document.getElementById('b2bNotes').value   = l.notes||'';
+  document.getElementById('b2bLeadModal').classList.add('open');
+}
+async function saveB2BLead() {
+  const id = document.getElementById('b2bEditId').value;
+  const body = {
+    businessName: document.getElementById('b2bBusiness').value.trim(),
+    ownerName:    document.getElementById('b2bOwner').value.trim(),
+    phone:        document.getElementById('b2bPhone').value.trim(),
+    email:        document.getElementById('b2bEmail').value.trim(),
+    type:         document.getElementById('b2bType').value,
+    status:       document.getElementById('b2bStatus').value,
+    area:         document.getElementById('b2bArea').value.trim(),
+    capacity:     Number(document.getElementById('b2bCapacity').value) || 0,
+    notes:        document.getElementById('b2bNotes').value.trim(),
+  };
+  if (!body.businessName) { alert('Business name is required.'); return; }
+  const res = id ? await put('/api/admin/b2b-leads/'+id, body) : await post('/api/admin/b2b-leads', body);
+  if (!res.ok) { const e = await res.json().catch(()=>({})); alert('Failed to save: '+(e.message||res.status)); return; }
+  closeModal('b2bLeadModal');
+  loadB2BLeads();
+}
+async function deleteB2BLead(id) {
+  if (!confirm('Delete this lead?')) return;
+  const res = await del('/api/admin/b2b-leads/'+id);
+  if (!res.ok) { alert('Failed to delete.'); return; }
+  loadB2BLeads();
+}
+async function sendB2BOutreach() {
+  const status = document.getElementById('b2bOutreachStatus');
+  const channels = [];
+  if (document.getElementById('b2bChEmail').checked) channels.push('email');
+  if (document.getElementById('b2bChWa').checked)    channels.push('whatsapp');
+  if (!channels.length) { status.textContent = 'Pick at least one channel (Email or WhatsApp).'; status.style.color='#C0392B'; return; }
+
+  const body = {
+    channels,
+    subject: document.getElementById('b2bSubject').value.trim() || undefined,
+    message: document.getElementById('b2bMessage').value.trim() || undefined,
+  };
+  const ids = b2bCheckedIds();
+  if (ids.length) body.leadIds = ids;
+  else body.filter = {
+    type:   document.getElementById('b2bFilterType').value || undefined,
+    status: document.getElementById('b2bFilterStatus').value || undefined,
+  };
+
+  const audience = ids.length ? `${ids.length} selected lead(s)` : 'all leads matching filters';
+  if (!confirm(`Send outreach via ${channels.join(' + ')} to ${audience}?`)) return;
+
+  status.style.color = '#1B4332';
+  status.textContent = 'Sending…';
+  try {
+    const res = await post('/api/admin/b2b-outreach', body);
+    const data = await res.json();
+    if (!res.ok) { status.style.color='#C0392B'; status.textContent = 'Failed: '+(data.message||res.status); return; }
+    // Outreach now sends in the background — the server acknowledges immediately
+    // and marks leads contacted as it runs. Reflect that instead of showing
+    // (now-empty) final counts.
+    status.style.color = '#1B4332';
+    status.textContent = `✅ Outreach queued for ${data.leadCount} lead(s) via ${(data.channels||channels).join(' + ')}. `
+      + `Sending in the background; leads are marked contacted as it runs.`;
+    // Refresh shortly so the "last contacted" / status columns pick up the update.
+    setTimeout(loadB2BLeads, 1500);
+  } catch (err) {
+    status.style.color = '#C0392B';
+    status.textContent = 'Error: '+err.message;
+  }
+}
 
 // ── OVERVIEW ──
 async function loadOverview() {
@@ -849,21 +1100,12 @@ async function sendBroadcast(channels) {
     });
     const d = await r.json();
     if (r.ok) {
-      const emailPart = d.result?.email
-        ? `Email: ${d.result.email.sent} sent${d.result.email.failed ? `, ${d.result.email.failed} failed` : ''}`
-        : '';
-      let waPart = '';
-      if (d.result?.whatsapp) {
-        const wa = d.result.whatsapp;
-        if (wa.error) {
-          waPart = `WhatsApp: ⚠️ ${wa.error}`;
-        } else {
-          waPart = `WhatsApp: ${wa.sent} sent${wa.failed ? `, ${wa.failed} failed` : ''}${wa.skipped ? `, ${wa.skipped} skipped (no phone)` : ''}`;
-        }
-      }
-      const parts = [emailPart, waPart].filter(Boolean).join(' · ');
-      const allGood = !(d.result?.whatsapp?.error) && (!d.result?.whatsapp || d.result.whatsapp.sent > 0 || d.result.whatsapp.skipped === d.userCount);
-      statusEl.innerHTML = `${allGood ? '✅' : '⚠️'} Broadcast finished — ${parts} (${d.userCount} users targeted)`;
+      // Delivery now runs in the background (email/WhatsApp can take minutes),
+      // so the server acknowledges immediately rather than returning final
+      // sent/failed counts. Show that it's queued + any up-front warnings.
+      const warn = (d.warnings && d.warnings.length) ? ' ⚠️ ' + d.warnings.join(' ') : '';
+      statusEl.innerHTML = `✅ Broadcast queued for ${d.userCount} user(s) via ${(d.channels||channels).join(' + ')}. `
+        + `Sending in the background — check server logs for final counts.${warn}`;
     } else {
       statusEl.textContent = '❌ ' + (d.message || 'Broadcast failed.');
     }
@@ -972,6 +1214,20 @@ async function waStartDisconnect() {
   }
 }
 
+async function waForceReset() {
+  if (!confirm('Force reset will wipe the saved WhatsApp session directly from the database, bypassing the live connection. Use this only if Disconnect did not work. Continue?')) return;
+  const statusEl = document.getElementById('waActionStatus');
+  statusEl.textContent = '⏳ Force resetting…';
+  try {
+    const headers = await csrfHeaders({ Authorization: 'Bearer ' + token });
+    const r = await fetch(API + '/api/admin/whatsapp/force-reset', { method: 'POST', credentials: 'include', headers });
+    const d = await r.json();
+    statusEl.textContent = r.ok ? `✅ ${d.message}` : `❌ ${d.message || 'Force reset failed.'}`;
+  } catch (e) {
+    statusEl.textContent = '❌ Network error during force reset.';
+  }
+}
+
 // ── SEND MESSAGE (test / custom / welcome / plan-assigned) ───────────────────
 function waPopulateUserPicker() {
   const sel = document.getElementById('waUserPicker');
@@ -1054,26 +1310,15 @@ async function createUser() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Enter a valid email address'); return; }
   if (phone && (phone.length !== 10 || !/^[6-9]/.test(phone))) { showToast('Enter valid 10-digit phone number'); return; }
 
-  // Use dev-login endpoint to create user
-  const r = await post('/api/auth/dev-login', { name, email, referralCode: referral || undefined });
-  if (!r.ok) { const d = await r.json(); showToast(d.message || 'Failed to create user'); return; }
-  const userData = await r.json();
-
-  // Save phone if provided
-  if (phone && userData.token) {
-    const headers = await csrfHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userData.token });
-    await fetch(API+'/api/auth/save-phone', {
-      method:'POST',
-      credentials:'include',
-      headers,
-      body: JSON.stringify({ phone })
-    });
-  }
-
-  // Set role if admin
-  if (role === 'admin') {
-    await put('/api/admin/users/'+userData.user.id+'/role', { role: 'admin' }).catch(()=>{});
-  }
+  // Secure admin-only create-user endpoint (replaces the old public dev-login).
+  // Phone + role are set server-side in the same request.
+  const r = await post('/api/admin/users', {
+    name, email,
+    phone: phone || undefined,
+    role: role || 'user',
+    referralCode: referral || undefined
+  });
+  if (!r.ok) { const d = await r.json().catch(()=>({})); showToast(d.message || 'Failed to create user'); return; }
 
   showToast(`User "${name}" created ✓`);
   closeModal('createUserModal');

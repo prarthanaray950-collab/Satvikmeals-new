@@ -1,0 +1,23 @@
+# SatvikMeals — robots.txt
+# Allow all search engines to crawl public pages.
+# Disallow private/account areas and dead checkout/payment pages.
+
+User-agent: *
+Allow: /
+
+# Account & admin areas — not useful for search, and dashboard contains
+# personal data that should never be indexed. Both the .html and the clean
+# (extensionless) URL are disallowed, since the site now serves both.
+Disallow: /admin.html
+Disallow: /admin
+Disallow: /dashboard.html
+Disallow: /dashboard
+Disallow: /login.html
+Disallow: /login
+
+# Dead pages no longer in use (Instamojo checkout flow, removed)
+Disallow: /checkout.html
+Disallow: /payment.html
+Disallow: /payment-success.html
+
+Sitemap: https://satvikmeals.in/sitemap.xml

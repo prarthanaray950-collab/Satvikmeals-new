@@ -66,13 +66,13 @@ main{padding-top:68px}
 </head>
 <body>
 <nav>
-  <a href="index.html" class="logo"><img src="/logo.jpg" alt="SatvikMeals" style="width:36px;height:36px;border-radius:8px;object-fit:cover;"/>SatvikMeals</a>
+  <a href="/" class="logo"><img src="/logo.jpg" alt="SatvikMeals" style="width:36px;height:36px;border-radius:8px;object-fit:cover;"/>SatvikMeals</a>
   <ul class="nav-links">
-    <li><a href="menu.html">Menu</a></li>
-    <li><a href="plans.html">Plans</a></li>
+    <li><a href="/#menu">Menu</a></li>
+    <li><a href="plans">Plans</a></li>
     <li><span class="coins-badge" id="coinsBadge">0 coins</span></li>
-    <li id="loginLi"><a href="login.html" class="btn-nav">Login</a></li>
-    <li id="dashLi" style="display:none"><a href="dashboard.html" class="btn-nav">Dashboard</a></li>
+    <li id="loginLi"><a href="login" class="btn-nav">Login</a></li>
+    <li id="dashLi" style="display:none"><a href="dashboard" class="btn-nav">Dashboard</a></li>
   </ul>
 </nav>
 <main>
@@ -169,7 +169,7 @@ function renderPlans() {
 let selectedPlan = {};
 
 function subscribe(planId, planName, price, coinsApplied) {
-  if (!token) { showToast('Please login first'); setTimeout(()=>window.location.href='login.html?redirect=plans.html',1200); return; }
+  if (!token) { showToast('Please login first'); setTimeout(()=>window.location.href='login?redirect=plans.html',1200); return; }
   selectedPlan = { planId, planName, price, coinsApplied };
   // Populate modal
   document.getElementById('modalPlanName').textContent = planName;

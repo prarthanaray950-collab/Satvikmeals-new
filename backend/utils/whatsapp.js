@@ -13,8 +13,15 @@
  * Install: npm install @whiskeysockets/baileys @hapi/boom qrcode
  */
 
-const { useMongoAuthState } = require('./waAuthState');
+const { useMongoAuthState, hasExistingSession, clearSession, clearAllSessions, SESSION_NS } = require('./waAuthState');
 const WaSession = require('../models/WaSession');
+
+// How many times connect() will silently retry a dropped connection before it
+// gives up, wipes the (evidently dead) session, and forces a fresh QR. This is
+// what stops the "stuck on Connecting, no QR forever" loop when saved creds
+// point at a device that no longer exists on the phone.
+const MAX_RECONNECTS = 4;
+let reconnectAttempts = 0;
 
 let sock = null;          // Baileys socket instance
 let isReady = false;      // true once connection is open
@@ -23,6 +30,12 @@ let lastQr = null;        // most recent QR string (raw, for re-encoding to imag
 let lastStatus = 'disconnected'; // 'disconnected' | 'connecting' | 'qr_pending' | 'connected'
 let lastError = null;
 const msgQueue = [];      // queued messages waiting for connection
+
+// Incremented every time connect() starts a brand-new socket. Event handlers
+// from an OLD socket capture the generation they belong to and check it
+// before mutating shared state — this stops a late/stale event from a
+// previous (possibly corrupted) connection from clobbering a newer attempt.
+let connGeneration = 0;
 
 // ── Public status (used by admin API) ─────────────────────────────────────────
 function getStatus() {
@@ -55,6 +68,12 @@ async function connect() {
   isConnecting = true;
   lastStatus = 'connecting';
   lastError = null;
+  msgQueue.length = 0; // clear any leftover queue from a previous broken session
+
+  // Claim a new generation for this connection attempt. Any event from a
+  // socket created in an earlier generation is ignored below.
+  connGeneration += 1;
+  const myGeneration = connGeneration;
 
   let makeWASocket, DisconnectReason;
   try {
@@ -71,21 +90,31 @@ async function connect() {
   try {
     const { state, saveCreds } = await useMongoAuthState();
 
-    sock = makeWASocket({
+    const newSock = makeWASocket({
       auth: state,
       printQRInTerminal: false,
       browser: ['SatvikMeals', 'Chrome', '1.0.0'],
       getMessage: async () => undefined,
     });
+    sock = newSock;
 
-    sock.ev.on('creds.update', saveCreds);
+    newSock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', async (update) => {
+    newSock.ev.on('connection.update', async (update) => {
+      // Ignore events from a socket that's no longer the current attempt —
+      // this is what prevents a stale/corrupted old session from clobbering
+      // the state of a fresh connect() call.
+      if (myGeneration !== connGeneration) {
+        console.log(`[WhatsApp] Ignoring stale connection.update from generation ${myGeneration} (current: ${connGeneration}).`);
+        return;
+      }
+
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
         lastQr = qr;
         lastStatus = 'qr_pending';
+        reconnectAttempts = 0; // a QR means we reached a clean, un-registered state — healthy
         console.log('[WhatsApp] QR code ready — scan from the admin panel (WhatsApp tab).');
       }
 
@@ -95,6 +124,7 @@ async function connect() {
         lastQr = null;
         lastStatus = 'connected';
         lastError = null;
+        reconnectAttempts = 0;
         console.log('[WhatsApp] ✅ Connected and ready to send messages.');
         while (msgQueue.length) {
           const { jid, text } = msgQueue.shift();
@@ -112,14 +142,54 @@ async function connect() {
         if (loggedOut) {
           lastStatus = 'disconnected';
           lastQr = null;
-          await WaSession.deleteMany({}).catch(() => {});
+          reconnectAttempts = 0;
+          await clearAllSessions().catch(() => {});
           console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
         } else {
-          lastStatus = 'connecting';
-          setTimeout(connect, 5000);
+          reconnectAttempts += 1;
+          if (reconnectAttempts > MAX_RECONNECTS) {
+            // Saved creds are evidently dead (a device that no longer exists, or
+            // corrupted state): we keep closing without ever getting a QR or an
+            // open. Wipe THIS namespace's session and reconnect from scratch so
+            // Baileys has no creds to resume and is forced to emit a fresh QR.
+            // This is the fix for "stuck on Connecting, no QR forever".
+            console.error(`[WhatsApp] ${MAX_RECONNECTS} reconnects failed with no success — wiping the session and forcing a fresh QR.`);
+            reconnectAttempts = 0;
+            lastQr = null;
+            await clearSession().catch(() => {});
+            lastStatus = 'connecting';
+            setTimeout(() => { if (myGeneration === connGeneration) connect(); }, 1500);
+          } else {
+            lastStatus = 'connecting';
+            const delay = Math.min(5000 * reconnectAttempts, 20000);
+            console.log(`[WhatsApp] Reconnect attempt ${reconnectAttempts}/${MAX_RECONNECTS} in ${delay}ms…`);
+            setTimeout(() => { if (myGeneration === connGeneration) connect(); }, delay);
+          }
         }
       }
     });
+
+    // Watchdog — Baileys occasionally neither emits a QR nor fires 'close' when
+    // handed dead/corrupted creds; it just sits silent, which is exactly the
+    // reported "Connecting… with no QR forever" symptom. If we're STILL merely
+    // "connecting" after 25s (no QR shown, not open), tear this attempt down and
+    // retry. Repeated timeouts trip the same wipe-and-fresh-QR self-heal as
+    // repeated closes. The generation check makes a superseded watchdog a no-op.
+    setTimeout(async () => {
+      if (myGeneration !== connGeneration) return;   // a newer attempt already took over
+      if (lastStatus !== 'connecting') return;       // a QR / open / close already happened
+      console.warn('[WhatsApp] No QR or connection within 25s — forcing a retry.');
+      try { newSock.ev.removeAllListeners(); newSock.end(new Error('watchdog timeout')); } catch (e) { /* ignore */ }
+      isConnecting = false;
+      connGeneration += 1;                            // permanently invalidate this dead attempt
+      reconnectAttempts += 1;
+      if (reconnectAttempts > MAX_RECONNECTS) {
+        reconnectAttempts = 0;
+        lastQr = null;
+        await clearSession().catch(() => {});         // wipe this namespace → next connect() shows a fresh QR
+      }
+      connect();
+    }, 25000);
 
     return getStatus();
   } catch (err) {
@@ -132,21 +202,40 @@ async function connect() {
 }
 
 // ── Disconnect — called by admin clicking "Disconnect WhatsApp" ──────────────
+// IMPORTANT: we do NOT call sock.logout() here. If the underlying session is
+// already corrupted/stale (e.g. an old broken Mongo session), logout() tries
+// to send a real logout request over that broken connection — it can hang,
+// throw late, or fire its own 'close' event into the SAME connection.update
+// handler that a subsequent connect() call relies on. That race is what
+// caused "stuck on Connecting, no QR, 2 messages queued" after disconnect.
+// Instead we forcibly detach all listeners and end the socket locally, then
+// wipe Mongo — no network round-trip to WhatsApp's servers required.
 async function disconnect() {
+  const oldSock = sock;
+  sock = null; // detach immediately so no other code path can use a stale socket
+  connGeneration += 1; // invalidate any in-flight events from the old socket permanently
+
+  if (oldSock) {
+    try { oldSock.ev.removeAllListeners(); } catch (e) { /* ignore */ }
+    try { oldSock.end(new Error('Disconnected by admin')); } catch (e) { /* ignore — socket may already be dead */ }
+  }
+
+  isReady = false;
+  isConnecting = false;
+  lastQr = null;
+  lastStatus = 'disconnected';
+  lastError = null;
+  reconnectAttempts = 0; // so a stale self-heal timer can't keep counting after disconnect
+  msgQueue.length = 0; // drop any stale queued messages from the old/corrupted session
+
   try {
-    if (sock) {
-      try { await sock.logout(); } catch (e) { /* ignore — may already be closed */ }
-      sock = null;
-    }
-  } finally {
-    isReady = false;
-    isConnecting = false;
-    lastQr = null;
-    lastStatus = 'disconnected';
-    lastError = null;
     await WaSession.deleteMany({});
     console.log('[WhatsApp] Session disconnected and cleared from MongoDB by admin.');
+  } catch (err) {
+    console.error('[WhatsApp] Failed to clear session from MongoDB:', err.message);
+    lastError = 'Disconnected locally, but failed to clear MongoDB session: ' + err.message;
   }
+
   return getStatus();
 }
 
@@ -314,12 +403,16 @@ async function sendBroadcastWA(users, message) {
 // disconnects or the phone itself logs the session out.
 async function autoReconnectIfSessionExists() {
   try {
-    const hasCreds = await WaSession.findOne({ category: 'creds' }).lean();
+    // Namespace-aware: only reconnect if THIS session namespace (WA_SESSION_ID,
+    // default 'v2') has creds. After the v1->v2 rotation this correctly returns
+    // false for the old compromised session, so startup waits for a fresh QR
+    // instead of trying to resume a dead session.
+    const hasCreds = await hasExistingSession();
     if (hasCreds) {
-      console.log('[WhatsApp] Existing session found in MongoDB — reconnecting automatically.');
+      console.log(`[WhatsApp] Existing session found in MongoDB (namespace "${SESSION_NS}") — reconnecting automatically.`);
       await connect();
     } else {
-      console.log('[WhatsApp] No existing session in MongoDB — waiting for admin to connect via admin panel.');
+      console.log(`[WhatsApp] No existing session for namespace "${SESSION_NS}" — waiting for admin to connect via admin panel.`);
     }
   } catch (err) {
     console.error('[WhatsApp] autoReconnectIfSessionExists error:', err.message);

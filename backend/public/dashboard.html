@@ -425,7 +425,7 @@ textarea{resize:vertical;min-height:110px;}
     <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
       <span></span><span></span><span></span>
     </button>
-    <a href="index.html" class="topnav-logo">
+    <a href="/" class="topnav-logo">
       <img src="/logo.jpg" alt="SatvikMeals"/>
       <span>SatvikMeals</span>
     </a>
@@ -790,7 +790,7 @@ textarea{resize:vertical;min-height:110px;}
 const API = '';
 window.API = API;
 const token = localStorage.getItem('satvikToken');
-if (!token) window.location.href = 'login.html?redirect=dashboard.html';
+if (!token) window.location.href = 'login?redirect=dashboard.html';
 
 let userData = null, bmiData = {}, bmiReport = null;
 
@@ -824,7 +824,7 @@ function show(section, el, bnId) {
   window.scrollTo(0,0);
 }
 
-function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+function logout() { localStorage.clear(); window.location.href = '/'; }
 
 // ── INIT ──
 async function init() {

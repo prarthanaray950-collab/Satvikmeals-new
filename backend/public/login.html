@@ -118,12 +118,12 @@ h1 em{font-style:italic;color:var(--g6);}
 <body>
 
 <nav class="nav">
-  <a href="index.html" class="nav-logo"><img src="/logo.jpg" alt="SatvikMeals"/><span class="nav-logo-text">SatvikMeals</span></a>
-  <a href="index.html" class="nav-back">← Back to Home</a>
+  <a href="/" class="nav-logo"><img src="/logo.jpg" alt="SatvikMeals"/><span class="nav-logo-text">SatvikMeals</span></a>
+  <a href="/" class="nav-back">← Back to Home</a>
 </nav>
 
 <div class="card">
-  <a href="index.html" class="brand">
+  <a href="/" class="brand">
     <img src="/logo.jpg" alt="SatvikMeals"/>
     <span>SatvikMeals</span>
   </a>
@@ -165,7 +165,7 @@ h1 em{font-style:italic;color:var(--g6);}
 
   <div id="status"></div>
 
-  <div class="terms">By continuing you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</div>
+  <div class="terms">By continuing you agree to our <a href="terms">Terms</a> and <a href="privacy">Privacy Policy</a>.</div>
 
   <div class="social-proof">
     <div class="sp-av">R</div><div class="sp-av">P</div><div class="sp-av">A</div>
@@ -234,7 +234,7 @@ window.API = API;
 const GID = '213132143602-an29ji4fuv3393o62bq1ke8roak4q7u8.apps.googleusercontent.com';
 
 if (localStorage.getItem('satvikToken')) {
-  window.location.href = new URLSearchParams(location.search).get('redirect') || 'dashboard.html';
+  window.location.href = new URLSearchParams(location.search).get('redirect') || 'dashboard';
 }
 const rc = new URLSearchParams(location.search).get('ref') || '';
 if (rc) document.getElementById('refInput').value = rc.toUpperCase();
@@ -305,7 +305,7 @@ function loginSuccess(d) {
   if (d.user.phone) localStorage.setItem('satvikPhone', d.user.phone);
   if (d.user.location && d.user.location.address) localStorage.setItem('satvikArea', d.user.location.address);
   showStatus('✅ Welcome to SatvikMeals!', 'success');
-  const dest = d.user.role === 'admin' ? 'admin.html' : (new URLSearchParams(location.search).get('redirect') || 'dashboard.html');
+  const dest = d.user.role === 'admin' ? 'admin' : (new URLSearchParams(location.search).get('redirect') || 'dashboard');
 
   // Phone and location are mandatory for every account — checked on every
   // login (not just new signups), so accounts created before this rule
@@ -375,7 +375,7 @@ async function useCurrentLoc() {
     try { const g = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${p.coords.latitude}&lon=${p.coords.longitude}&format=json`)).json(); addr = g.display_name || addr; } catch(_){}
     await saveLoc(p.coords.latitude, p.coords.longitude, addr);
     document.getElementById('locModal').classList.remove('open');
-    location.href = pDest || 'dashboard.html';
+    location.href = pDest || 'dashboard';
   } catch(e) {
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="18" height="18"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Use My Current Location`;
     btn.disabled = false; showMap();
@@ -405,7 +405,7 @@ async function searchMap() {
 async function confirmMap() {
   await saveLoc(mLat, mLng, document.getElementById('mapAddr').textContent.replace('📍 ',''));
   document.getElementById('locModal').classList.remove('open');
-  location.href = pDest || 'dashboard.html';
+  location.href = pDest || 'dashboard';
 }
 async function saveLoc(lat, lng, address) {
   const t = pToken || localStorage.getItem('satvikToken'); if (!t) return;

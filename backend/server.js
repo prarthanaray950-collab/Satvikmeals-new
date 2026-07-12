@@ -27,6 +27,32 @@ const app = express();
 // ── Trust proxy (needed for correct IP detection behind Render/Heroku/Nginx) ──
 app.set('trust proxy', 1);
 
+// ── Canonical host + HTTPS redirect ──────────────────────────────────────────
+// Fixes Google Search Console's "Duplicate without user-selected canonical":
+// the site must be reachable at exactly ONE URL. We force:
+//   www.satvikmeals.in   → satvikmeals.in   (drop www)
+//   http://              → https://          (secure)
+// This matches the extensionless canonical tags across the site. It is a safety
+// net in case the Hostinger/Render domain settings don't already enforce it;
+// if they do, this simply never fires. Guards:
+//   - Only redirects the known production domain, so the *.onrender.com URL and
+//     localhost keep working untouched (no redirect loops during testing).
+//   - X-Forwarded-Proto is honored because trust proxy is set above.
+const CANONICAL_HOST = process.env.CANONICAL_HOST || 'satvikmeals.in';
+app.use((req, res, next) => {
+  const host  = (req.headers.host || '').toLowerCase();
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  const isProdDomain = host === CANONICAL_HOST || host === 'www.' + CANONICAL_HOST;
+  if (!isProdDomain) return next(); // onrender.com / localhost — leave alone
+
+  const needsHostFix  = host === 'www.' + CANONICAL_HOST;
+  const needsHttpsFix = proto !== 'https';
+  if (needsHostFix || needsHttpsFix) {
+    return res.redirect(301, 'https://' + CANONICAL_HOST + req.originalUrl);
+  }
+  next();
+});
+
 // ── Security headers ───────────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: false, // keep disabled — site uses inline scripts/styles on many pages
@@ -52,15 +78,18 @@ console.log('[CORS] Allowed origins:', allowedOrigins);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, server-to-server, same-origin page loads)
+    // Allow requests with no Origin header (same-origin page loads, curl,
+    // server-to-server, native mobile apps). Browsers always send Origin on
+    // cross-site requests, so this does not weaken cross-site protection.
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
-    console.warn(`[CORS] Blocked request from unexpected origin: "${origin}". ` +
-      `If this is your real domain, add it to ALLOWED_ORIGINS in Render env vars.`);
-    // Fail OPEN with a warning rather than throwing — an unexpected-but-legit
-    // origin (e.g. you testing on the .onrender.com URL before DNS cutover)
-    // should not silently break login. Tighten this once your domain is confirmed.
-    return callback(null, true);
+    // Fail CLOSED — an unknown cross-origin site is not allowed to make
+    // credentialed API calls. If a legitimate domain is blocked (e.g. the
+    // .onrender.com URL before DNS cutover, or a new www/apex variant), add it
+    // to ALLOWED_ORIGINS in the Render env vars — do not weaken this check.
+    console.warn(`[CORS] Blocked cross-origin request from "${origin}". ` +
+      `Add it to ALLOWED_ORIGINS if this domain is legitimate.`);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
@@ -93,6 +122,39 @@ const authLimiter = rateLimit({
   message: { message: 'Too many auth attempts. Please try again in 15 minutes.' }
 });
 app.use('/api/auth/', authLimiter);
+
+// ── Clean URLs + 301 redirects ───────────────────────────────────────────────
+// SEO: canonical URLs are extensionless (e.g. /tiffin-service-patna). We 301
+// redirect the old *.html URLs to the clean form so existing links/backlinks
+// consolidate onto one canonical URL, then serve the underlying .html file for
+// the clean path. Runs BEFORE express.static so static never answers *.html
+// directly. API routes are untouched (guarded by the /api and '.' checks).
+const PUBLIC_DIR = path.join(__dirname, 'public');
+
+// 1) Redirect "/foo.html" → "/foo" (permanent). Skip index.html → "/".
+app.get(/\.html$/i, (req, res, next) => {
+  // Never touch API or files with a query we can't clean; only GET page loads.
+  const cleanPath = req.path.replace(/\.html$/i, '');
+  if (req.path === '/index.html') {
+    return res.redirect(301, '/' + (req._parsedUrl.search || ''));
+  }
+  const search = req._parsedUrl && req._parsedUrl.search ? req._parsedUrl.search : '';
+  return res.redirect(301, cleanPath + search);
+});
+
+// 2) Serve the clean extensionless path by mapping it to its .html file, if one
+// exists. Anything not matching a real .html file falls through to static/404.
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  if (req.path.startsWith('/api/')) return next();
+  // Skip paths that already have a file extension (.css, .js, .png, .svg, .xml…)
+  if (path.extname(req.path)) return next();
+  if (req.path === '/') return next(); // handled by the '/' route below
+  const candidate = path.join(PUBLIC_DIR, req.path + '.html');
+  // Prevent path traversal — candidate must stay inside PUBLIC_DIR
+  if (!candidate.startsWith(PUBLIC_DIR)) return next();
+  return res.sendFile(candidate, err => { if (err) next(); });
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 

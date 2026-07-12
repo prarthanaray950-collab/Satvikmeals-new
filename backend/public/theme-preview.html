@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SatvikMeals — Theme Comparison (pick one)</title>
+<meta name="robots" content="noindex"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:#EDEBE6;color:#1a1a1a;line-height:1.6;}
+  .pagehead{text-align:center;padding:36px 20px 8px;}
+  .pagehead h1{font-family:'Manrope',sans-serif;font-size:1.5rem;font-weight:800;}
+  .pagehead p{font-size:0.9rem;color:#555;max-width:640px;margin:8px auto 0;}
+
+  /* Each theme block scopes its own palette via CSS variables */
+  .theme{--headline:'Manrope',sans-serif;--body:'Inter',sans-serif;
+    margin:34px auto;max-width:1080px;background:#FFFFFF;border-radius:22px;overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,0.14);border:1px solid rgba(0,0,0,0.06);}
+  .theme-tag{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    padding:16px 26px;background:var(--p9);color:#fff;}
+  .theme-tag .name{font-family:var(--headline);font-weight:800;font-size:1.05rem;letter-spacing:0.01em;}
+  .swatches{display:flex;gap:8px;}
+  .sw{width:26px;height:26px;border-radius:7px;border:1.5px solid rgba(255,255,255,0.25);}
+
+  .demo{padding:0;}
+  /* mini hero — BOLD colored gradient (eye-catching, no cream) */
+  .mh{display:grid;grid-template-columns:1.1fr 0.9fr;gap:26px;padding:46px 40px 44px;align-items:center;
+    background:linear-gradient(120deg,var(--p9) 0%,var(--p8) 52%,var(--p7) 100%);color:#fff;}
+  .mh-eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:var(--headline);font-weight:700;
+    font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#fff;
+    background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);padding:6px 12px;border-radius:100px;margin-bottom:16px;}
+  .mh h2{font-family:var(--headline);font-weight:800;font-size:2.05rem;line-height:1.08;letter-spacing:-0.02em;color:#fff;}
+  .mh h2 .g{background:linear-gradient(120deg,var(--p4),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .mh p{font-size:0.9rem;color:rgba(255,255,255,0.84);margin:12px 0 18px;max-width:420px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:0.74rem;font-weight:600;color:#fff;
+    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);padding:6px 12px;border-radius:100px;}
+  .chip .d{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;}
+  .b1{background:var(--gold);color:#241206;font-family:var(--headline);font-weight:700;font-size:0.86rem;
+    padding:12px 22px;border-radius:11px;border:none;box-shadow:0 8px 22px rgba(0,0,0,0.22);cursor:pointer;}
+  .b2{background:rgba(255,255,255,0.1);color:#fff;font-weight:700;font-size:0.86rem;padding:12px 22px;border-radius:11px;border:1.5px solid rgba(255,255,255,0.4);cursor:pointer;}
+  .mh-img{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/3;box-shadow:0 16px 40px rgba(0,0,0,0.14);}
+  .mh-img img{width:100%;height:100%;object-fit:cover;display:block;}
+  .float{position:absolute;bottom:12px;left:12px;background:var(--ww);border-radius:12px;padding:8px 12px;
+    display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.16);}
+  .float .fi{width:30px;height:30px;border-radius:8px;background:var(--p0);display:flex;align-items:center;justify-content:center;font-size:0.95rem;}
+  .float .ft{font-family:var(--headline);font-weight:700;font-size:0.76rem;color:var(--td);}
+  .float .fs{font-size:0.66rem;color:var(--tl);}
+
+  /* cards */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:6px 40px 30px;}
+  .card{background:var(--ww);border:1px solid var(--bd);border-radius:14px;padding:20px 18px;}
+  .card .ci{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:12px;}
+  .ci-a{background:var(--p0);}.ci-b{background:var(--acc-l);}.ci-c{background:var(--gold-l);}
+  .card .ct{font-family:var(--headline);font-weight:700;font-size:0.9rem;color:var(--td);margin-bottom:5px;}
+  .card .cd{font-size:0.8rem;color:var(--tm);line-height:1.55;}
+
+  /* dark strip (plans/cta look) */
+  .strip{margin:0 40px 40px;border-radius:16px;background:linear-gradient(135deg,var(--p9),var(--p8));
+    padding:30px 28px;text-align:center;color:#fff;}
+  .strip h3{font-family:var(--headline);font-weight:800;font-size:1.35rem;margin-bottom:8px;}
+  .strip h3 em{font-style:normal;color:var(--p4);}
+  .strip p{font-size:0.85rem;color:rgba(255,255,255,0.72);margin-bottom:16px;}
+  .strip .b1{background:var(--gold);color:#241206;}
+  .strip .b3{background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,0.3);font-weight:700;font-size:0.86rem;padding:12px 22px;border-radius:11px;}
+
+  @media(max-width:760px){.mh{grid-template-columns:1fr;}.mh-img{display:none;}.cards{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="pagehead">
+  <h1>SatvikMeals — 4 Colour Themes</h1>
+  <p>Scroll through all four. Each shows the same homepage components in that palette — hero, chips, buttons, cards and a dark plans/CTA strip. Tell me the one you like (or mix — e.g. "Terracotta hero, Maroon strip").</p>
+</div>
+
+<!-- 1. TERRACOTTA & AMBER -->
+<div class="theme" style="
+  --p9:#3A1E16;--p8:#6B3320;--p7:#9E4A2B;--p6:#B85E38;--p5:#D08A5E;--p4:#E8B48A;--p1:#F5E0D0;--p0:#FBF0E7;
+  --acc:#E0951E;--acc-d:#A8611A;--acc-l:#FCEBD2;--gold:#E9B84A;--gold-l:#FBF0D6;
+  --cream:#FBF7F1;--ww:#FFFFFF;--td:#241611;--tm:#5A463D;--tl:#94847A;--bd:#EAE0D5;">
+  <div class="theme-tag"><span class="name">1 · Terracotta &amp; Amber</span>
+    <div class="swatches"><span class="sw" style="background:#9E4A2B"></span><span class="sw" style="background:#E0951E"></span><span class="sw" style="background:#E9B84A"></span><span class="sw" style="background:#FBF7F1"></span></div></div>
+  <div class="demo">
+    <div class="mh">
+      <div>
+        <span class="mh-eyebrow">🌿 Pure · Satvik · Wholesome</span>
+        <h2>Satvik meals,<br><span class="g">made with pure care,</span><br>delivered fresh.</h2>
+        <p>Pure-veg tiffin with Jain &amp; no onion-garlic options, cooked fresh daily and delivered across Patna.</p>
+        <div class="chips"><span class="chip"><span class="d"></span>No Onion</span><span class="chip"><span class="d"></span>No Garlic</span><span class="chip"><span class="d"></span>100% Satvik</span></div>
+        <div class="btns"><button class="b1">Order Now →</button><button class="b2">View Plans</button></div>
+      </div>
+      <div class="mh-img"><img src="kitchen1.png" alt="thali"/><div class="float"><div class="fi">🍃</div><div><div class="ft">Freshly Cooked</div><div class="fs">Every day</div></div></div></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="ci ci-b">🧅</div><div class="ct">No Onion-Garlic</div><div class="cd">Cooked in separate vessels — safe for strict Jain diets.</div></div>
+      <div class="card"><div class="ci ci-a">🕉️</div><div class="ct">Jain &amp; Satvik</div><div class="cd">The only dedicated Jain delivery option in Patna.</div></div>
+      <div class="card"><div class="ci ci-c">⚡</div><div class="ct">Instant Delivery</div><div class="cd">Single meals or subscriptions — no lock-in.</div></div>
+    </div>
+    <div class="strip"><h3>Ready for fresh, <em>healthy meals</em> every day?</h3><p>Join 200+ happy families in Patna.</p><button class="b1">Get Started</button> <button class="b3">💬 WhatsApp</button></div>
+  </div>
+</div>
+
+<!-- 2. ROYAL MAROON & GOLD -->
+<div class="theme" style="
+  --p9:#2A1616;--p8:#5A2020;--p7:#7A2E2E;--p6:#983C3C;--p5:#B85E5E;--p4:#D89A9A;--p1:#F0D8D8;--p0:#FBEEEC;
+  --acc:#C79A3E;--acc-d:#8F6E22;--acc-l:#F6ECD4;--gold:#D8B45A;--gold-l:#F8EFD6;
+  --cream:#FBF6EC;--ww:#FFFFFF;--td:#2A1616;--tm:#5A4040;--tl:#948078;--bd:#EAE0D5;">
+  <div class="theme-tag"><span class="name">2 · Royal Maroon &amp; Gold</span>
+    <div class="swatches"><span class="sw" style="background:#7A2E2E"></span><span class="sw" style="background:#C79A3E"></span><span class="sw" style="background:#D8B45A"></span><span class="sw" style="background:#FBF6EC"></span></div></div>
+  <div class="demo">
+    <div class="mh">
+      <div>
+        <span class="mh-eyebrow">🌿 Pure · Satvik · Wholesome</span>
+        <h2>Satvik meals,<br><span class="g">made with pure care,</span><br>delivered fresh.</h2>
+        <p>Pure-veg tiffin with Jain &amp; no onion-garlic options, cooked fresh daily and delivered across Patna.</p>
+        <div class="chips"><span class="chip"><span class="d"></span>No Onion</span><span class="chip"><span class="d"></span>No Garlic</span><span class="chip"><span class="d"></span>100% Satvik</span></div>
+        <div class="btns"><button class="b1">Order Now →</button><button class="b2">View Plans</button></div>
+      </div>
+      <div class="mh-img"><img src="kitchen1.png" alt="thali"/><div class="float"><div class="fi">🍃</div><div><div class="ft">Freshly Cooked</div><div class="fs">Every day</div></div></div></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="ci ci-b">🧅</div><div class="ct">No Onion-Garlic</div><div class="cd">Cooked in separate vessels — safe for strict Jain diets.</div></div>
+      <div class="card"><div class="ci ci-a">🕉️</div><div class="ct">Jain &amp; Satvik</div><div class="cd">The only dedicated Jain delivery option in Patna.</div></div>
+      <div class="card"><div class="ci ci-c">⚡</div><div class="ct">Instant Delivery</div><div class="cd">Single meals or subscriptions — no lock-in.</div></div>
+    </div>
+    <div class="strip"><h3>Ready for fresh, <em>healthy meals</em> every day?</h3><p>Join 200+ happy families in Patna.</p><button class="b1">Get Started</button> <button class="b3">💬 WhatsApp</button></div>
+  </div>
+</div>
+
+<!-- 3. SAFFRON & CHARCOAL -->
+<div class="theme" style="
+  --p9:#262220;--p8:#3D362F;--p7:#E08A1E;--p6:#E89B32;--p5:#F2B33C;--p4:#F7CE7A;--p1:#FBE8C8;--p0:#FEF6E8;
+  --acc:#262220;--acc-d:#8a5a12;--acc-l:#F7CE7A;--gold:#F2B33C;--gold-l:#FBE8C8;
+  --cream:#FBF8F3;--ww:#FFFFFF;--td:#262220;--tm:#5A5048;--tl:#948A80;--bd:#EAE2D5;">
+  <div class="theme-tag"><span class="name">3 · Saffron &amp; Charcoal</span>
+    <div class="swatches"><span class="sw" style="background:#E08A1E"></span><span class="sw" style="background:#262220"></span><span class="sw" style="background:#F2B33C"></span><span class="sw" style="background:#FBF8F3"></span></div></div>
+  <div class="demo">
+    <div class="mh">
+      <div>
+        <span class="mh-eyebrow">🌿 Pure · Satvik · Wholesome</span>
+        <h2>Satvik meals,<br><span class="g">made with pure care,</span><br>delivered fresh.</h2>
+        <p>Pure-veg tiffin with Jain &amp; no onion-garlic options, cooked fresh daily and delivered across Patna.</p>
+        <div class="chips"><span class="chip"><span class="d"></span>No Onion</span><span class="chip"><span class="d"></span>No Garlic</span><span class="chip"><span class="d"></span>100% Satvik</span></div>
+        <div class="btns"><button class="b1">Order Now →</button><button class="b2">View Plans</button></div>
+      </div>
+      <div class="mh-img"><img src="kitchen1.png" alt="thali"/><div class="float"><div class="fi">🍃</div><div><div class="ft">Freshly Cooked</div><div class="fs">Every day</div></div></div></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="ci ci-b">🧅</div><div class="ct">No Onion-Garlic</div><div class="cd">Cooked in separate vessels — safe for strict Jain diets.</div></div>
+      <div class="card"><div class="ci ci-a">🕉️</div><div class="ct">Jain &amp; Satvik</div><div class="cd">The only dedicated Jain delivery option in Patna.</div></div>
+      <div class="card"><div class="ci ci-c">⚡</div><div class="ct">Instant Delivery</div><div class="cd">Single meals or subscriptions — no lock-in.</div></div>
+    </div>
+    <div class="strip"><h3>Ready for fresh, <em>healthy meals</em> every day?</h3><p>Join 200+ happy families in Patna.</p><button class="b1">Get Started</button> <button class="b3">💬 WhatsApp</button></div>
+  </div>
+</div>
+
+<!-- 4. DEEP PLUM & BLUSH -->
+<div class="theme" style="
+  --p9:#2C1826;--p8:#4A2540;--p7:#5C2E4F;--p6:#7A4268;--p5:#A06A8E;--p4:#C98BA6;--p1:#EED8E4;--p0:#FBEEF4;
+  --acc:#C79A3E;--acc-d:#8F6E22;--acc-l:#F6ECD4;--gold:#C98BA6;--gold-l:#F5E2EC;
+  --cream:#FAF5F2;--ww:#FFFFFF;--td:#2C1826;--tm:#544048;--tl:#948088;--bd:#EAE0DE;">
+  <div class="theme-tag"><span class="name">4 · Deep Plum &amp; Blush</span>
+    <div class="swatches"><span class="sw" style="background:#5C2E4F"></span><span class="sw" style="background:#C98BA6"></span><span class="sw" style="background:#C79A3E"></span><span class="sw" style="background:#FAF5F2"></span></div></div>
+  <div class="demo">
+    <div class="mh">
+      <div>
+        <span class="mh-eyebrow">🌿 Pure · Satvik · Wholesome</span>
+        <h2>Satvik meals,<br><span class="g">made with pure care,</span><br>delivered fresh.</h2>
+        <p>Pure-veg tiffin with Jain &amp; no onion-garlic options, cooked fresh daily and delivered across Patna.</p>
+        <div class="chips"><span class="chip"><span class="d"></span>No Onion</span><span class="chip"><span class="d"></span>No Garlic</span><span class="chip"><span class="d"></span>100% Satvik</span></div>
+        <div class="btns"><button class="b1">Order Now →</button><button class="b2">View Plans</button></div>
+      </div>
+      <div class="mh-img"><img src="kitchen1.png" alt="thali"/><div class="float"><div class="fi">🍃</div><div><div class="ft">Freshly Cooked</div><div class="fs">Every day</div></div></div></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="ci ci-b">🧅</div><div class="ct">No Onion-Garlic</div><div class="cd">Cooked in separate vessels — safe for strict Jain diets.</div></div>
+      <div class="card"><div class="ci ci-a">🕉️</div><div class="ct">Jain &amp; Satvik</div><div class="cd">The only dedicated Jain delivery option in Patna.</div></div>
+      <div class="card"><div class="ci ci-c">⚡</div><div class="ct">Instant Delivery</div><div class="cd">Single meals or subscriptions — no lock-in.</div></div>
+    </div>
+    <div class="strip"><h3>Ready for fresh, <em>healthy meals</em> every day?</h3><p>Join 200+ happy families in Patna.</p><button class="b1">Get Started</button> <button class="b3">💬 WhatsApp</button></div>
+  </div>
+</div>
+
+<div class="pagehead" style="padding-bottom:50px;">
+  <p><strong>Tell me the number you want</strong> (1–4), and I'll apply that palette across the whole site. You can also mix &amp; match.</p>
+</div>
+
+</body>
+</html>
