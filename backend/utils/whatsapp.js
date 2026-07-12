@@ -146,6 +146,7 @@ async function connect() {
           await clearAllSessions().catch(() => {});
           console.log('[WhatsApp] Logged out from phone. Session cleared — admin must reconnect with a new QR.');
         } else {
+<<<<<<< HEAD
           reconnectAttempts += 1;
           if (reconnectAttempts > MAX_RECONNECTS) {
             // Saved creds are evidently dead (a device that no longer exists, or
@@ -165,6 +166,10 @@ async function connect() {
             console.log(`[WhatsApp] Reconnect attempt ${reconnectAttempts}/${MAX_RECONNECTS} in ${delay}ms…`);
             setTimeout(() => { if (myGeneration === connGeneration) connect(); }, delay);
           }
+=======
+          lastStatus = 'connecting';
+          setTimeout(() => { if (myGeneration === connGeneration) connect(); }, 5000);
+>>>>>>> cfcfebb4355dd015e8d06f082ae1ab24a62b12dc
         }
       }
     });
@@ -225,7 +230,10 @@ async function disconnect() {
   lastQr = null;
   lastStatus = 'disconnected';
   lastError = null;
+<<<<<<< HEAD
   reconnectAttempts = 0; // so a stale self-heal timer can't keep counting after disconnect
+=======
+>>>>>>> cfcfebb4355dd015e8d06f082ae1ab24a62b12dc
   msgQueue.length = 0; // drop any stale queued messages from the old/corrupted session
 
   try {

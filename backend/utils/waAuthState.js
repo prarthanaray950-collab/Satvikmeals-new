@@ -88,8 +88,13 @@ async function readDoc(category, keyId = null) {
   try {
     const value = deserialize(doc.data);
     if (hasCorruptedBuffers(value)) {
+<<<<<<< HEAD
       console.error(`[WaAuthState] Detected corrupted (non-Buffer) key data for ${nsCat(category)}/${keyId} — discarding so Baileys treats it as missing instead of crashing.`);
       await WaSession.deleteOne({ category: nsCat(category), keyId }).catch(() => {});
+=======
+      console.error(`[WaAuthState] Detected corrupted (non-Buffer) key data for ${category}/${keyId} — discarding so Baileys treats it as missing instead of crashing.`);
+      await WaSession.deleteOne({ category, keyId }).catch(() => {});
+>>>>>>> cfcfebb4355dd015e8d06f082ae1ab24a62b12dc
       return null;
     }
     return value;

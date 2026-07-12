@@ -6,6 +6,7 @@ User-agent: *
 Allow: /
 
 # Account & admin areas — not useful for search, and dashboard contains
+<<<<<<< HEAD
 # personal data that should never be indexed. Both the .html and the clean
 # (extensionless) URL are disallowed, since the site now serves both.
 Disallow: /admin.html
@@ -14,6 +15,11 @@ Disallow: /dashboard.html
 Disallow: /dashboard
 Disallow: /login.html
 Disallow: /login
+=======
+# personal data that should never be indexed
+Disallow: /admin.html
+Disallow: /dashboard.html
+>>>>>>> cfcfebb4355dd015e8d06f082ae1ab24a62b12dc
 
 # Dead pages no longer in use (Instamojo checkout flow, removed)
 Disallow: /checkout.html
